@@ -1,153 +1,171 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Calendar, Filter, Plus, Users, Activity } from "lucide-react";
+import { Search, ChevronDown, X } from "lucide-react";
 import TreatmentPlanEditor from "@/components/medical/TreatmentPlanEditor";
 
 export default function DoctorDashboard() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [filterStatus, setFilterStatus] = useState("all"); // all, waiting, completed, emergency
+    const [activeFilter, setActiveFilter] = useState("초진");
 
-    // Mock Data (Expanded)
+    // Mock Data matching the design
     const patients = [
-        { id: 1, name: "김철수", age: 45, condition: "만성 피로", status: "대기중", lastVisit: "2024-01-15", score: 45 },
-        { id: 2, name: "이영희", age: 32, condition: "소화 불량", status: "진료중", lastVisit: "2024-02-01", score: 62 },
-        { id: 3, name: "박지성", age: 28, condition: "허리 통증", status: "완료", lastVisit: "2024-02-10", score: 30 },
-        { id: 4, name: "최동원", age: 55, condition: "불면증", status: "응급", lastVisit: "2024-02-12", score: 15 },
-        { id: 5, name: "홍길동", age: 40, condition: "두통", status: "대기중", lastVisit: "2024-02-13", score: 70 },
+        {
+            id: 1,
+            time: "10:00",
+            name: "김OO",
+            type: "초진",
+            complaint: "6개월째 아침 피로, 감기 잦음",
+            keywords: ["회복력 저하", "수면 리듬 불안정"],
+            score: 42,
+            status: "완료"
+        },
+        {
+            id: 2,
+            time: "10:30",
+            name: "이△△",
+            type: "재진",
+            complaint: "최근 소화불량 및 복부 팽만감",
+            keywords: ["소화·수면"],
+            score: 78,
+            status: "완료"
+        },
+        {
+            id: 3,
+            time: "11:00",
+            name: "박□□",
+            type: "초진",
+            complaint: "만성적인 허리 통증과 뻣뻣함",
+            keywords: ["통증"],
+            score: 55,
+            status: "완료"
+        },
+        {
+            id: 4,
+            time: "11:30",
+            name: "최○△",
+            type: "온라인",
+            complaint: "임신 준비를 위한 상담",
+            keywords: ["임신 준비"],
+            score: 82,
+            status: "완료"
+        },
+        {
+            id: 5,
+            time: "14:00",
+            name: "정□○",
+            type: "재진",
+            complaint: "생리통 및 주기 불규칙",
+            keywords: ["여성밸런스"],
+            score: 38,
+            status: "완료"
+        },
     ];
 
-    const filteredPatients = patients.filter(patient => {
-        const matchesSearch = patient.name.includes(searchTerm) || patient.condition.includes(searchTerm);
-        const matchesFilter = filterStatus === "all" || patient.status === filterStatus;
-        if (filterStatus === "emergency") return patient.score < 30; // Example logic for emergency filter
-        return matchesSearch && matchesFilter;
-    });
+    const filters = ["초진", "재진", "온라인", "회복력", "여성밸런스", "통증", "소화·수면"];
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-900">진료 대시보드</h1>
-                <div className="text-sm text-gray-500">
-                    {new Date().toLocaleDateString()} 기준
-                </div>
+            <h1 className="text-2xl font-bold text-gray-900">오늘의 환자 목록</h1>
+
+            {/* Top Filters */}
+            <div className="flex flex-wrap gap-2 items-center">
+                <button className="px-4 py-1.5 rounded-full border border-teal-600 text-teal-600 text-sm font-medium hover:bg-teal-50">
+                    오늘
+                </button>
+                <button className="px-4 py-1.5 rounded-full border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50">
+                    이번 주
+                </button>
+                <button className="px-4 py-1.5 rounded-full border border-gray-300 text-gray-600 text-sm font-medium hover:bg-gray-50 flex items-center gap-1">
+                    기간 선택 <ChevronDown size={14} />
+                </button>
+                <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                {filters.map((filter) => (
+                    <button
+                        key={filter}
+                        onClick={() => setActiveFilter(filter === activeFilter ? "" : filter)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1 ${activeFilter === filter
+                                ? "bg-teal-100 text-teal-700 border border-teal-200"
+                                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                            }`}
+                    >
+                        {filter}
+                        {activeFilter === filter && <X size={12} />}
+                    </button>
+                ))}
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <div className="text-sm text-gray-500">대기 환자</div>
-                    <div className="text-2xl font-bold text-blue-600">{patients.filter(p => p.status === "대기중").length}명</div>
-                </div>
-                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <div className="text-sm text-gray-500">오늘 진료</div>
-                    <div className="text-2xl font-bold text-gray-900">{patients.length}명</div>
-                </div>
-                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <div className="text-sm text-gray-500">응급/주의</div>
-                    <div className="text-2xl font-bold text-red-600">{patients.filter(p => p.score < 40).length}명</div>
-                </div>
-                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <div className="text-sm text-gray-500">평균 리듬 점수</div>
-                    <div className="text-2xl font-bold text-green-600">58점</div>
-                </div>
-            </div>
-
-            {/* Search & Filter */}
-            <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                    <input
-                        type="text"
-                        placeholder="환자 이름 또는 증상 검색..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <div className="flex gap-2">
-                    {["all", "대기중", "진료중", "완료"].map((status) => (
-                        <button
-                            key={status}
-                            onClick={() => setFilterStatus(status)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filterStatus === status
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                }`}
-                        >
-                            {status === "all" ? "전체" : status}
-                        </button>
-                    ))}
-                </div>
+            {/* Search Bar */}
+            <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-teal-500" size={20} />
+                <input
+                    type="text"
+                    placeholder="이름/키워드 검색"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent shadow-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
             {/* Patient Table */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                 <table className="w-full text-left">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="bg-teal-50/50 border-b border-teal-100">
                         <tr>
-                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">환자명</th>
-                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">나이</th>
-                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">주요 증상</th>
-                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">리듬 점수</th>
-                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">상태</th>
-                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">최근 방문</th>
-                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">관리</th>
+                            <th className="px-6 py-4 text-sm font-bold text-teal-700">시간</th>
+                            <th className="px-6 py-4 text-sm font-bold text-teal-700">이름·유형</th>
+                            <th className="px-6 py-4 text-sm font-bold text-teal-700">주호소</th>
+                            <th className="px-6 py-4 text-sm font-bold text-teal-700">패턴 키워드</th>
+                            <th className="px-6 py-4 text-sm font-bold text-teal-700">리듬 점수</th>
+                            <th className="px-6 py-4 text-sm font-bold text-teal-700">예진</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
-                        {filteredPatients.map((patient) => (
+                    <tbody className="divide-y divide-gray-100">
+                        {patients.map((patient) => (
                             <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 font-medium text-gray-900">{patient.name}</td>
-                                <td className="px-6 py-4 text-gray-500">{patient.age}세</td>
-                                <td className="px-6 py-4 text-gray-900">
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {patient.condition}
-                                    </span>
-                                </td>
+                                <td className="px-6 py-4 text-gray-600 font-medium">{patient.time}</td>
                                 <td className="px-6 py-4">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div
-                                                className={`h-full ${patient.score < 50 ? 'bg-red-500' : 'bg-green-500'}`}
-                                                style={{ width: `${patient.score}%` }}
-                                            />
-                                        </div>
-                                        <span className={`text-sm font-bold ${patient.score < 50 ? 'text-red-600' : 'text-green-600'}`}>
-                                            {patient.score}
+                                    <div className="flex items-center gap-1">
+                                        <span className="font-bold text-gray-900">{patient.name}</span>
+                                        <span className="text-gray-400">·</span>
+                                        <span className={`text-sm font-medium ${patient.type === '초진' ? 'text-green-600' :
+                                                patient.type === '온라인' ? 'text-blue-600' : 'text-gray-600'
+                                            }`}>
+                                            {patient.type}
                                         </span>
                                     </div>
                                 </td>
+                                <td className="px-6 py-4 text-gray-700">{patient.complaint}</td>
+                                <td className="px-6 py-4 text-gray-600 text-sm">
+                                    {patient.keywords.join(", ")}
+                                </td>
                                 <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.status === '대기중' ? 'bg-yellow-100 text-yellow-800' :
-                                            patient.status === '진료중' ? 'bg-green-100 text-green-800' :
-                                                patient.status === '응급' ? 'bg-red-100 text-red-800' :
-                                                    'bg-gray-100 text-gray-800'
-                                        }`}>
+                                    <div className="flex items-center gap-3">
+                                        <span className={`text-lg font-bold ${patient.score < 50 ? 'text-red-500' : 'text-teal-600'}`}>
+                                            {patient.score}
+                                        </span>
+                                        <div className={`px-2 py-1 rounded text-xs font-medium ${patient.score < 50 ? 'bg-red-100 text-red-700' : 'bg-teal-100 text-teal-700'
+                                            }`}>
+                                            {patient.score < 50 ? '낮음' : patient.score >= 80 ? '양호' : '보통'}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <span className="text-teal-600 font-bold text-sm">
                                         {patient.status}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-gray-500">{patient.lastVisit}</td>
-                                <td className="px-6 py-4">
-                                    <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                        상세보기
-                                    </button>
-                                </td>
                             </tr>
                         ))}
-                        {filteredPatients.length === 0 && (
-                            <tr>
-                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                                    검색 결과가 없습니다.
-                                </td>
-                            </tr>
-                        )}
                     </tbody>
                 </table>
             </div>
 
-            {/* Treatment Plan Editor (Demo) */}
-            <TreatmentPlanEditor />
+            {/* Treatment Plan Editor (Hidden by default or moved, keeping it here for functionality but maybe collapsed) */}
+            <div className="mt-8 pt-8 border-t border-gray-200">
+                <h2 className="text-lg font-bold text-gray-900 mb-4">치료 계획 관리 (Demo)</h2>
+                <TreatmentPlanEditor />
+            </div>
         </div>
     );
 }

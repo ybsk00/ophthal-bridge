@@ -1,50 +1,132 @@
 import Link from "next/link";
-import { ArrowRight, Activity, Moon, Sun, Heart, Baby } from "lucide-react";
+import { ArrowRight, Activity, Moon, Sun, Heart, Baby, CheckCircle, BarChart2, Calendar } from "lucide-react";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-traditional-bg text-traditional-text font-sans">
-      {/* Hero Section */}
-      <header className="relative px-6 py-12 md:py-20 text-center overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('/texture-hanji.png')] pointer-events-none mix-blend-multiply"></div>
-        <div className="relative z-10 max-w-3xl mx-auto space-y-6 animate-fade-in">
-          <div className="inline-block px-3 py-1 mb-4 text-sm font-medium tracking-widest text-traditional-secondary border border-traditional-secondary/30 rounded-full bg-traditional-bg/50 backdrop-blur-sm">
-            100년 전통 · AI 기술의 만남
+      {/* Navigation */}
+      <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-traditional-accent rounded-sm flex items-center justify-center">
+            <span className="text-white text-xs font-bold">L</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-traditional-text leading-tight">
-            <span className="block text-traditional-primary text-2xl md:text-3xl mb-2 font-normal">
-              당신의 체질과 리듬을 읽습니다
+          <span className="text-lg font-bold text-traditional-text">100년 한의학 AI 헬스케어</span>
+        </div>
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-traditional-subtext">
+          <Link href="#" className="hover:text-traditional-primary transition-colors">소개</Link>
+          <Link href="#" className="hover:text-traditional-primary transition-colors">내 몸 체크</Link>
+          <Link href="#" className="hover:text-traditional-primary transition-colors">건강정보</Link>
+          <Link href="#" className="hover:text-traditional-primary transition-colors">시설망</Link>
+          <Link href="#" className="hover:text-traditional-primary transition-colors">메디컬 상담</Link>
+        </div>
+        <Link
+          href="/login"
+          className="px-5 py-2 bg-traditional-accent text-white text-sm font-medium rounded-full hover:bg-opacity-90 transition-colors"
+        >
+          로그인
+        </Link>
+      </nav>
+
+      {/* Hero Section */}
+      <header className="relative px-6 py-20 md:py-32 text-center overflow-hidden">
+        {/* Background Image Placeholder - In real app, use next/image with the tea image */}
+        <div className="absolute inset-0 bg-gradient-to-b from-traditional-muted/30 to-traditional-bg z-0"></div>
+        <div className="absolute inset-0 opacity-10 bg-[url('/texture-hanji.png')] pointer-events-none mix-blend-multiply"></div>
+
+        <div className="relative z-10 max-w-4xl mx-auto space-y-8 animate-fade-in">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white drop-shadow-md leading-tight">
+            <span className="block text-2xl md:text-3xl mb-4 font-normal opacity-90">
+              100년의 지혜와 AI가 만나
             </span>
-            100년 한의학 <br className="md:hidden" />
-            AI 헬스케어
+            당신의 건강한 리듬을 찾습니다
           </h1>
-          <p className="text-lg md:text-xl text-traditional-subtext max-w-2xl mx-auto leading-relaxed break-keep">
-            죽전한의원의 100년 노하우를 담았습니다.<br />
-            병원에 가기 전, 내 몸의 상태를 먼저 체크해보세요.
+          <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed drop-shadow-sm">
+            AI로 찾는 나의 건강 리듬. 전통 한의학의 깊이와 현대 기술로 개인 맞춤형 건강 솔루션을 경험해보세요.
           </p>
+          <div className="pt-4">
+            <Link
+              href="/healthcare/chat?topic=resilience"
+              className="inline-flex items-center px-8 py-4 bg-traditional-accent text-white text-lg font-medium rounded-full hover:bg-opacity-90 transition-transform hover:scale-105 shadow-lg"
+            >
+              AI 상담 시작하기
+            </Link>
+          </div>
+        </div>
+
+        {/* Hero Image Background (Simulated with color for now, replace with actual image) */}
+        <div className="absolute inset-0 -z-10 bg-[#C8B6A6]">
+          {/* This div simulates the tea/herbs image background. 
+                In production, use: <Image src="/hero-bg.jpg" fill className="object-cover" /> 
+            */}
+          <div className="w-full h-full opacity-50 bg-[url('https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center" />
         </div>
       </header>
 
-      {/* Module Selection Grid */}
-      <main className="px-6 pb-20 max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Module 1: Resilience (Active for MVP) */}
-          <Link href="/healthcare/chat?topic=resilience" className="group">
-            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-traditional-primary/50 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Sun size={80} className="text-traditional-primary" />
+      {/* Features Section */}
+      <section className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-traditional-text">
+            AI가 당신의 건강 상태를 분석하고<br />
+            맞춤 솔루션을 제안합니다
+          </h2>
+          <p className="text-traditional-subtext">
+            언제 어디서든 AI 한방 헬스케어 챗봇을 통해 당신의 건강 리듬을 체크하고 개인화된 건강 관리법을 추천받으세요.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: <BarChart2 className="w-6 h-6 text-traditional-accent" />,
+              title: "실시간 건강 분석",
+              desc: "현재 건강 상태와 증상을 입력하면 AI가 실시간으로 분석합니다."
+            },
+            {
+              icon: <Activity className="w-6 h-6 text-traditional-primary" />,
+              title: "맞춤형 솔루션 제안",
+              desc: "분석 결과를 바탕으로 개인 체질에 맞는 음식, 차, 생활 가이드를 추천합니다."
+            },
+            {
+              icon: <Calendar className="w-6 h-6 text-traditional-secondary" />,
+              title: "생활 습관 관리",
+              desc: "꾸준한 기록을 통해 건강한 생활 리듬을 유지하도록 돕습니다."
+            }
+          ].map((feature, idx) => (
+            <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-traditional-muted hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-traditional-bg rounded-lg flex items-center justify-center mb-6">
+                {feature.icon}
               </div>
-              <div className="relative z-10 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-traditional-primary/10 flex items-center justify-center text-traditional-primary mb-4">
-                  <Sun size={24} />
+              <h3 className="text-xl font-bold text-traditional-text mb-3">{feature.title}</h3>
+              <p className="text-traditional-subtext text-sm leading-relaxed">{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Modules Grid */}
+      <section className="px-6 pb-24 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Module 1: Resilience */}
+          <Link href="/healthcare/chat?topic=resilience" className="group">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-traditional-muted hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+              <div className="h-48 bg-gray-100 relative overflow-hidden">
+                {/* Placeholder for Yoga Image */}
+                <div className="absolute inset-0 bg-gray-200 flex items-center justify-center text-gray-400">
+                  <Sun size={48} />
                 </div>
-                <h3 className="text-2xl font-bold text-traditional-text">회복력·면역</h3>
-                <p className="text-traditional-subtext text-sm leading-relaxed">
-                  "자도 자도 피곤해요"<br />
-                  만성 피로와 면역력 저하가 걱정되시나요?
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" />
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-traditional-text mb-2">회복력·면역</h3>
+                <p className="text-traditional-subtext text-sm mb-4 flex-1">
+                  피로와 스트레스 관리, 면역력 증진을 위한 생활 습관을 점검합니다.
                 </p>
-                <div className="pt-4 flex items-center text-traditional-primary font-medium text-sm group-hover:translate-x-1 transition-transform">
-                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
+                <div className="flex gap-2 mb-6">
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#만성피로</span>
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#면역력</span>
+                </div>
+                <div className="w-full py-3 bg-traditional-muted/30 text-traditional-text text-sm font-medium rounded-lg text-center group-hover:bg-traditional-accent group-hover:text-white transition-colors">
+                  대화로 체크 시작
                 </div>
               </div>
             </div>
@@ -52,21 +134,21 @@ export default function LandingPage() {
 
           {/* Module 2: Women */}
           <Link href="/healthcare/chat?topic=women" className="group">
-            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-traditional-secondary/50 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Moon size={80} className="text-traditional-secondary" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-traditional-muted hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+              <div className="h-48 bg-gray-100 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" />
               </div>
-              <div className="relative z-10 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-traditional-secondary/10 flex items-center justify-center text-traditional-secondary mb-4">
-                  <Moon size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-traditional-text">여성 밸런스</h3>
-                <p className="text-traditional-subtext text-sm leading-relaxed">
-                  생리통, 갱년기, 호르몬 변화.<br />
-                  여성만의 리듬을 케어합니다.
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-traditional-text mb-2">여성 밸런스</h3>
+                <p className="text-traditional-subtext text-sm mb-4 flex-1">
+                  월경 주기, 호르몬 변화 등 여성 건강의 균형을 위한 생활 리듬을 살핍니다.
                 </p>
-                <div className="pt-4 flex items-center text-traditional-secondary font-medium text-sm group-hover:translate-x-1 transition-transform">
-                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
+                <div className="flex gap-2 mb-6">
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#생리통</span>
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#갱년기</span>
+                </div>
+                <div className="w-full py-3 bg-traditional-muted/30 text-traditional-text text-sm font-medium rounded-lg text-center group-hover:bg-traditional-secondary group-hover:text-white transition-colors">
+                  대화로 체크 시작
                 </div>
               </div>
             </div>
@@ -74,21 +156,21 @@ export default function LandingPage() {
 
           {/* Module 3: Pain */}
           <Link href="/healthcare/chat?topic=pain" className="group">
-            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-traditional-accent/50 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Activity size={80} className="text-traditional-accent" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-traditional-muted hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+              <div className="h-48 bg-gray-100 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" />
               </div>
-              <div className="relative z-10 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-traditional-accent/10 flex items-center justify-center text-traditional-accent mb-4">
-                  <Activity size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-traditional-text">통증 패턴</h3>
-                <p className="text-traditional-subtext text-sm leading-relaxed">
-                  허리, 어깨, 무릎 통증.<br />
-                  반복되는 통증의 원인을 찾습니다.
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-traditional-text mb-2">통증 패턴</h3>
+                <p className="text-traditional-subtext text-sm mb-4 flex-1">
+                  일상 속 불편한 통증의 원인이 될 수 있는 생활 패턴을 분석합니다.
                 </p>
-                <div className="pt-4 flex items-center text-traditional-accent font-medium text-sm group-hover:translate-x-1 transition-transform">
-                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
+                <div className="flex gap-2 mb-6">
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#두통</span>
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#허리통증</span>
+                </div>
+                <div className="w-full py-3 bg-traditional-muted/30 text-traditional-text text-sm font-medium rounded-lg text-center group-hover:bg-traditional-accent group-hover:text-white transition-colors">
+                  대화로 체크 시작
                 </div>
               </div>
             </div>
@@ -96,21 +178,21 @@ export default function LandingPage() {
 
           {/* Module 4: Digestion */}
           <Link href="/healthcare/chat?topic=digestion" className="group">
-            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-orange-400/50 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Heart size={80} className="text-orange-600" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-traditional-muted hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+              <div className="h-48 bg-gray-100 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1511690656952-34342d5c2899?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" />
               </div>
-              <div className="relative z-10 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-4">
-                  <Heart size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-traditional-text">소화·수면</h3>
-                <p className="text-traditional-subtext text-sm leading-relaxed">
-                  속이 더부룩하고 잠들기 힘든가요?<br />
-                  순환의 문제를 짚어드립니다.
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-traditional-text mb-2">소화·수면 리듬</h3>
+                <p className="text-traditional-subtext text-sm mb-4 flex-1">
+                  규칙적인 소화와 깊은 수면을 위한 식습관과 생활 습관을 체크합니다.
                 </p>
-                <div className="pt-4 flex items-center text-orange-600 font-medium text-sm group-hover:translate-x-1 transition-transform">
-                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
+                <div className="flex gap-2 mb-6">
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#소화불량</span>
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#불면증</span>
+                </div>
+                <div className="w-full py-3 bg-traditional-muted/30 text-traditional-text text-sm font-medium rounded-lg text-center group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                  대화로 체크 시작
                 </div>
               </div>
             </div>
@@ -118,34 +200,69 @@ export default function LandingPage() {
 
           {/* Module 5: Pregnancy */}
           <Link href="/healthcare/chat?topic=pregnancy" className="group">
-            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-pink-400/50 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Baby size={80} className="text-pink-600" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-traditional-muted hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+              <div className="h-48 bg-gray-100 relative overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-80 group-hover:scale-105 transition-transform duration-500" />
               </div>
-              <div className="relative z-10 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 mb-4">
-                  <Baby size={24} />
-                </div>
-                <h3 className="text-2xl font-bold text-traditional-text">임신 준비</h3>
-                <p className="text-traditional-subtext text-sm leading-relaxed">
-                  건강한 아기를 만나는 준비.<br />
-                  부부의 몸 상태를 함께 봅니다.
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-traditional-text mb-2">임신 준비 생활 체크</h3>
+                <p className="text-traditional-subtext text-sm mb-4 flex-1">
+                  건강한 임신을 준비하기 위한 생활 수칙과 영양 상태를 점검합니다.
                 </p>
-                <div className="pt-4 flex items-center text-pink-600 font-medium text-sm group-hover:translate-x-1 transition-transform">
-                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
+                <div className="flex gap-2 mb-6">
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#임신준비</span>
+                  <span className="text-xs px-2 py-1 bg-traditional-bg text-traditional-subtext rounded">#영양</span>
+                </div>
+                <div className="w-full py-3 bg-traditional-muted/30 text-traditional-text text-sm font-medium rounded-lg text-center group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                  대화로 체크 시작
                 </div>
               </div>
             </div>
           </Link>
-
         </div>
-      </main>
+      </section>
 
       {/* Footer */}
-      <footer className="py-8 text-center text-traditional-subtext/60 text-xs border-t border-traditional-muted/50">
-        <p className="mb-2">본 서비스는 건강 정보 제공을 목적으로 하며, 의학적 진단을 대체하지 않습니다.</p>
-        <p>© 2025 죽전한의원 AI 헬스케어</p>
+      <footer className="py-12 bg-traditional-bg border-t border-traditional-muted">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-8">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-5 h-5 bg-traditional-accent rounded-sm flex items-center justify-center">
+                <span className="text-white text-[10px] font-bold">L</span>
+              </div>
+              <span className="text-base font-bold text-traditional-text">죽전한의원</span>
+            </div>
+            <div className="text-xs text-traditional-subtext space-y-1">
+              <p>주소: 경기도 용인시 수지구 죽전로 123, 4층</p>
+              <p>연락처: 031-123-4567 | 진료시간: 평일 09:00 - 18:00</p>
+            </div>
+          </div>
+          <div className="flex gap-12 text-xs text-traditional-subtext">
+            <div className="space-y-2">
+              <h4 className="font-bold text-traditional-text">바로가기</h4>
+              <p>한의원 소개</p>
+              <p>AI 헬스케어</p>
+              <p>라이프스타일</p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-bold text-traditional-text">지원</h4>
+              <p>이용약관</p>
+              <p>개인정보처리방침</p>
+              <p>문의하기</p>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-6 mt-8 pt-8 border-t border-traditional-muted/50 text-center text-[10px] text-traditional-subtext/60">
+          <p>© 2025 죽전한의원. All rights reserved.</p>
+        </div>
       </footer>
+
+      {/* Floating Chat Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button className="w-14 h-14 bg-traditional-accent rounded-full flex items-center justify-center text-white shadow-lg hover:bg-opacity-90 transition-all hover:scale-110">
+          <span className="text-2xl">💬</span>
+        </button>
+      </div>
     </div>
   );
 }

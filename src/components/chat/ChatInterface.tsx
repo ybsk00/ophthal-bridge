@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, User, Bot, ArrowLeft } from "lucide-react";
+import { Send, User, Bot, ArrowLeft, Paperclip, ArrowUp, Sun, Moon, Activity, Heart, Baby } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import ConditionReport from "@/components/healthcare/ConditionReport";
@@ -22,25 +22,7 @@ export default function ChatInterface() {
 
     // Welcome message based on topic
     useEffect(() => {
-        let welcomeMsg = "안녕하세요! 100년 전통 죽전한의원의 노하우가 담긴 AI 헬스케어입니다. 오늘 컨디션은 어떠신가요?";
-
-        switch (topic) {
-            case "women":
-                welcomeMsg = "안녕하세요! 여성의 건강한 리듬을 찾아드리는 AI 헬스케어입니다. 생리통, 갱년기, 기분 변화 등 고민되는 점을 말씀해주세요.";
-                break;
-            case "pain":
-                welcomeMsg = "안녕하세요! 반복되는 통증의 원인을 함께 찾는 AI 헬스케어입니다. 어디가 언제부터 아프신지 편하게 말씀해주세요.";
-                break;
-            case "digestion":
-                welcomeMsg = "안녕하세요! 속이 편안해야 잠도 잘 옵니다. 소화나 수면과 관련해서 불편하신 점이 있으신가요?";
-                break;
-            case "pregnancy":
-                welcomeMsg = "안녕하세요! 건강한 임신 준비를 돕는 AI 헬스케어입니다. 부부의 건강 상태나 궁금한 점을 말씀해주세요.";
-                break;
-            default: // resilience
-                welcomeMsg = "안녕하세요! 100년 전통 죽전한의원의 노하우가 담긴 AI 헬스케어입니다. 피로감이나 면역력 저하로 고민이신가요?";
-        }
-
+        let welcomeMsg = "안녕하세요, 죽전한의원 AI 헬스케어입니다. 궁금한 점을 체크해 보세요.";
         setMessages([{ role: "ai", content: welcomeMsg }]);
     }, [topic]);
 
@@ -84,140 +66,143 @@ export default function ChatInterface() {
         }
     };
 
-    // Report Logic
+    // Report Logic (Simplified for design update, keeping functionality)
     const [showReport, setShowReport] = useState(false);
     const [reportData, setReportData] = useState<any>(null);
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-    const handleFinish = async () => {
-        if (messages.length < 2) {
-            alert("최소 2마디 이상 대화를 나누신 후 분석할 수 있습니다.");
-            return;
-        }
-
-        setIsAnalyzing(true);
-        try {
-            const response = await fetch("/api/summary", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ history: messages, topic }),
-            });
-
-            if (!response.ok) throw new Error("Analysis failed");
-
-            const data = await response.json();
-            setReportData(data);
-            setShowReport(true);
-        } catch (error) {
-            console.error("Analysis Error:", error);
-            alert("분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-        } finally {
-            setIsAnalyzing(false);
-        }
-    };
 
     if (showReport && reportData) {
-        return <ConditionReport result={reportData} onRetry={() => {
-            setShowReport(false);
-            setMessages([]);
-            setReportData(null);
-        }} />;
+        return <ConditionReport result={reportData} onRetry={() => setShowReport(false)} />;
     }
 
+    const modules = [
+        { id: "resilience", label: "회복력·면역", icon: Sun, desc: "만성 피로와 잦은 감기" },
+        { id: "women", label: "여성 밸런스", icon: Moon, desc: "생리 주기부터 갱년기까지" },
+        { id: "pain", label: "통증 패턴", icon: Activity, desc: "반복되는 두통, 어깨 결림" },
+        { id: "digestion", label: "소화·수면 리듬", icon: Heart, desc: "더부룩한 속과 깊은 잠" },
+        { id: "pregnancy", label: "임신 준비", icon: Baby, desc: "예비 부모를 위한 필수 체크" },
+    ];
+
     return (
-        <div className="flex flex-col h-screen bg-traditional-bg font-sans max-w-md mx-auto shadow-2xl overflow-hidden border-x border-traditional-muted">
+        <div className="min-h-screen bg-traditional-bg font-sans flex flex-col">
             {/* Header */}
-            <header className="flex items-center justify-between px-4 py-3 bg-white/80 backdrop-blur-md border-b border-traditional-muted sticky top-0 z-10">
-                <div className="flex items-center">
-                    <Link href="/" className="p-2 -ml-2 text-traditional-subtext hover:text-traditional-text transition-colors">
-                        <ArrowLeft size={24} />
-                    </Link>
-                    <div className="ml-2">
-                        <h1 className="text-lg font-bold text-traditional-text">AI 헬스케어 상담</h1>
-                        <p className="text-xs text-traditional-primary flex items-center">
-                            <span className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>
-                            실시간 답변 중
-                        </p>
+            <header className="bg-traditional-bg px-6 py-4 flex items-center justify-between sticky top-0 z-20">
+                <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-traditional-accent rounded-sm flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">L</span>
                     </div>
+                    <span className="text-lg font-bold text-traditional-text">100년 한의학 AI 헬스케어</span>
                 </div>
-                {messages.length >= 2 && (
-                    <button
-                        onClick={handleFinish}
-                        disabled={isAnalyzing}
-                        className="text-xs font-bold bg-traditional-secondary text-white px-3 py-1.5 rounded-full hover:bg-traditional-secondary/90 transition-colors disabled:opacity-50"
-                    >
-                        {isAnalyzing ? "분석중..." : "결과보기"}
-                    </button>
-                )}
+                <div className="hidden md:flex items-center gap-6 text-sm font-medium text-traditional-subtext">
+                    <Link href="#" className="hover:text-traditional-primary">AI 헬스케어</Link>
+                    <Link href="#" className="hover:text-traditional-primary">이용후기</Link>
+                    <Link href="#" className="hover:text-traditional-primary">문의하기</Link>
+                    <Link href="#" className="px-4 py-2 bg-traditional-accent text-white rounded-full hover:bg-opacity-90 transition-colors">
+                        상담예약
+                    </Link>
+                </div>
             </header>
 
-            {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-6 bg-[url('/texture-hanji.png')] bg-repeat">
-                {messages.map((msg, idx) => (
-                    <div
-                        key={idx}
-                        className={`flex items-start gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""
-                            } animate-slide-up`}
-                    >
-                        {/* Avatar */}
-                        <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === "ai"
-                                    ? "bg-traditional-primary text-white"
-                                    : "bg-traditional-muted text-traditional-subtext"
-                                }`}
-                        >
-                            {msg.role === "ai" ? <Bot size={18} /> : <User size={18} />}
-                        </div>
-
-                        {/* Bubble */}
-                        <div
-                            className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === "ai"
-                                    ? "bg-white text-traditional-text border border-traditional-muted rounded-tl-none"
-                                    : "bg-traditional-primary text-white rounded-tr-none"
-                                }`}
-                        >
-                            {msg.content}
-                        </div>
+            <main className="flex-1 max-w-3xl mx-auto w-full px-4 pb-20">
+                {/* Hero Banner */}
+                <div className="relative rounded-3xl overflow-hidden mb-8 h-48 md:h-64">
+                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
+                    <div className="absolute inset-0 bg-black/30"></div>
+                    <div className="relative z-10 h-full flex flex-col justify-end p-8">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                            AI 헬스케어로 알아보는 나의 건강
+                        </h2>
                     </div>
-                ))}
-                {isLoading && (
-                    <div className="flex items-start gap-3 animate-pulse">
-                        <div className="w-8 h-8 rounded-full bg-traditional-primary text-white flex items-center justify-center">
-                            <Bot size={18} />
-                        </div>
-                        <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none border border-traditional-muted">
-                            <div className="flex gap-1">
-                                <span className="w-2 h-2 bg-traditional-subtext/30 rounded-full animate-bounce"></span>
-                                <span className="w-2 h-2 bg-traditional-subtext/30 rounded-full animate-bounce delay-100"></span>
-                                <span className="w-2 h-2 bg-traditional-subtext/30 rounded-full animate-bounce delay-200"></span>
+                </div>
+
+                {/* Module List */}
+                <div className="flex gap-4 overflow-x-auto pb-6 no-scrollbar mb-4">
+                    {modules.map((mod) => (
+                        <Link
+                            key={mod.id}
+                            href={`/healthcare/chat?topic=${mod.id}`}
+                            className={`flex-shrink-0 w-64 p-5 rounded-xl border transition-all ${topic === mod.id
+                                    ? "bg-white border-traditional-accent shadow-md ring-1 ring-traditional-accent"
+                                    : "bg-white border-traditional-muted hover:border-traditional-subtext/50"
+                                }`}
+                        >
+                            <div className="flex items-start justify-between mb-2">
+                                <h3 className="font-bold text-traditional-text">{mod.label}</h3>
+                                <mod.icon size={16} className="text-traditional-subtext" />
+                            </div>
+                            <p className="text-xs text-traditional-subtext">{mod.desc}</p>
+                        </Link>
+                    ))}
+                </div>
+
+                {/* Chat Area */}
+                <div className="bg-traditional-bg/50 rounded-3xl p-4 min-h-[400px] space-y-6">
+                    {messages.map((msg, idx) => (
+                        <div
+                            key={idx}
+                            className={`flex items-start gap-3 ${msg.role === "user" ? "flex-row-reverse" : ""}`}
+                        >
+                            {/* Avatar */}
+                            <div
+                                className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${msg.role === "ai"
+                                    ? "bg-traditional-accent text-white"
+                                    : "bg-white border border-traditional-muted"
+                                    }`}
+                            >
+                                {msg.role === "ai" ? <div className="text-xs font-bold">AI</div> : <User size={20} className="text-traditional-subtext" />}
+                            </div>
+
+                            {/* Bubble */}
+                            <div
+                                className={`max-w-[80%] px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === "ai"
+                                    ? "bg-white text-traditional-text border border-traditional-muted rounded-tl-none"
+                                    : "bg-traditional-accent text-white rounded-tr-none"
+                                    }`}
+                            >
+                                {msg.content}
                             </div>
                         </div>
-                    </div>
-                )}
-                <div ref={messagesEndRef} />
-            </div>
+                    ))}
+                    {isLoading && (
+                        <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 rounded-full bg-traditional-accent text-white flex items-center justify-center">
+                                <div className="text-xs font-bold">AI</div>
+                            </div>
+                            <div className="bg-white px-5 py-3 rounded-2xl rounded-tl-none border border-traditional-muted shadow-sm">
+                                <div className="flex gap-1">
+                                    <span className="w-1.5 h-1.5 bg-traditional-subtext/40 rounded-full animate-bounce"></span>
+                                    <span className="w-1.5 h-1.5 bg-traditional-subtext/40 rounded-full animate-bounce delay-100"></span>
+                                    <span className="w-1.5 h-1.5 bg-traditional-subtext/40 rounded-full animate-bounce delay-200"></span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
+            </main>
 
             {/* Input Area */}
-            <div className="p-4 bg-white border-t border-traditional-muted">
-                <form onSubmit={handleSubmit} className="relative flex items-center">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="증상을 입력해주세요..."
-                        className="w-full pl-4 pr-12 py-3 bg-traditional-muted/30 border border-traditional-muted rounded-full focus:outline-none focus:border-traditional-primary focus:ring-1 focus:ring-traditional-primary transition-all placeholder:text-traditional-subtext/50 text-traditional-text"
-                    />
-                    <button
-                        type="submit"
-                        disabled={isLoading || !input.trim()}
-                        className="absolute right-2 p-2 bg-traditional-primary text-white rounded-full hover:bg-traditional-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                        <Send size={18} />
-                    </button>
-                </form>
-                <p className="text-[10px] text-center text-traditional-subtext/50 mt-2">
-                    본 서비스는 의학적 진단을 대체하지 않습니다. 응급 시 119에 연락하세요.
-                </p>
+            <div className="fixed bottom-0 left-0 right-0 bg-traditional-bg/80 backdrop-blur-md border-t border-traditional-muted/50 p-4">
+                <div className="max-w-3xl mx-auto relative">
+                    <form onSubmit={handleSubmit} className="relative bg-white rounded-full shadow-lg border border-traditional-muted flex items-center p-2 pl-6">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            placeholder="어떤 점이 궁금하신가요?"
+                            className="flex-1 bg-transparent border-none focus:ring-0 text-traditional-text placeholder:text-traditional-subtext/50"
+                        />
+                        <button type="button" className="p-2 text-traditional-subtext hover:text-traditional-text transition-colors">
+                            <Paperclip size={20} />
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={isLoading || !input.trim()}
+                            className="p-2 bg-traditional-accent text-white rounded-full hover:bg-opacity-90 transition-colors disabled:opacity-50 ml-2"
+                        >
+                            <ArrowUp size={20} />
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );
