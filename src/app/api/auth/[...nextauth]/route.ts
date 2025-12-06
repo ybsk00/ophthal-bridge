@@ -22,7 +22,6 @@ const handler = NextAuth({
     },
     debug: true, // Enable debug logs for Vercel
     secret: process.env.NEXTAUTH_SECRET,
-    trustHost: true, // Trust the host header (important for Vercel)
 })
 
 export { handler as GET, handler as POST }
