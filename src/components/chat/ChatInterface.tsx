@@ -126,7 +126,7 @@ export default function ChatInterface() {
 
             <main className="flex-1 max-w-4xl mx-auto w-full px-4 pb-20">
                 {/* Hero Banner */}
-                <div className="relative rounded-3xl overflow-hidden mb-6 h-40 md:h-52 shadow-lg group">
+                <div className="relative rounded-3xl overflow-hidden mb-6 h-[400px] md:h-[600px] shadow-lg group">
                     <div className="absolute inset-0 bg-[url('/images/herbal-bg.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
 
