@@ -1,12 +1,14 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, ChevronDown, X, MessageSquare, CheckCircle2, Clock } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function DoctorDashboard() {
     const [searchTerm, setSearchTerm] = useState("");
     const [activeFilter, setActiveFilter] = useState("전체");
+    const supabase = createClient();
 
     // Define Patient type
     type Patient = {
@@ -19,72 +21,48 @@ export default function DoctorDashboard() {
         status: "completed" | "pending";
     };
 
-    // Mock Data for Demo
-    const [patients, setPatients] = useState<Patient[]>([
-        {
-            id: 1,
-            time: "10:00",
-            name: "김OO",
-            type: "초진",
-            complaint: "6개월째 아침 피로, 감기 잦음",
-            keywords: ["회복력 저하"],
-            status: "pending"
-        },
-        {
-            id: 2,
-            time: "10:30",
-            name: "이△△",
-            type: "재진",
-            complaint: "최근 소화불량 및 복부 팽만감",
-            keywords: ["소화·수면"],
-            status: "completed"
-        },
-        {
-            id: 3,
-            time: "11:00",
-            name: "박□□",
-            type: "초진",
-            complaint: "만성적인 허리 통증과 뻣뻣함",
-            keywords: ["통증"],
-            status: "pending"
-        },
-        {
-            id: 4,
-            time: "11:30",
-            name: "최○△",
-            type: "온라인",
-            complaint: "임신 준비를 위한 상담",
-            keywords: ["임신 준비"],
-            status: "completed"
-        },
-        {
-            id: 5,
-            time: "14:00",
-            name: "정□○",
-            type: "재진",
-            complaint: "생리통 및 주기 불규칙",
-            keywords: ["여성밸런스"],
-            status: "pending"
-        },
-    ]);
-
+    const [patients, setPatients] = useState<Patient[]>([]);
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
     const [showChatModal, setShowChatModal] = useState(false);
     const [showReservationModal, setShowReservationModal] = useState(false);
 
     const filters = ["전체", "대기", "완료"];
 
-    const handleStatusClick = (patient: Patient) => {
-        if (patient.status === "completed") {
-            setSelectedPatient(patient);
-            setShowReservationModal(true);
+    useEffect(() => {
+        fetchPatients();
+    }, []);
+
+    const fetchPatients = async () => {
+        const { data, error } = await supabase
+            .from('patients')
+            .select('*')
+            .order('time', { ascending: true });
+
+        if (error) {
+            console.error('Error fetching patients:', error);
+        } else {
+            setPatients(data || []);
         }
     };
 
-    // TODO: Fetch real patients data from Supabase
-    // useEffect(() => {
-    //     const fetchPatients = async () => {
-    //         const { data, error } = await supabase.from('patients').select('*');
+    const handleStatusClick = async (patient: Patient) => {
+        if (patient.status === "completed") {
+            setSelectedPatient(patient);
+            setShowReservationModal(true);
+        } else {
+            // Toggle status logic (optional, or just for demo)
+            // For now, let's just mark as completed if pending
+            const newStatus = "completed";
+            const { error } = await supabase
+                .from('patients')
+                .update({ status: newStatus })
+                .eq('id', patient.id);
+
+            if (!error) {
+                fetchPatients(); // Refresh data
+            }
+        }
+    };
 
     const handleComplaintClick = (patient: Patient) => {
         setSelectedPatient(patient);
