@@ -167,41 +167,43 @@ export default function ChatInterface(props: ChatInterfaceProps) {
             )}
 
             <main className="flex-1 max-w-4xl mx-auto w-full px-4 pb-20">
-                {/* Hero Banner */}
-                <div className="relative rounded-3xl overflow-hidden mb-6 h-[300px] md:h-[450px] shadow-lg group">
-                    <div className="absolute inset-0 bg-[url('/images/herbal-bg.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+                {/* Hero Banner - Hidden if embedded */}
+                {!props.isEmbedded && (
+                    <div className="relative rounded-3xl overflow-hidden mb-6 h-[300px] md:h-[450px] shadow-lg group">
+                        <div className="absolute inset-0 bg-[url('/images/herbal-bg.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
+                        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
 
-                    <div className="relative z-10 h-full flex flex-col justify-end p-6">
-                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-md">
-                            AI 헬스케어로 알아보는 나의 건강
-                        </h2>
-                        <p className="text-white/90 text-sm md:text-base font-medium mb-10">
-                            전통의 지혜와 현대 기술의 만남
-                        </p>
+                        <div className="relative z-10 h-full flex flex-col justify-end p-6">
+                            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-md">
+                                AI 헬스케어로 알아보는 나의 건강
+                            </h2>
+                            <p className="text-white/90 text-sm md:text-base font-medium mb-10">
+                                전통의 지혜와 현대 기술의 만남
+                            </p>
 
-                        {/* Module List (Overlay on Hero) */}
-                        <div className="grid grid-cols-5 gap-2">
-                            {modules.map((mod) => (
-                                <Link
-                                    key={mod.id}
-                                    href={`/healthcare/chat?topic=${mod.id}`}
-                                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border backdrop-blur-md transition-all h-full text-center ${topic === mod.id
-                                        ? "bg-white/95 border-white shadow-lg scale-105 z-10"
-                                        : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/40"
-                                        }`}
-                                >
-                                    <h3 className={`font-bold text-sm leading-tight mb-1 ${topic === mod.id ? "text-gray-900" : "text-white"}`}>
-                                        {mod.label}
-                                    </h3>
-                                    <p className={`text-xs leading-tight line-clamp-1 ${topic === mod.id ? "text-gray-600" : "text-white/80"}`}>
-                                        {mod.desc}
-                                    </p>
-                                </Link>
-                            ))}
+                            {/* Module List (Overlay on Hero) */}
+                            <div className="grid grid-cols-5 gap-2">
+                                {modules.map((mod) => (
+                                    <Link
+                                        key={mod.id}
+                                        href={`/healthcare/chat?topic=${mod.id}`}
+                                        className={`flex flex-col items-center justify-center p-2.5 rounded-xl border backdrop-blur-md transition-all h-full text-center ${topic === mod.id
+                                            ? "bg-white/95 border-white shadow-lg scale-105 z-10"
+                                            : "bg-white/10 border-white/20 hover:bg-white/20 hover:border-white/40"
+                                            }`}
+                                    >
+                                        <h3 className={`font-bold text-sm leading-tight mb-1 ${topic === mod.id ? "text-gray-900" : "text-white"}`}>
+                                            {mod.label}
+                                        </h3>
+                                        <p className={`text-xs leading-tight line-clamp-1 ${topic === mod.id ? "text-gray-600" : "text-white/80"}`}>
+                                            {mod.desc}
+                                        </p>
+                                    </Link>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Chat Area */}
                 <div className="bg-indigo-50/50 border border-indigo-100 rounded-3xl p-6 min-h-[400px] space-y-6 shadow-inner">
