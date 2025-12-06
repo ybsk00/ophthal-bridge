@@ -94,9 +94,21 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                             <p className="font-bold mb-1">진료 예약</p>
                                             <p>원하시는 날짜와 시간을 선택해주세요.</p>
                                         </div>
-                                        {/* Mock Date Picker */}
-                                        <div className="border rounded-xl p-4 text-center text-gray-500 hover:bg-gray-50 cursor-pointer transition-colors">
-                                            📅 날짜/시간 선택하기
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-xs font-medium text-gray-500">날짜</label>
+                                                <input
+                                                    type="date"
+                                                    className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-xs font-medium text-gray-500">시간</label>
+                                                <input
+                                                    type="time"
+                                                    className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -104,12 +116,24 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                 {activeTab === "reschedule" && (
                                     <div className="space-y-4">
                                         <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 text-sm text-amber-800">
-                                            <p className="font-bold mb-1">기존 예약 정보</p>
-                                            <p>2025.12.08 (금) 오후 2:30</p>
-                                            <p>정기 침구치료 (김환자님)</p>
+                                            <p className="font-bold mb-1">예약 변경</p>
+                                            <p>변경하실 날짜와 시간을 선택해주세요.</p>
                                         </div>
-                                        <div className="border rounded-xl p-4 text-center text-gray-500 hover:bg-gray-50 cursor-pointer transition-colors">
-                                            📅 변경할 날짜/시간 선택하기
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="space-y-1">
+                                                <label className="text-xs font-medium text-gray-500">날짜</label>
+                                                <input
+                                                    type="date"
+                                                    className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all"
+                                                />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <label className="text-xs font-medium text-gray-500">시간</label>
+                                                <input
+                                                    type="time"
+                                                    className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 )}

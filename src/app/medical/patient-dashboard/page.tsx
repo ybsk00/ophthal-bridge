@@ -10,11 +10,12 @@ export default function PatientDashboard() {
     const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
 
     // Mock appointment data
+    // Mock appointment data (Empty or Generic)
     const appointment = {
-        date: "12.08 (금)",
-        time: "오후 2:30",
-        type: "정기 침구치료",
-        doctor: "김환자님"
+        date: "예약 없음",
+        time: "",
+        type: "예정된 진료가 없습니다.",
+        doctor: ""
     };
 
     return (
@@ -26,16 +27,16 @@ export default function PatientDashboard() {
                 {/* Header / Appointment Card */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-600">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${appointment.date === "예약 없음" ? "bg-gray-100 text-gray-400" : "bg-teal-50 text-teal-600"}`}>
                             <Calendar size={24} />
                         </div>
                         <div>
                             <h2 className="text-sm text-gray-500 font-medium mb-1">다음 예약 안내</h2>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-xl font-bold text-gray-900">{appointment.date}</span>
-                                <span className="text-xl font-bold text-gray-900">{appointment.time}</span>
+                                <span className={`text-xl font-bold ${appointment.date === "예약 없음" ? "text-gray-400" : "text-gray-900"}`}>{appointment.date}</span>
+                                {appointment.time && <span className="text-xl font-bold text-gray-900">{appointment.time}</span>}
                             </div>
-                            <p className="text-teal-600 text-sm font-medium mt-1">{appointment.type}</p>
+                            <p className={`${appointment.date === "예약 없음" ? "text-gray-400" : "text-teal-600"} text-sm font-medium mt-1`}>{appointment.type}</p>
                         </div>
                     </div>
 
