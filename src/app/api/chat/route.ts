@@ -22,11 +22,50 @@ export async function POST(req: NextRequest) {
         }
 
         // 2. System Prompt Construction
+        let topicInstruction = "";
+        switch (topic) {
+            case "women":
+                topicInstruction = `
+[주제: 여성 밸런스]
+- 타겟: 생리통, 갱년기, 수면, 정서 변동이 있는 여성
+- 핵심 질문: 주기, 열감, 수면, 기분 변화
+- 표현 가이드: "생활 리듬 불균형 유형" 등으로 표현 (질환명 X)`;
+                break;
+            case "pain":
+                topicInstruction = `
+[주제: 통증 패턴]
+- 타겟: 목, 어깨, 허리, 무릎 통증
+- 핵심 질문: 통증 시기, 자세, 활동, 스트레스
+- 표현 가이드: "근막 긴장 의심", "순환 저하 패턴" 등으로 표현 (디스크/관절염 진단 X)`;
+                break;
+            case "digestion":
+                topicInstruction = `
+[주제: 소화·수면]
+- 타겟: 소화불량, 체함, 식욕 변동, 불면
+- 핵심 질문: 식사 시간, 수면 패턴, 스트레스
+- 표현 가이드: "소화 리듬 불균형", "기·혈 흐름 저하" 등으로 표현 (위염/식도염 진단 X)`;
+                break;
+            case "pregnancy":
+                topicInstruction = `
+[주제: 임신 준비]
+- 타겟: 임신 준비, 난임 관심 부부
+- 핵심 질문: 생활 습관, 리듬, 컨디션
+- 표현 가이드: "생활 리듬 교정 안내" (불임 진단 X)`;
+                break;
+            default: // resilience
+                topicInstruction = `
+[주제: 회복력·면역]
+- 타겟: 만성 피로, 쉬어도 피곤, 감기 잦음
+- 핵심 질문: 수면, 식사, 스트레스, 회복감
+- 표현 가이드: "회복력 저하 의심", "기혈 순환 저하" 등으로 표현`;
+        }
+
         const systemPrompt = `
 [역할]
 당신은 "헬스케어 AI"입니다.
 2대째 100년 한의원에서 쌓인 경험을 바탕으로, 사용자의 몸 상태와 생활 리듬을 함께 정리해 주는 생활·건강정보 전용 AI입니다.
-현재 주제: ${topic || "종합 건강"}
+
+${topicInstruction}
 
 [금지 사항]
 - 특정 질환명 진단, 확률 언급, '치료된다/낫는다' 같은 확정적 표현 금지

@@ -50,9 +50,12 @@ export default function LandingPage() {
             </div>
           </Link>
 
-          {/* Module 2: Women (Coming Soon) */}
-          <div className="group opacity-70 cursor-not-allowed">
-            <div className="h-full p-8 rounded-2xl bg-white/50 border border-traditional-muted relative overflow-hidden">
+          {/* Module 2: Women */}
+          <Link href="/healthcare/chat?topic=women" className="group">
+            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-traditional-secondary/50 transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Moon size={80} className="text-traditional-secondary" />
+              </div>
               <div className="relative z-10 space-y-4">
                 <div className="w-12 h-12 rounded-full bg-traditional-secondary/10 flex items-center justify-center text-traditional-secondary mb-4">
                   <Moon size={24} />
@@ -62,16 +65,19 @@ export default function LandingPage() {
                   생리통, 갱년기, 호르몬 변화.<br />
                   여성만의 리듬을 케어합니다.
                 </p>
-                <div className="pt-4 text-xs text-traditional-subtext font-medium bg-traditional-muted/50 inline-block px-2 py-1 rounded">
-                  준비중
+                <div className="pt-4 flex items-center text-traditional-secondary font-medium text-sm group-hover:translate-x-1 transition-transform">
+                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
 
-          {/* Module 3: Pain (Coming Soon) */}
-          <div className="group opacity-70 cursor-not-allowed">
-            <div className="h-full p-8 rounded-2xl bg-white/50 border border-traditional-muted relative overflow-hidden">
+          {/* Module 3: Pain */}
+          <Link href="/healthcare/chat?topic=pain" className="group">
+            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-traditional-accent/50 transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Activity size={80} className="text-traditional-accent" />
+              </div>
               <div className="relative z-10 space-y-4">
                 <div className="w-12 h-12 rounded-full bg-traditional-accent/10 flex items-center justify-center text-traditional-accent mb-4">
                   <Activity size={24} />
@@ -81,16 +87,19 @@ export default function LandingPage() {
                   허리, 어깨, 무릎 통증.<br />
                   반복되는 통증의 원인을 찾습니다.
                 </p>
-                <div className="pt-4 text-xs text-traditional-subtext font-medium bg-traditional-muted/50 inline-block px-2 py-1 rounded">
-                  준비중
+                <div className="pt-4 flex items-center text-traditional-accent font-medium text-sm group-hover:translate-x-1 transition-transform">
+                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
 
-          {/* Module 4: Digestion (Coming Soon) */}
-          <div className="group opacity-70 cursor-not-allowed">
-            <div className="h-full p-8 rounded-2xl bg-white/50 border border-traditional-muted relative overflow-hidden">
+          {/* Module 4: Digestion */}
+          <Link href="/healthcare/chat?topic=digestion" className="group">
+            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-orange-400/50 transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Heart size={80} className="text-orange-600" />
+              </div>
               <div className="relative z-10 space-y-4">
                 <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 mb-4">
                   <Heart size={24} />
@@ -100,16 +109,19 @@ export default function LandingPage() {
                   속이 더부룩하고 잠들기 힘든가요?<br />
                   순환의 문제를 짚어드립니다.
                 </p>
-                <div className="pt-4 text-xs text-traditional-subtext font-medium bg-traditional-muted/50 inline-block px-2 py-1 rounded">
-                  준비중
+                <div className="pt-4 flex items-center text-orange-600 font-medium text-sm group-hover:translate-x-1 transition-transform">
+                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
 
-          {/* Module 5: Pregnancy (Coming Soon) */}
-          <div className="group opacity-70 cursor-not-allowed">
-            <div className="h-full p-8 rounded-2xl bg-white/50 border border-traditional-muted relative overflow-hidden">
+          {/* Module 5: Pregnancy */}
+          <Link href="/healthcare/chat?topic=pregnancy" className="group">
+            <div className="h-full p-8 rounded-2xl bg-white border border-traditional-muted shadow-sm hover:shadow-md hover:border-pink-400/50 transition-all duration-300 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Baby size={80} className="text-pink-600" />
+              </div>
               <div className="relative z-10 space-y-4">
                 <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 mb-4">
                   <Baby size={24} />
@@ -119,12 +131,12 @@ export default function LandingPage() {
                   건강한 아기를 만나는 준비.<br />
                   부부의 몸 상태를 함께 봅니다.
                 </p>
-                <div className="pt-4 text-xs text-traditional-subtext font-medium bg-traditional-muted/50 inline-block px-2 py-1 rounded">
-                  준비중
+                <div className="pt-4 flex items-center text-pink-600 font-medium text-sm group-hover:translate-x-1 transition-transform">
+                  체크 시작하기 <ArrowRight size={16} className="ml-1" />
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
 
         </div>
       </main>

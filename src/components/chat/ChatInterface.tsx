@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, User, Bot, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import ConditionReport from "@/components/healthcare/ConditionReport";
 
 type Message = {
     role: "user" | "ai";
@@ -14,15 +15,34 @@ export default function ChatInterface() {
     const searchParams = useSearchParams();
     const topic = searchParams.get("topic") || "resilience";
 
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            role: "ai",
-            content: "안녕하세요! 100년 전통 죽전한의원의 노하우가 담긴 AI 헬스케어입니다. 오늘 컨디션은 어떠신가요? 불편한 점을 편하게 말씀해주세요."
-        }
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Welcome message based on topic
+    useEffect(() => {
+        let welcomeMsg = "안녕하세요! 100년 전통 죽전한의원의 노하우가 담긴 AI 헬스케어입니다. 오늘 컨디션은 어떠신가요?";
+
+        switch (topic) {
+            case "women":
+                welcomeMsg = "안녕하세요! 여성의 건강한 리듬을 찾아드리는 AI 헬스케어입니다. 생리통, 갱년기, 기분 변화 등 고민되는 점을 말씀해주세요.";
+                break;
+            case "pain":
+                welcomeMsg = "안녕하세요! 반복되는 통증의 원인을 함께 찾는 AI 헬스케어입니다. 어디가 언제부터 아프신지 편하게 말씀해주세요.";
+                break;
+            case "digestion":
+                welcomeMsg = "안녕하세요! 속이 편안해야 잠도 잘 옵니다. 소화나 수면과 관련해서 불편하신 점이 있으신가요?";
+                break;
+            case "pregnancy":
+                welcomeMsg = "안녕하세요! 건강한 임신 준비를 돕는 AI 헬스케어입니다. 부부의 건강 상태나 궁금한 점을 말씀해주세요.";
+                break;
+            default: // resilience
+                welcomeMsg = "안녕하세요! 100년 전통 죽전한의원의 노하우가 담긴 AI 헬스케어입니다. 피로감이나 면역력 저하로 고민이신가요?";
+        }
+
+        setMessages([{ role: "ai", content: welcomeMsg }]);
+    }, [topic]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -64,20 +84,71 @@ export default function ChatInterface() {
         }
     };
 
+    // Report Logic
+    const [showReport, setShowReport] = useState(false);
+    const [reportData, setReportData] = useState<any>(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+    const handleFinish = async () => {
+        if (messages.length < 2) {
+            alert("최소 2마디 이상 대화를 나누신 후 분석할 수 있습니다.");
+            return;
+        }
+
+        setIsAnalyzing(true);
+        try {
+            const response = await fetch("/api/summary", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ history: messages, topic }),
+            });
+
+            if (!response.ok) throw new Error("Analysis failed");
+
+            const data = await response.json();
+            setReportData(data);
+            setShowReport(true);
+        } catch (error) {
+            console.error("Analysis Error:", error);
+            alert("분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    if (showReport && reportData) {
+        return <ConditionReport result={reportData} onRetry={() => {
+            setShowReport(false);
+            setMessages([]);
+            setReportData(null);
+        }} />;
+    }
+
     return (
         <div className="flex flex-col h-screen bg-traditional-bg font-sans max-w-md mx-auto shadow-2xl overflow-hidden border-x border-traditional-muted">
             {/* Header */}
-            <header className="flex items-center px-4 py-3 bg-white/80 backdrop-blur-md border-b border-traditional-muted sticky top-0 z-10">
-                <Link href="/" className="p-2 -ml-2 text-traditional-subtext hover:text-traditional-text transition-colors">
-                    <ArrowLeft size={24} />
-                </Link>
-                <div className="ml-2">
-                    <h1 className="text-lg font-bold text-traditional-text">AI 헬스케어 상담</h1>
-                    <p className="text-xs text-traditional-primary flex items-center">
-                        <span className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>
-                        실시간 답변 중
-                    </p>
+            <header className="flex items-center justify-between px-4 py-3 bg-white/80 backdrop-blur-md border-b border-traditional-muted sticky top-0 z-10">
+                <div className="flex items-center">
+                    <Link href="/" className="p-2 -ml-2 text-traditional-subtext hover:text-traditional-text transition-colors">
+                        <ArrowLeft size={24} />
+                    </Link>
+                    <div className="ml-2">
+                        <h1 className="text-lg font-bold text-traditional-text">AI 헬스케어 상담</h1>
+                        <p className="text-xs text-traditional-primary flex items-center">
+                            <span className="w-2 h-2 rounded-full bg-green-500 mr-1 animate-pulse"></span>
+                            실시간 답변 중
+                        </p>
+                    </div>
                 </div>
+                {messages.length >= 2 && (
+                    <button
+                        onClick={handleFinish}
+                        disabled={isAnalyzing}
+                        className="text-xs font-bold bg-traditional-secondary text-white px-3 py-1.5 rounded-full hover:bg-traditional-secondary/90 transition-colors disabled:opacity-50"
+                    >
+                        {isAnalyzing ? "분석중..." : "결과보기"}
+                    </button>
+                )}
             </header>
 
             {/* Chat Area */}

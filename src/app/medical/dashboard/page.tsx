@@ -1,108 +1,146 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Calendar, Filter, Plus } from "lucide-react";
+import { Search, Calendar, Filter, Plus, Users, Activity } from "lucide-react";
 
-// Mock Data for MVP
-const MOCK_PATIENTS = [
-    { id: 1, name: "김민수", time: "10:00", type: "초진", complaint: "6개월째 아침 피로, 감기 잦음", status: "예진완료", score: 42 },
-    { id: 2, name: "이영희", time: "10:30", type: "재진", complaint: "갱년기 열감, 불면", status: "예진완료", score: 55 },
-    { id: 3, name: "박철수", time: "11:00", type: "초진", complaint: "허리 통증, 굽힐 때 심함", status: "진료중", score: 60 },
-    { id: 4, name: "최지은", time: "11:30", type: "온라인", complaint: "식후 더부룩함, 야식 잦음", status: "미완료", score: 52 },
-    { id: 5, name: "정우성", time: "13:00", type: "재진", complaint: "난임 상담, 생활 교정", status: "예약", score: 64 },
-];
+export default function DoctorDashboard() {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterStatus, setFilterStatus] = useState("all"); // all, waiting, completed, emergency
 
-export default function DashboardPage() {
-    const [patients, setPatients] = useState(MOCK_PATIENTS);
+    // Mock Data (Expanded)
+    const patients = [
+        { id: 1, name: "김철수", age: 45, condition: "만성 피로", status: "대기중", lastVisit: "2024-01-15", score: 45 },
+        { id: 2, name: "이영희", age: 32, condition: "소화 불량", status: "진료중", lastVisit: "2024-02-01", score: 62 },
+        { id: 3, name: "박지성", age: 28, condition: "허리 통증", status: "완료", lastVisit: "2024-02-10", score: 30 },
+        { id: 4, name: "최동원", age: 55, condition: "불면증", status: "응급", lastVisit: "2024-02-12", score: 15 },
+        { id: 5, name: "홍길동", age: 40, condition: "두통", status: "대기중", lastVisit: "2024-02-13", score: 70 },
+    ];
+
+    const filteredPatients = patients.filter(patient => {
+        const matchesSearch = patient.name.includes(searchTerm) || patient.condition.includes(searchTerm);
+        const matchesFilter = filterStatus === "all" || patient.status === filterStatus;
+        if (filterStatus === "emergency") return patient.score < 30; // Example logic for emergency filter
+        return matchesSearch && matchesFilter;
+    });
 
     return (
-        <div className="space-y-6 animate-fade-in">
-            {/* Top Controls */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
-                    <h2 className="text-2xl font-bold text-medical-text">환자 리스트</h2>
-                    <span className="px-2 py-0.5 bg-medical-primary/10 text-medical-primary text-xs font-bold rounded-full">
-                        Today {patients.length}
-                    </span>
+        <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold text-gray-900">진료 대시보드</h1>
+                <div className="text-sm text-gray-500">
+                    {new Date().toLocaleDateString()} 기준
                 </div>
+            </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-medical-subtext" size={18} />
-                        <input
-                            type="text"
-                            placeholder="이름/차트번호 검색"
-                            className="pl-10 pr-4 py-2 border border-medical-muted rounded-lg text-sm focus:outline-none focus:border-medical-primary w-64"
-                        />
-                    </div>
-                    <button className="p-2 border border-medical-muted rounded-lg hover:bg-medical-muted text-medical-subtext">
-                        <Filter size={18} />
-                    </button>
-                    <button className="flex items-center gap-1 px-4 py-2 bg-medical-primary text-white rounded-lg hover:bg-medical-primary/90 text-sm font-medium">
-                        <Plus size={16} />
-                        환자 등록
-                    </button>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <div className="text-sm text-gray-500">대기 환자</div>
+                    <div className="text-2xl font-bold text-blue-600">{patients.filter(p => p.status === "대기중").length}명</div>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <div className="text-sm text-gray-500">오늘 진료</div>
+                    <div className="text-2xl font-bold text-gray-900">{patients.length}명</div>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <div className="text-sm text-gray-500">응급/주의</div>
+                    <div className="text-2xl font-bold text-red-600">{patients.filter(p => p.score < 40).length}명</div>
+                </div>
+                <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <div className="text-sm text-gray-500">평균 리듬 점수</div>
+                    <div className="text-2xl font-bold text-green-600">58점</div>
+                </div>
+            </div>
+
+            {/* Search & Filter */}
+            <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <input
+                        type="text"
+                        placeholder="환자 이름 또는 증상 검색..."
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="flex gap-2">
+                    {["all", "대기중", "진료중", "완료"].map((status) => (
+                        <button
+                            key={status}
+                            onClick={() => setFilterStatus(status)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filterStatus === status
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                }`}
+                        >
+                            {status === "all" ? "전체" : status}
+                        </button>
+                    ))}
                 </div>
             </div>
 
             {/* Patient Table */}
-            <div className="bg-white border border-medical-muted rounded-xl shadow-sm overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="bg-medical-muted/50 border-b border-medical-muted text-xs uppercase text-medical-subtext font-semibold">
-                            <th className="px-6 py-4">시간</th>
-                            <th className="px-6 py-4">이름/유형</th>
-                            <th className="px-6 py-4">주호소 (Chief Complaint)</th>
-                            <th className="px-6 py-4">리듬점수</th>
-                            <th className="px-6 py-4">상태</th>
-                            <th className="px-6 py-4 text-right">관리</th>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <table className="w-full text-left">
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">환자명</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">나이</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">주요 증상</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">리듬 점수</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">상태</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">최근 방문</th>
+                            <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">관리</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-medical-muted">
-                        {patients.map((patient) => (
-                            <tr key={patient.id} className="hover:bg-medical-muted/30 transition-colors cursor-pointer group">
-                                <td className="px-6 py-4 text-sm font-medium text-medical-text">
-                                    {patient.time}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-medical-text">{patient.name}</span>
-                                        <span className={`text-xs ${patient.type === '초진' ? 'text-medical-secondary' : 'text-medical-subtext'}`}>
-                                            {patient.type}
-                                        </span>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 text-sm text-medical-text">
-                                    {patient.complaint}
+                    <tbody className="divide-y divide-gray-200">
+                        {filteredPatients.map((patient) => (
+                            <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-6 py-4 font-medium text-gray-900">{patient.name}</td>
+                                <td className="px-6 py-4 text-gray-500">{patient.age}세</td>
+                                <td className="px-6 py-4 text-gray-900">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {patient.condition}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-2">
-                                        <div className="w-full max-w-[80px] h-2 bg-medical-muted rounded-full overflow-hidden">
+                                        <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
                                             <div
-                                                className={`h-full rounded-full ${patient.score < 50 ? 'bg-red-400' : patient.score < 70 ? 'bg-yellow-400' : 'bg-green-400'
-                                                    }`}
+                                                className={`h-full ${patient.score < 50 ? 'bg-red-500' : 'bg-green-500'}`}
                                                 style={{ width: `${patient.score}%` }}
-                                            ></div>
+                                            />
                                         </div>
-                                        <span className="text-xs font-medium text-medical-subtext">{patient.score}</span>
+                                        <span className={`text-sm font-bold ${patient.score < 50 ? 'text-red-600' : 'text-green-600'}`}>
+                                            {patient.score}
+                                        </span>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.status === '예진완료' ? 'bg-blue-100 text-blue-800' :
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${patient.status === '대기중' ? 'bg-yellow-100 text-yellow-800' :
                                             patient.status === '진료중' ? 'bg-green-100 text-green-800' :
-                                                patient.status === '미완료' ? 'bg-gray-100 text-gray-800' :
-                                                    'bg-purple-100 text-purple-800'
+                                                patient.status === '응급' ? 'bg-red-100 text-red-800' :
+                                                    'bg-gray-100 text-gray-800'
                                         }`}>
                                         {patient.status}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-right">
-                                    <button className="text-medical-primary hover:text-medical-accent text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                                <td className="px-6 py-4 text-gray-500">{patient.lastVisit}</td>
+                                <td className="px-6 py-4">
+                                    <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                         상세보기
                                     </button>
                                 </td>
                             </tr>
                         ))}
+                        {filteredPatients.length === 0 && (
+                            <tr>
+                                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                                    검색 결과가 없습니다.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
