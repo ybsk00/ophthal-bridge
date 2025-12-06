@@ -25,6 +25,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <header className="relative px-6 py-20 md:py-32 text-center overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-traditional-muted/30 to-traditional-bg z-0"></div>
         {/* Hero Video Background */}
         <div className="absolute inset-0 z-0 bg-[#C8B6A6]">
           <video
@@ -38,7 +39,6 @@ export default function LandingPage() {
             Your browser does not support the video tag.
           </video>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-traditional-muted/30 to-traditional-bg z-0"></div>
         <div className="absolute inset-0 opacity-10 bg-[url('/texture-hanji.png')] pointer-events-none mix-blend-multiply"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto space-y-8 animate-fade-in">
