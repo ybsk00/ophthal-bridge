@@ -89,10 +89,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
 
                 const { error } = await supabase
                     .from('patients')
-                    .update({
-                        status: 'canceled',
-                        complaint: '예약 취소' // Update reason if needed
-                    })
+                    .delete()
                     .eq('id', existingReservation.id);
 
                 if (error) throw error;
