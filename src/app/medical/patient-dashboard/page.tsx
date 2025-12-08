@@ -24,10 +24,11 @@ export default function PatientDashboard() {
 
     const fetchLatestAppointment = async () => {
         try {
-            // Fetch the most recent reservation
+            // Fetch the most recent pending reservation
             const { data, error } = await supabase
                 .from('patients')
                 .select('*')
+                .eq('status', 'pending')
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .maybeSingle();

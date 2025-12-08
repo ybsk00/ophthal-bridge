@@ -30,6 +30,27 @@ export default function DoctorDashboard() {
 
     useEffect(() => {
         fetchPatients();
+
+        // Realtime subscription
+        const channel = supabase
+            .channel('patients-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'patients'
+                },
+                (payload) => {
+                    console.log('Change received!', payload);
+                    fetchPatients();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
     const fetchPatients = async () => {
