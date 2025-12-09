@@ -119,6 +119,19 @@ export default function PatientDashboard() {
                     }}
                 />
 
+                {/* Video Section */}
+                <div className="w-full rounded-2xl overflow-hidden shadow-lg border border-white/50">
+                    <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-48 md:h-64 object-cover"
+                    >
+                        <source src="/1.mp4" type="video/mp4" />
+                    </video>
+                </div>
+
                 {/* Main Chat Interface Area */}
                 <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 overflow-hidden h-[650px] flex flex-col">
                     <div className="p-5 border-b border-traditional-muted/20 flex justify-between items-center bg-white/40">
