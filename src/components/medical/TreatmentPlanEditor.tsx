@@ -1,7 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Save, Plus, Trash2, Calendar, Clock } from "lucide-react";
+import { Save, Plus, Trash2, Calendar, Clock, FileText } from "lucide-react";
+import {
+    Paper,
+    Group,
+    Stack,
+    Select,
+    TextInput,
+    Button,
+    ActionIcon,
+    Title,
+    Text,
+    Box,
+    rem
+} from "@mantine/core";
 
 type TreatmentItem = {
     id: string;
@@ -34,90 +47,79 @@ export default function TreatmentPlanEditor() {
     };
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <FileTextIcon /> 치료 계획 (Treatment Plan)
-                </h2>
-                <button
+        <Paper radius="xl" p="xl" withBorder>
+            <Group justify="space-between" mb="lg">
+                <Group gap="xs">
+                    <FileText size={20} />
+                    <Title order={3} size="h4" c="dark.8">치료 계획 (Treatment Plan)</Title>
+                </Group>
+                <Button
                     onClick={() => alert("저장되었습니다 (Mock)")}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    leftSection={<Save size={16} />}
+                    color="sage-green"
                 >
-                    <Save size={16} /> 저장하기
-                </button>
-            </div>
+                    저장하기
+                </Button>
+            </Group>
 
-            <div className="space-y-4">
+            <Stack gap="md">
                 {items.map((item) => (
-                    <div key={item.id} className="flex gap-3 items-start p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3">
-                            <select
-                                value={item.type}
-                                onChange={(e) => updateItem(item.id, "type", e.target.value)}
-                                className="p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    <Paper key={item.id} p="md" bg="gray.0" withBorder radius="md">
+                        <Group align="flex-start">
+                            <Stack gap="xs" style={{ flex: 1 }}>
+                                <Group grow>
+                                    <Select
+                                        value={item.type}
+                                        onChange={(value) => updateItem(item.id, "type", value as any)}
+                                        data={["침치료", "약침", "한약", "물리치료", "생활관리"]}
+                                        placeholder="치료 종류"
+                                    />
+                                    <TextInput
+                                        value={item.description}
+                                        onChange={(e) => updateItem(item.id, "description", e.currentTarget.value)}
+                                        placeholder="상세 내용 (예: 경추 이완)"
+                                        style={{ flex: 2 }}
+                                    />
+                                </Group>
+                                <Group grow>
+                                    <TextInput
+                                        leftSection={<Calendar size={16} />}
+                                        value={item.frequency}
+                                        onChange={(e) => updateItem(item.id, "frequency", e.currentTarget.value)}
+                                        placeholder="빈도 (예: 주 2회)"
+                                    />
+                                    <TextInput
+                                        leftSection={<Clock size={16} />}
+                                        value={item.duration}
+                                        onChange={(e) => updateItem(item.id, "duration", e.currentTarget.value)}
+                                        placeholder="기간 (예: 4주)"
+                                    />
+                                </Group>
+                            </Stack>
+                            <ActionIcon
+                                color="red"
+                                variant="subtle"
+                                onClick={() => removeItem(item.id)}
+                                mt={4}
                             >
-                                <option value="침치료">침치료</option>
-                                <option value="약침">약침</option>
-                                <option value="한약">한약</option>
-                                <option value="물리치료">물리치료</option>
-                                <option value="생활관리">생활관리</option>
-                            </select>
-                            <input
-                                type="text"
-                                value={item.description}
-                                onChange={(e) => updateItem(item.id, "description", e.target.value)}
-                                placeholder="상세 내용 (예: 경추 이완)"
-                                className="md:col-span-3 p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                            />
-                            <div className="flex items-center gap-2 md:col-span-2">
-                                <Calendar size={16} className="text-gray-400" />
-                                <input
-                                    type="text"
-                                    value={item.frequency}
-                                    onChange={(e) => updateItem(item.id, "frequency", e.target.value)}
-                                    placeholder="빈도 (예: 주 2회)"
-                                    className="flex-1 p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                />
-                            </div>
-                            <div className="flex items-center gap-2 md:col-span-2">
-                                <Clock size={16} className="text-gray-400" />
-                                <input
-                                    type="text"
-                                    value={item.duration}
-                                    onChange={(e) => updateItem(item.id, "duration", e.target.value)}
-                                    placeholder="기간 (예: 4주)"
-                                    className="flex-1 p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                                />
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => removeItem(item.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                        >
-                            <Trash2 size={18} />
-                        </button>
-                    </div>
+                                <Trash2 size={18} />
+                            </ActionIcon>
+                        </Group>
+                    </Paper>
                 ))}
-            </div>
+            </Stack>
 
-            <button
+            <Button
                 onClick={addItem}
-                className="mt-4 w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center justify-center gap-2 font-medium"
+                variant="outline"
+                color="sage-green"
+                fullWidth
+                mt="md"
+                leftSection={<Plus size={18} />}
+                style={{ borderStyle: 'dashed' }}
             >
-                <Plus size={18} /> 항목 추가
-            </button>
-        </div>
-    );
-}
-
-function FileTextIcon() {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" x2="8" y1="13" y2="13" />
-            <line x1="16" x2="8" y1="17" y2="17" />
-            <line x1="10" x2="8" y1="9" y2="9" />
-        </svg>
+                항목 추가
+            </Button>
+        </Paper>
     );
 }

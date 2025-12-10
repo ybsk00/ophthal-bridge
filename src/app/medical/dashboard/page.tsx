@@ -2,8 +2,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, ChevronDown, X, MessageSquare, CheckCircle2, Clock, User, Calendar } from "lucide-react";
+import { Search, X, MessageSquare, CheckCircle2, Clock, User, Calendar } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import {
+    Title,
+    Text,
+    Group,
+    Button,
+    TextInput,
+    Table,
+    Badge,
+    Modal,
+    Stack,
+    Paper,
+    ActionIcon,
+    Avatar,
+    ScrollArea,
+    ThemeIcon,
+    Divider,
+    Box,
+    rem
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
 export default function DoctorDashboard() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -23,8 +43,8 @@ export default function DoctorDashboard() {
 
     const [patients, setPatients] = useState<Patient[]>([]);
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-    const [showChatModal, setShowChatModal] = useState(false);
-    const [showReservationModal, setShowReservationModal] = useState(false);
+    const [openedChat, { open: openChat, close: closeChat }] = useDisclosure(false);
+    const [openedReservation, { open: openReservation, close: closeReservation }] = useDisclosure(false);
 
     const filters = ["전체", "대기", "완료"];
 
@@ -69,7 +89,7 @@ export default function DoctorDashboard() {
     const handleStatusClick = async (patient: Patient) => {
         if (patient.status === "completed") {
             setSelectedPatient(patient);
-            setShowReservationModal(true);
+            openReservation();
         } else {
             // Toggle status logic (optional, or just for demo)
             // For now, let's just mark as completed if pending
@@ -87,262 +107,240 @@ export default function DoctorDashboard() {
 
     const handleComplaintClick = (patient: Patient) => {
         setSelectedPatient(patient);
-        setShowChatModal(true);
+        openChat();
     };
 
     return (
-        <div className="space-y-8 p-6 max-w-7xl mx-auto">
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <Stack gap="lg">
+            <Group justify="space-between" align="flex-end">
                 <div>
-                    <h1 className="text-3xl font-bold text-traditional-text font-serif mb-2">진료 대시보드</h1>
-                    <p className="text-traditional-subtext text-sm">오늘의 예약 환자 및 진료 현황을 관리합니다.</p>
+                    <Title order={1} size="h2" c="sage-green.9" ff="heading">진료 대시보드</Title>
+                    <Text c="dimmed" size="sm">오늘의 예약 환자 및 진료 현황을 관리합니다.</Text>
                 </div>
-                <div className="flex items-center gap-3 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-traditional-muted/50 shadow-sm">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span className="text-sm font-medium text-traditional-text">실시간 연동 중</span>
-                </div>
-            </header>
+                <Badge
+                    variant="light"
+                    color="green"
+                    size="lg"
+                    leftSection={<Box w={8} h={8} bg="green" style={{ borderRadius: '50%' }} />}
+                >
+                    실시간 연동 중
+                </Badge>
+            </Group>
 
             {/* Top Filters & Search */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-sm">
-                <div className="flex flex-wrap gap-2 items-center w-full md:w-auto">
-                    <button className="px-4 py-2 rounded-full bg-traditional-primary text-white text-sm font-medium shadow-md hover:bg-traditional-primary/90 transition-colors">
-                        오늘
-                    </button>
-                    <div className="w-px h-6 bg-traditional-muted mx-2"></div>
-                    {filters.map((filter) => (
-                        <button
-                            key={filter}
-                            onClick={() => setActiveFilter(filter === activeFilter ? "" : filter)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${activeFilter === filter
-                                ? "bg-traditional-accent text-white shadow-md"
-                                : "bg-white border border-traditional-muted text-traditional-subtext hover:bg-traditional-bg hover:text-traditional-text"
-                                }`}
-                        >
-                            {filter}
-                            {activeFilter === filter && <X size={14} />}
-                        </button>
-                    ))}
-                </div>
-
-                {/* Search Bar */}
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-traditional-subtext" size={18} />
-                    <input
-                        type="text"
+            <Paper p="md" radius="lg" withBorder bg="white">
+                <Group justify="space-between">
+                    <Group gap="xs">
+                        <Button variant="filled" color="sage-green" radius="xl" size="sm">오늘</Button>
+                        <Divider orientation="vertical" />
+                        {filters.map((filter) => (
+                            <Button
+                                key={filter}
+                                variant={activeFilter === filter ? "light" : "subtle"}
+                                color="sage-green"
+                                radius="xl"
+                                size="sm"
+                                onClick={() => setActiveFilter(filter === activeFilter ? "" : filter)}
+                                rightSection={activeFilter === filter && <X size={14} />}
+                            >
+                                {filter}
+                            </Button>
+                        ))}
+                    </Group>
+                    <TextInput
                         placeholder="환자 이름 또는 키워드 검색"
-                        className="w-full pl-11 pr-4 py-2.5 bg-white border border-traditional-muted rounded-xl focus:outline-none focus:ring-2 focus:ring-traditional-accent/50 focus:border-traditional-accent transition-all shadow-sm text-sm"
+                        leftSection={<Search size={16} />}
+                        radius="xl"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={(e) => setSearchTerm(e.currentTarget.value)}
+                        w={300}
                     />
-                </div>
-            </div>
+                </Group>
+            </Paper>
 
             {/* Patient Table */}
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-white/60 shadow-xl overflow-hidden">
-                <table className="w-full text-left border-collapse">
-                    <thead className="bg-traditional-bg/50 border-b border-traditional-muted/50">
-                        <tr>
-                            <th className="px-8 py-5 text-sm font-bold text-traditional-text/80 uppercase tracking-wider">시간</th>
-                            <th className="px-8 py-5 text-sm font-bold text-traditional-text/80 uppercase tracking-wider">환자 정보</th>
-                            <th className="px-8 py-5 text-sm font-bold text-traditional-text/80 uppercase tracking-wider">주호소 (AI 요약)</th>
-                            <th className="px-8 py-5 text-sm font-bold text-traditional-text/80 uppercase tracking-wider">분석 키워드</th>
-                            <th className="px-8 py-5 text-sm font-bold text-traditional-text/80 uppercase tracking-wider">상태</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-traditional-muted/30">
+            <Paper radius="xl" withBorder style={{ overflow: 'hidden' }} shadow="sm">
+                <Table verticalSpacing="md" highlightOnHover>
+                    <Table.Thead bg="gray.0">
+                        <Table.Tr>
+                            <Table.Th>시간</Table.Th>
+                            <Table.Th>환자 정보</Table.Th>
+                            <Table.Th>주호소 (AI 요약)</Table.Th>
+                            <Table.Th>분석 키워드</Table.Th>
+                            <Table.Th>상태</Table.Th>
+                        </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
                         {patients.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} className="px-8 py-16 text-center text-traditional-subtext">
-                                    <div className="flex flex-col items-center gap-3">
-                                        <Calendar className="w-10 h-10 text-traditional-muted" />
-                                        <p>예약된 환자가 없습니다.</p>
-                                    </div>
-                                </td>
-                            </tr>
+                            <Table.Tr>
+                                <Table.Td colSpan={5}>
+                                    <Stack align="center" py={60} c="dimmed">
+                                        <Calendar size={40} />
+                                        <Text>예약된 환자가 없습니다.</Text>
+                                    </Stack>
+                                </Table.Td>
+                            </Table.Tr>
                         ) : (
                             patients.map((patient) => (
-                                <tr key={patient.id} className="hover:bg-white/50 transition-colors group">
-                                    <td className="px-8 py-5 text-traditional-text font-medium font-mono text-base">{patient.time}</td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-traditional-bg border border-traditional-muted flex items-center justify-center text-traditional-subtext">
+                                <Table.Tr key={patient.id}>
+                                    <Table.Td>
+                                        <Text fw={500} ff="monospace">{patient.time}</Text>
+                                    </Table.Td>
+                                    <Table.Td>
+                                        <Group gap="sm">
+                                            <Avatar radius="xl" color="gray">
                                                 <User size={18} />
-                                            </div>
+                                            </Avatar>
                                             <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-traditional-text text-base">{patient.name}</span>
-                                                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${patient.type === '초진' ? 'bg-green-100 text-green-700' :
-                                                        patient.type === '온라인' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
-                                                        }`}>
+                                                <Group gap="xs">
+                                                    <Text fw={700}>{patient.name}</Text>
+                                                    <Badge
+                                                        size="sm"
+                                                        variant="light"
+                                                        color={patient.type === '초진' ? 'green' : patient.type === '온라인' ? 'blue' : 'gray'}
+                                                    >
                                                         {patient.type}
-                                                    </span>
-                                                </div>
+                                                    </Badge>
+                                                </Group>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <button
+                                        </Group>
+                                    </Table.Td>
+                                    <Table.Td>
+                                        <Button
+                                            variant="subtle"
+                                            color="dark"
+                                            size="sm"
+                                            justify="flex-start"
+                                            leftSection={<MessageSquare size={16} className="mantine-rotate-rtl" />}
                                             onClick={() => handleComplaintClick(patient)}
-                                            className="text-traditional-subtext hover:text-traditional-primary hover:underline text-left flex items-center gap-2 group-hover:translate-x-1 transition-all"
+                                            styles={{ label: { fontWeight: 400 } }}
                                         >
-                                            <MessageSquare size={16} className="text-traditional-muted group-hover:text-traditional-primary" />
-                                            <span className="line-clamp-1">{patient.complaint}</span>
-                                        </button>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <div className="flex flex-wrap gap-1.5">
+                                            {patient.complaint}
+                                        </Button>
+                                    </Table.Td>
+                                    <Table.Td>
+                                        <Group gap={4}>
                                             {patient.keywords.map((keyword, idx) => (
-                                                <span key={idx} className="px-2.5 py-1 bg-traditional-bg border border-traditional-muted/50 rounded-md text-xs text-traditional-subtext font-medium">
+                                                <Badge key={idx} variant="outline" color="gray" size="sm" fw={500}>
                                                     #{keyword}
-                                                </span>
+                                                </Badge>
                                             ))}
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-5">
-                                        <button
+                                        </Group>
+                                    </Table.Td>
+                                    <Table.Td>
+                                        <Button
+                                            variant={patient.status === 'completed' ? 'light' : patient.status === 'cancelled' ? 'light' : 'default'}
+                                            color={patient.status === 'completed' ? 'sage-green' : patient.status === 'cancelled' ? 'red' : 'gray'}
+                                            radius="xl"
+                                            size="xs"
+                                            leftSection={
+                                                patient.status === 'completed' ? <CheckCircle2 size={14} /> :
+                                                    patient.status === 'cancelled' ? <X size={14} /> :
+                                                        <Clock size={14} />
+                                            }
                                             onClick={() => handleStatusClick(patient)}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${patient.status === 'completed'
-                                                ? 'bg-traditional-primary/10 text-traditional-primary border border-traditional-primary/20 hover:bg-traditional-primary/20'
-                                                : patient.status === 'cancelled'
-                                                    ? 'bg-red-50 text-red-600 border border-red-100 hover:bg-red-100'
-                                                    : 'bg-white border border-traditional-muted text-traditional-subtext hover:bg-traditional-bg'
-                                                }`}
                                         >
-                                            {patient.status === 'completed' ? (
-                                                <>
-                                                    <CheckCircle2 size={16} />
-                                                    진료 완료
-                                                </>
-                                            ) : patient.status === 'cancelled' ? (
-                                                <>
-                                                    <X size={16} />
-                                                    예약 취소
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Clock size={16} />
-                                                    진료 대기
-                                                </>
-                                            )}
-                                        </button>
-                                    </td>
-                                </tr>
+                                            {patient.status === 'completed' ? '진료 완료' :
+                                                patient.status === 'cancelled' ? '예약 취소' :
+                                                    '진료 대기'}
+                                        </Button>
+                                    </Table.Td>
+                                </Table.Tr>
                             ))
                         )}
-                    </tbody>
-                </table>
-            </div>
+                    </Table.Tbody>
+                </Table>
+            </Paper>
 
             {/* Chat History Modal */}
-            {showChatModal && selectedPatient && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-white/20 flex flex-col max-h-[80vh]">
-                        <div className="flex items-center justify-between px-8 py-5 border-b border-traditional-muted/30 bg-traditional-bg/50">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-traditional-primary/10 rounded-lg">
-                                    <MessageSquare className="text-traditional-primary" size={20} />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-traditional-text">AI 사전 문진 내역</h3>
-                                    <p className="text-xs text-traditional-subtext">환자: {selectedPatient.name}</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setShowChatModal(false)}
-                                className="p-2 text-traditional-subtext hover:text-traditional-text hover:bg-traditional-muted/20 rounded-full transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
+            <Modal
+                opened={openedChat}
+                onClose={closeChat}
+                title={
+                    <Group>
+                        <ThemeIcon variant="light" color="sage-green" size="lg" radius="md">
+                            <MessageSquare size={20} />
+                        </ThemeIcon>
+                        <div>
+                            <Text fw={700}>AI 사전 문진 내역</Text>
+                            <Text size="xs" c="dimmed">환자: {selectedPatient?.name}</Text>
                         </div>
-                        <div className="p-8 space-y-6 overflow-y-auto bg-traditional-bg/30 flex-1">
-                            {/* Mock Chat Content */}
-                            <div className="flex gap-4">
-                                <div className="w-10 h-10 rounded-full bg-traditional-primary flex items-center justify-center flex-shrink-0 shadow-md border-2 border-white">
-                                    <span className="text-xs font-bold text-white">AI</span>
-                                </div>
-                                <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-traditional-muted/50 text-traditional-text text-sm leading-relaxed max-w-[80%]">
-                                    안녕하세요, {selectedPatient.name}님. 오늘 어떤 불편함 때문에 내원하셨나요?
-                                </div>
-                            </div>
-                            <div className="flex gap-4 flex-row-reverse">
-                                <div className="w-10 h-10 rounded-full bg-traditional-accent flex items-center justify-center flex-shrink-0 shadow-md border-2 border-white">
-                                    <span className="text-xs font-bold text-white">나</span>
-                                </div>
-                                <div className="bg-traditional-accent/10 p-4 rounded-2xl rounded-tr-none shadow-sm border border-traditional-accent/20 text-traditional-text text-sm leading-relaxed max-w-[80%]">
-                                    {selectedPatient.complaint}
-                                </div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="w-10 h-10 rounded-full bg-traditional-primary flex items-center justify-center flex-shrink-0 shadow-md border-2 border-white">
-                                    <span className="text-xs font-bold text-white">AI</span>
-                                </div>
-                                <div className="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-traditional-muted/50 text-traditional-text text-sm leading-relaxed max-w-[80%]">
-                                    증상이 언제부터 시작되었나요? 통증의 정도는 어떠신가요?
-                                </div>
-                            </div>
-                        </div>
-                        <div className="p-5 border-t border-traditional-muted/30 bg-white flex justify-end">
-                            <button
-                                onClick={() => setShowChatModal(false)}
-                                className="px-6 py-2.5 bg-traditional-bg text-traditional-text border border-traditional-muted rounded-xl font-medium hover:bg-traditional-muted/30 transition-colors"
-                            >
-                                닫기
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                    </Group>
+                }
+                size="lg"
+                radius="lg"
+                centered
+            >
+                <Paper bg="gray.0" p="md" radius="md" h={400} withBorder>
+                    <ScrollArea h="100%">
+                        <Stack gap="md">
+                            <Group align="flex-start" gap="sm">
+                                <Avatar color="sage-green" radius="xl">AI</Avatar>
+                                <Paper p="sm" radius="md" bg="white" shadow="xs" style={{ borderTopLeftRadius: 0 }}>
+                                    <Text size="sm">안녕하세요, {selectedPatient?.name}님. 오늘 어떤 불편함 때문에 내원하셨나요?</Text>
+                                </Paper>
+                            </Group>
+                            <Group align="flex-start" justify="flex-end" gap="sm">
+                                <Paper p="sm" radius="md" bg="sage-green.1" style={{ borderTopRightRadius: 0 }}>
+                                    <Text size="sm">{selectedPatient?.complaint}</Text>
+                                </Paper>
+                                <Avatar color="gray" radius="xl">나</Avatar>
+                            </Group>
+                            <Group align="flex-start" gap="sm">
+                                <Avatar color="sage-green" radius="xl">AI</Avatar>
+                                <Paper p="sm" radius="md" bg="white" shadow="xs" style={{ borderTopLeftRadius: 0 }}>
+                                    <Text size="sm">증상이 언제부터 시작되었나요? 통증의 정도는 어떠신가요?</Text>
+                                </Paper>
+                            </Group>
+                        </Stack>
+                    </ScrollArea>
+                </Paper>
+                <Group justify="flex-end" mt="md">
+                    <Button variant="default" onClick={closeChat}>닫기</Button>
+                </Group>
+            </Modal>
 
             {/* Reservation Confirmation Modal */}
-            {showReservationModal && selectedPatient && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-white/20">
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-traditional-muted/30">
-                            <h3 className="text-lg font-bold text-traditional-text">예약 상세 정보</h3>
-                            <button
-                                onClick={() => setShowReservationModal(false)}
-                                className="text-traditional-subtext hover:text-traditional-text transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="p-8 text-center space-y-6">
-                            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2 ring-8 ring-green-50/50">
-                                <CheckCircle2 className="text-green-600" size={40} />
-                            </div>
-
-                            <div className="space-y-1">
-                                <h4 className="text-xl font-bold text-traditional-text">{selectedPatient.name}님</h4>
-                                <p className="text-traditional-subtext text-sm">진료 예약이 확정되었습니다.</p>
-                            </div>
-
-                            <div className="bg-traditional-bg rounded-2xl p-5 space-y-4 text-left border border-traditional-muted/50">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-traditional-subtext text-sm">날짜</span>
-                                    <span className="font-bold text-traditional-text">2025년 12월 08일 (금)</span>
-                                </div>
-                                <div className="flex justify-between items-center border-t border-traditional-muted/20 pt-3">
-                                    <span className="text-traditional-subtext text-sm">시간</span>
-                                    <span className="font-bold text-traditional-primary text-lg">{selectedPatient.time}</span>
-                                </div>
-                                <div className="flex justify-between items-center border-t border-traditional-muted/20 pt-3">
-                                    <span className="text-traditional-subtext text-sm">진료 유형</span>
-                                    <span className="font-medium text-traditional-text bg-white px-2 py-0.5 rounded border border-traditional-muted/30 text-sm">{selectedPatient.type}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="p-5 border-t border-traditional-muted/30 bg-white">
-                            <button
-                                onClick={() => setShowReservationModal(false)}
-                                className="w-full py-3.5 bg-traditional-primary text-white rounded-xl font-bold hover:bg-traditional-primary/90 transition-colors shadow-lg shadow-traditional-primary/20"
-                            >
-                                확인 완료
-                            </button>
-                        </div>
+            <Modal
+                opened={openedReservation}
+                onClose={closeReservation}
+                title={<Text fw={700}>예약 상세 정보</Text>}
+                centered
+                radius="lg"
+            >
+                <Stack align="center" gap="md" py="lg">
+                    <ThemeIcon size={80} radius="xl" color="green" variant="light">
+                        <CheckCircle2 size={40} />
+                    </ThemeIcon>
+                    <div style={{ textAlign: 'center' }}>
+                        <Title order={3}>{selectedPatient?.name}님</Title>
+                        <Text c="dimmed" size="sm">진료 예약이 확정되었습니다.</Text>
                     </div>
-                </div>
-            )}
-        </div>
+
+                    <Paper withBorder p="md" radius="md" w="100%" bg="gray.0">
+                        <Stack gap="sm">
+                            <Group justify="space-between">
+                                <Text size="sm" c="dimmed">날짜</Text>
+                                <Text fw={500}>2025년 12월 08일 (금)</Text>
+                            </Group>
+                            <Divider />
+                            <Group justify="space-between">
+                                <Text size="sm" c="dimmed">시간</Text>
+                                <Text fw={700} c="sage-green.9" size="lg">{selectedPatient?.time}</Text>
+                            </Group>
+                            <Divider />
+                            <Group justify="space-between">
+                                <Text size="sm" c="dimmed">진료 유형</Text>
+                                <Badge variant="default">{selectedPatient?.type}</Badge>
+                            </Group>
+                        </Stack>
+                    </Paper>
+
+                    <Button fullWidth color="sage-green" size="lg" onClick={closeReservation}>
+                        확인 완료
+                    </Button>
+                </Stack>
+            </Modal>
+        </Stack>
     );
 }

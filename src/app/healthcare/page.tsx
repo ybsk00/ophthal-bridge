@@ -1,5 +1,17 @@
 import Link from "next/link";
 import { Battery, Moon, CloudRain, Thermometer, Baby } from "lucide-react";
+import {
+    Container,
+    Title,
+    Text,
+    SimpleGrid,
+    Card,
+    Group,
+    ThemeIcon,
+    Stack,
+    Badge,
+    rem
+} from "@mantine/core";
 
 const services = [
     {
@@ -8,7 +20,7 @@ const services = [
         subtitle: "기력 배터리 & 한방 기운 도장",
         description: "지금 내 몸 배터리는 몇 %일까? 한의사가 보는 오늘 기력 점수 확인하기",
         icon: Battery,
-        color: "bg-blue-100 text-blue-600",
+        color: "blue",
     },
     {
         id: "women",
@@ -16,7 +28,7 @@ const services = [
         subtitle: "월경 리듬 MBTI",
         description: "나의 한방 여성 리듬 MBTI는? PMS 때 나는 숨고 싶은 타입 vs 말 걸지 마 타입?",
         icon: Moon,
-        color: "bg-purple-100 text-purple-600",
+        color: "grape",
     },
     {
         id: "pain",
@@ -24,7 +36,7 @@ const services = [
         subtitle: "통증 지도 & 몸 날씨 예보",
         description: "한의사가 보는 내 몸 통증 지도. 오늘 내 몸 날씨는 맑음일까 흐림일까?",
         icon: CloudRain,
-        color: "bg-gray-100 text-gray-600",
+        color: "gray",
     },
     {
         id: "digestion",
@@ -32,7 +44,7 @@ const services = [
         subtitle: "위장 온도계 & 수면 한방 MBTI",
         description: "내 위장은 지금 뜨거울까, 차가울까? 야식과 수면 패턴으로 보는 내 타입",
         icon: Thermometer,
-        color: "bg-orange-100 text-orange-600",
+        color: "orange",
     },
     {
         id: "pregnancy",
@@ -40,51 +52,70 @@ const services = [
         subtitle: "임신 체력 레벨 테스트",
         description: "임신을 준비하는 내 몸, 체력 레벨은? 성실 준비형 vs 휴식 필요형",
         icon: Baby,
-        color: "bg-pink-100 text-pink-600",
+        color: "pink",
     },
 ];
 
 export default function HealthcarePage() {
     return (
-        <div className="min-h-screen bg-stone-50 p-6 pb-24">
-            <div className="max-w-md mx-auto space-y-6">
-                <div className="text-center space-y-2 mb-8">
-                    <h1 className="text-2xl font-bold text-stone-800">AI 한방 헬스케어</h1>
-                    <p className="text-stone-500 text-sm">
-                        전통 한의학과 AI가 만나<br />
-                        당신의 매일매일 건강 리듬을 챙겨드립니다.
-                    </p>
-                </div>
+        <Container size="sm" py="xl" pb={100}>
+            <Stack gap="lg" mb={40} align="center">
+                <Title order={1} c="sage-green.9" style={{ fontSize: '1.75rem' }}>
+                    AI 한방 헬스케어
+                </Title>
+                <Text c="dimmed" size="sm" ta="center" style={{ lineHeight: 1.6 }}>
+                    전통 한의학과 AI가 만나<br />
+                    당신의 매일매일 건강 리듬을 챙겨드립니다.
+                </Text>
+            </Stack>
 
-                <div className="grid gap-4">
-                    {services.map((service) => (
-                        <Link
-                            key={service.id}
-                            href={`/healthcare/${service.id}`}
-                            className="block bg-white p-5 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-all active:scale-[0.98]"
-                        >
-                            <div className="flex items-start gap-4">
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${service.color}`}>
-                                    <service.icon size={24} />
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-600">
-                                            {service.title}
-                                        </span>
-                                    </div>
-                                    <h3 className="font-bold text-lg text-stone-800 leading-tight">
-                                        {service.subtitle}
-                                    </h3>
-                                    <p className="text-sm text-stone-500 leading-snug">
-                                        {service.description}
-                                    </p>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            </div>
-        </div>
+            <SimpleGrid cols={{ base: 1, sm: 1 }} spacing="md">
+                {services.map((service) => (
+                    <Card
+                        key={service.id}
+                        component={Link}
+                        href={`/healthcare/${service.id}`}
+                        padding="lg"
+                        radius="md"
+                        withBorder
+                        style={{
+                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                            cursor: 'pointer'
+                        }}
+                        className="hover:shadow-md active:scale-[0.99]"
+                    >
+                        <Group align="flex-start" wrap="nowrap">
+                            <ThemeIcon
+                                size={48}
+                                radius="md"
+                                variant="light"
+                                color={service.color}
+                            >
+                                <service.icon size={24} />
+                            </ThemeIcon>
+
+                            <Stack gap={4} style={{ flex: 1 }}>
+                                <Group>
+                                    <Badge
+                                        variant="light"
+                                        color="sage-green"
+                                        size="sm"
+                                        radius="sm"
+                                    >
+                                        {service.title}
+                                    </Badge>
+                                </Group>
+                                <Title order={3} size="h4" c="dark.8" mt={4}>
+                                    {service.subtitle}
+                                </Title>
+                                <Text size="sm" c="dimmed" lh={1.5}>
+                                    {service.description}
+                                </Text>
+                            </Stack>
+                        </Group>
+                    </Card>
+                ))}
+            </SimpleGrid>
+        </Container>
     );
 }

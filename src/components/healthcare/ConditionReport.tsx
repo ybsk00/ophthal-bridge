@@ -4,6 +4,19 @@ import { motion } from "framer-motion";
 import { Activity, Tag, FileText, ArrowRight, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { SummaryResult } from "@/lib/ai/summary";
+import {
+    Paper,
+    Text,
+    Title,
+    Badge,
+    Button,
+    Group,
+    Stack,
+    ThemeIcon,
+    Container,
+    Alert,
+    rem
+} from "@mantine/core";
 
 interface ConditionReportProps {
     result: SummaryResult;
@@ -13,10 +26,10 @@ interface ConditionReportProps {
 export default function ConditionReport({ result, onRetry }: ConditionReportProps) {
     // Determine color based on score
     const getScoreColor = (score: number) => {
-        if (score >= 90) return "text-green-600";
-        if (score >= 70) return "text-blue-600";
-        if (score >= 50) return "text-orange-500";
-        return "text-red-500";
+        if (score >= 90) return "green";
+        if (score >= 70) return "blue";
+        if (score >= 50) return "orange";
+        return "red";
     };
 
     const getScoreLabel = (score: number) => {
@@ -26,34 +39,56 @@ export default function ConditionReport({ result, onRetry }: ConditionReportProp
         return "관리 필요";
     };
 
-    return (
-        <div className="flex flex-col h-full bg-traditional-bg font-sans overflow-y-auto">
-            <div className="p-6 space-y-8 pb-20">
+    const scoreColor = getScoreColor(result.rhythm_score);
 
+    return (
+        <Container size="sm" py="xl" pb={100}>
+            <Stack gap="xl">
                 {/* Header */}
-                <div className="text-center space-y-2">
-                    <h2 className="text-2xl font-bold text-traditional-text">나의 건강 리듬 리포트</h2>
-                    <p className="text-sm text-traditional-subtext">AI가 분석한 현재 컨디션입니다.</p>
-                </div>
+                <Stack gap="xs" align="center" ta="center">
+                    <Title order={2} c="sage-green.9">나의 건강 리듬 리포트</Title>
+                    <Text c="dimmed" size="sm">AI가 분석한 현재 컨디션입니다.</Text>
+                </Stack>
 
                 {/* Score Card */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white rounded-3xl p-8 shadow-lg border border-traditional-muted text-center relative overflow-hidden"
                 >
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-traditional-secondary to-traditional-accent opacity-30" />
-
-                    <div className="space-y-4">
-                        <h3 className="text-traditional-subtext font-medium">종합 리듬 점수</h3>
-                        <div className={`text-6xl font-black ${getScoreColor(result.rhythm_score)}`}>
-                            {result.rhythm_score}
-                            <span className="text-2xl text-traditional-subtext font-normal ml-1">점</span>
-                        </div>
-                        <div className={`inline-block px-4 py-1 rounded-full text-sm font-bold bg-traditional-muted/20 ${getScoreColor(result.rhythm_score)}`}>
-                            {getScoreLabel(result.rhythm_score)}
-                        </div>
-                    </div>
+                    <Paper
+                        radius="xl"
+                        p="xl"
+                        withBorder
+                        style={{
+                            textAlign: 'center',
+                            overflow: 'hidden',
+                            position: 'relative'
+                        }}
+                    >
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: '8px',
+                                background: 'linear-gradient(90deg, var(--mantine-color-sage-green-3), var(--mantine-color-sage-green-6))',
+                                opacity: 0.5
+                            }}
+                        />
+                        <Stack gap="md" align="center">
+                            <Text c="dimmed" fw={500}>종합 리듬 점수</Text>
+                            <Group align="baseline" gap={4}>
+                                <Text size={rem(60)} fw={900} c={`${scoreColor}.7`} style={{ lineHeight: 1 }}>
+                                    {result.rhythm_score}
+                                </Text>
+                                <Text size="xl" c="dimmed">점</Text>
+                            </Group>
+                            <Badge size="lg" variant="light" color={scoreColor}>
+                                {getScoreLabel(result.rhythm_score)}
+                            </Badge>
+                        </Stack>
+                    </Paper>
                 </motion.div>
 
                 {/* Key Patterns */}
@@ -61,19 +96,22 @@ export default function ConditionReport({ result, onRetry }: ConditionReportProp
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="space-y-4"
                 >
-                    <div className="flex items-center gap-2 text-traditional-text font-bold text-lg">
-                        <Tag size={20} className="text-traditional-secondary" />
-                        <h3>핵심 패턴 태그</h3>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {result.pattern_tags.map((tag, i) => (
-                            <span key={i} className="px-4 py-2 bg-white border border-traditional-muted rounded-xl text-traditional-text font-medium shadow-sm">
-                                #{tag}
-                            </span>
-                        ))}
-                    </div>
+                    <Stack gap="sm">
+                        <Group gap="xs">
+                            <ThemeIcon variant="light" color="sage-green" size="md">
+                                <Tag size={16} />
+                            </ThemeIcon>
+                            <Title order={3} size="h4" c="sage-green.9">핵심 패턴 태그</Title>
+                        </Group>
+                        <Group gap="xs">
+                            {result.pattern_tags.map((tag, i) => (
+                                <Badge key={i} size="lg" variant="outline" color="gray" radius="md" py="md" tt="none">
+                                    #{tag}
+                                </Badge>
+                            ))}
+                        </Group>
+                    </Stack>
                 </motion.div>
 
                 {/* Summary Text */}
@@ -81,15 +119,20 @@ export default function ConditionReport({ result, onRetry }: ConditionReportProp
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="space-y-4"
                 >
-                    <div className="flex items-center gap-2 text-traditional-text font-bold text-lg">
-                        <FileText size={20} className="text-traditional-secondary" />
-                        <h3>AI 분석 요약</h3>
-                    </div>
-                    <div className="bg-white p-6 rounded-2xl border border-traditional-muted shadow-sm leading-relaxed text-traditional-text">
-                        {result.summary_text}
-                    </div>
+                    <Stack gap="sm">
+                        <Group gap="xs">
+                            <ThemeIcon variant="light" color="sage-green" size="md">
+                                <FileText size={16} />
+                            </ThemeIcon>
+                            <Title order={3} size="h4" c="sage-green.9">AI 분석 요약</Title>
+                        </Group>
+                        <Paper p="lg" radius="md" withBorder bg="gray.0">
+                            <Text c="dark.8" lh={1.6}>
+                                {result.summary_text}
+                            </Text>
+                        </Paper>
+                    </Stack>
                 </motion.div>
 
                 {/* Main Concern */}
@@ -97,32 +140,49 @@ export default function ConditionReport({ result, onRetry }: ConditionReportProp
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-red-50 p-6 rounded-2xl border border-red-100 space-y-2"
                 >
-                    <h4 className="text-red-800 font-bold flex items-center gap-2">
-                        <Activity size={18} />
-                        주요 관리 포인트
-                    </h4>
-                    <p className="text-red-600 font-medium">
-                        {result.main_concern}
-                    </p>
+                    <Alert
+                        variant="light"
+                        color="red"
+                        title={
+                            <Group gap="xs">
+                                <Activity size={18} />
+                                <Text fw={700}>주요 관리 포인트</Text>
+                            </Group>
+                        }
+                        radius="md"
+                    >
+                        <Text c="red.8" fw={500} mt="xs">
+                            {result.main_concern}
+                        </Text>
+                    </Alert>
                 </motion.div>
 
                 {/* CTA Actions */}
-                <div className="space-y-3 pt-4">
-                    <Link href="/login" className="block w-full py-4 bg-traditional-text text-white rounded-xl font-bold text-center shadow-md hover:bg-black transition-colors">
-                        로그인하고 전체 리포트 저장하기
-                    </Link>
-                    <button
-                        onClick={onRetry}
-                        className="block w-full py-4 bg-white border border-traditional-muted text-traditional-subtext rounded-xl font-medium text-center hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                <Stack gap="md" pt="md">
+                    <Button
+                        component={Link}
+                        href="/login"
+                        size="xl"
+                        color="sage-green"
+                        fullWidth
+                        radius="md"
+                        rightSection={<ArrowRight size={18} />}
                     >
-                        <RefreshCw size={18} />
+                        로그인하고 전체 리포트 저장하기
+                    </Button>
+                    <Button
+                        onClick={onRetry}
+                        variant="default"
+                        size="xl"
+                        fullWidth
+                        radius="md"
+                        leftSection={<RefreshCw size={18} />}
+                    >
                         다시 상담하기
-                    </button>
-                </div>
-
-            </div>
-        </div>
+                    </Button>
+                </Stack>
+            </Stack>
+        </Container>
     );
 }

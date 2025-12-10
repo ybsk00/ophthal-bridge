@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Calendar, Search, Bell, Video, LogOut } from "lucide-react";
+import { Stack, NavLink, Group, Text, ThemeIcon, Button, Divider, Box } from "@mantine/core";
 
 export default function DoctorSidebar() {
     const pathname = usePathname();
@@ -15,45 +16,53 @@ export default function DoctorSidebar() {
     ];
 
     return (
-        <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col fixed left-0 top-0 z-30">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-100">
-                <div className="flex items-center gap-3 mb-1">
-                    <div className="w-8 h-8 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
-                        J
-                    </div>
-                    <h1 className="font-bold text-gray-900 text-lg">한의원</h1>
-                </div>
-                <p className="text-xs text-teal-600 font-medium pl-11">Doctor Dashboard</p>
-            </div>
+        <Stack h="100%" justify="space-between">
+            <Box>
+                {/* Header */}
+                <Box p="md" mb="md">
+                    <Group gap="xs" mb={4}>
+                        <ThemeIcon size="lg" radius="xl" color="sage-green" variant="filled">
+                            <Text fw={700} size="sm">J</Text>
+                        </ThemeIcon>
+                        <Text fw={700} size="lg" c="dark.9">한의원</Text>
+                    </Group>
+                    <Text size="xs" c="sage-green.7" fw={500} pl={42}>Doctor Dashboard</Text>
+                </Box>
 
-            {/* Menu */}
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                {menuItems.map((item) => {
-                    const isActive = pathname === item.href;
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${isActive
-                                ? "bg-teal-50 text-teal-700"
-                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                }`}
-                        >
-                            <item.icon size={20} className={isActive ? "text-teal-600" : "text-gray-400"} />
-                            {item.label}
-                        </Link>
-                    );
-                })}
-            </nav>
+                {/* Menu */}
+                <Stack gap={4}>
+                    {menuItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        return (
+                            <NavLink
+                                key={item.href}
+                                component={Link}
+                                href={item.href}
+                                label={item.label}
+                                leftSection={<item.icon size={20} />}
+                                active={isActive}
+                                color="sage-green"
+                                variant="light"
+                                style={{ borderRadius: 'var(--mantine-radius-md)' }}
+                            />
+                        );
+                    })}
+                </Stack>
+            </Box>
 
             {/* Footer */}
-            <div className="p-4 border-t border-gray-100">
-                <button className="flex items-center gap-3 px-4 py-3 w-full text-left text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
-                    <LogOut size={20} className="text-gray-400" />
+            <Box>
+                <Divider mb="md" />
+                <Button
+                    variant="subtle"
+                    color="gray"
+                    fullWidth
+                    justify="flex-start"
+                    leftSection={<LogOut size={20} />}
+                >
                     로그아웃
-                </button>
-            </div>
-        </aside>
+                </Button>
+            </Box>
+        </Stack>
     );
 }

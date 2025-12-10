@@ -3,6 +3,20 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, User, Bot, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import {
+    Paper,
+    Stack,
+    Group,
+    Text,
+    Textarea,
+    ActionIcon,
+    Avatar,
+    ScrollArea,
+    Loader,
+    Box,
+    ThemeIcon,
+    rem
+} from "@mantine/core";
 
 interface Message {
     role: "user" | "ai";
@@ -15,16 +29,22 @@ interface HealthcareChatProps {
     initialMessage: string;
 }
 
-export default function HealthcareChat({ serviceType, serviceName, initialMessage }: HealthcareChatProps) {
+export default function HealthcareChat({
+    serviceType,
+    serviceName,
+    initialMessage,
+}: HealthcareChatProps) {
     const [messages, setMessages] = useState<Message[]>([
-        { role: "ai", content: initialMessage }
+        { role: "ai", content: initialMessage },
     ]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const viewport = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (viewport.current) {
+            viewport.current.scrollTo({ top: viewport.current.scrollHeight, behavior: 'smooth' });
+        }
     };
 
     useEffect(() => {
@@ -62,7 +82,10 @@ export default function HealthcareChat({ serviceType, serviceName, initialMessag
             console.error("Chat Error:", error);
             setMessages((prev) => [
                 ...prev,
-                { role: "ai", content: "죄송합니다. 잠시 문제가 발생했습니다. 다시 시도해 주세요." },
+                {
+                    role: "ai",
+                    content: "죄송합니다. 잠시 문제가 발생했습니다. 다시 시도해 주세요.",
+                },
             ]);
         } finally {
             setIsLoading(false);
@@ -77,82 +100,118 @@ export default function HealthcareChat({ serviceType, serviceName, initialMessag
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-120px)] max-w-2xl mx-auto bg-white/50 backdrop-blur-sm rounded-2xl shadow-xl border border-stone-200 overflow-hidden">
+        <Paper
+            shadow="xl"
+            radius="lg"
+            withBorder
+            h="calc(100vh - 120px)"
+            maw={700}
+            mx="auto"
+            style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+        >
             {/* Header */}
-            <div className="bg-traditional-accent/10 p-4 border-b border-traditional-accent/20 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-traditional-accent/20 flex items-center justify-center text-traditional-accent">
-                    <Sparkles size={20} />
-                </div>
-                <div>
-                    <h2 className="font-bold text-lg text-stone-800">{serviceName}</h2>
-                    <p className="text-xs text-stone-500">AI 한방 헬스케어</p>
-                </div>
-            </div>
+            <Box p="md" bg="sage-green.0" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)' }}>
+                <Group>
+                    <ThemeIcon size="lg" radius="xl" color="sage-green" variant="light">
+                        <Sparkles size={20} />
+                    </ThemeIcon>
+                    <div>
+                        <Text fw={700} size="lg" c="dark.8">
+                            {serviceName}
+                        </Text>
+                        <Text size="xs" c="dimmed">
+                            AI 한방 헬스케어
+                        </Text>
+                    </div>
+                </Group>
+            </Box>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-stone-300 scrollbar-track-transparent">
-                {messages.map((msg, index) => (
-                    <div
-                        key={index}
-                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                        <div
-                            className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${msg.role === "user"
-                                    ? "bg-traditional-accent text-white rounded-tr-none"
-                                    : "bg-white border border-stone-100 text-stone-800 rounded-tl-none"
-                                }`}
+            <ScrollArea viewportRef={viewport} style={{ flex: 1 }} p="md" bg="gray.0">
+                <Stack gap="md">
+                    {messages.map((msg, index) => (
+                        <Group
+                            key={index}
+                            align="flex-start"
+                            justify={msg.role === "user" ? "flex-end" : "flex-start"}
+                            gap="xs"
                         >
-                            <div className="flex items-start gap-2 mb-1">
-                                {msg.role === "ai" ? (
-                                    <Bot size={14} className="mt-1 opacity-50" />
-                                ) : (
-                                    <User size={14} className="mt-1 opacity-50" />
-                                )}
-                                <span className="text-xs opacity-70 font-medium">
+                            {msg.role === "ai" && (
+                                <Avatar color="sage-green" radius="xl" size="sm">
+                                    <Bot size={16} />
+                                </Avatar>
+                            )}
+
+                            <Paper
+                                p="md"
+                                radius="md"
+                                bg={msg.role === "user" ? "sage-green.6" : "white"}
+                                c={msg.role === "user" ? "white" : "dark.8"}
+                                shadow="xs"
+                                maw="85%"
+                                style={{
+                                    borderTopRightRadius: msg.role === "user" ? 0 : undefined,
+                                    borderTopLeftRadius: msg.role === "ai" ? 0 : undefined,
+                                }}
+                            >
+                                <Text size="xs" mb={4} opacity={0.7} fw={500} c={msg.role === "user" ? "white" : "dimmed"}>
                                     {msg.role === "user" ? "나" : serviceName}
-                                </span>
-                            </div>
-                            <div className="prose prose-sm max-w-none dark:prose-invert leading-relaxed whitespace-pre-wrap">
-                                <ReactMarkdown>{msg.content}</ReactMarkdown>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-                {isLoading && (
-                    <div className="flex justify-start">
-                        <div className="bg-white border border-stone-100 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center gap-2">
-                            <div className="w-2 h-2 bg-traditional-accent/50 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                            <div className="w-2 h-2 bg-traditional-accent/50 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                            <div className="w-2 h-2 bg-traditional-accent/50 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-                        </div>
-                    </div>
-                )}
-                <div ref={messagesEndRef} />
-            </div>
+                                </Text>
+                                <div className={`prose prose-sm max-w-none ${msg.role === "user" ? "text-white prose-headings:text-white prose-p:text-white prose-strong:text-white" : "text-gray-800"}`}>
+                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                </div>
+                            </Paper>
+
+                            {msg.role === "user" && (
+                                <Avatar color="gray" radius="xl" size="sm">
+                                    <User size={16} />
+                                </Avatar>
+                            )}
+                        </Group>
+                    ))}
+
+                    {isLoading && (
+                        <Group align="flex-start" gap="xs">
+                            <Avatar color="sage-green" radius="xl" size="sm">
+                                <Bot size={16} />
+                            </Avatar>
+                            <Paper p="md" radius="md" bg="white" shadow="xs" style={{ borderTopLeftRadius: 0 }}>
+                                <Loader size="xs" color="sage-green" type="dots" />
+                            </Paper>
+                        </Group>
+                    )}
+                </Stack>
+            </ScrollArea>
 
             {/* Input Area */}
-            <div className="p-4 bg-white border-t border-stone-100">
-                <div className="flex gap-2 items-end bg-stone-50 p-2 rounded-xl border border-stone-200 focus-within:border-traditional-accent/50 focus-within:ring-1 focus-within:ring-traditional-accent/50 transition-all">
-                    <textarea
+            <Box p="md" bg="white" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+                <Group align="flex-end" gap="sm">
+                    <Textarea
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={(e) => setInput(e.currentTarget.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="답변을 입력해주세요..."
-                        className="flex-1 bg-transparent border-none focus:ring-0 resize-none min-h-[44px] max-h-[120px] p-2 text-stone-800 placeholder:text-stone-400 text-sm"
-                        rows={1}
+                        autosize
+                        minRows={1}
+                        maxRows={4}
+                        style={{ flex: 1 }}
+                        styles={{ input: { padding: '10px' } }}
                     />
-                    <button
+                    <ActionIcon
                         onClick={handleSendMessage}
                         disabled={!input.trim() || isLoading}
-                        className="p-2 rounded-lg bg-traditional-accent text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-traditional-accent/90 transition-colors mb-0.5"
+                        size="lg"
+                        color="sage-green"
+                        variant="filled"
+                        mb={4}
                     >
                         <Send size={18} />
-                    </button>
-                </div>
-                <p className="text-[10px] text-center text-stone-400 mt-2">
+                    </ActionIcon>
+                </Group>
+                <Text size="xs" c="dimmed" ta="center" mt="xs">
                     AI 답변은 참고용이며 의학적 진단을 대체하지 않습니다.
-                </p>
-            </div>
-        </div>
+                </Text>
+            </Box>
+        </Paper>
     );
 }

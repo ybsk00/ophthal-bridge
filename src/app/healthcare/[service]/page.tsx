@@ -2,6 +2,7 @@
 
 import { notFound } from "next/navigation";
 import HealthcareChat from "@/components/healthcare/HealthcareChat";
+import { Container } from "@mantine/core";
 
 interface PageProps {
     params: {
@@ -40,12 +41,12 @@ export default function HealthcareServicePage({ params }: PageProps) {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 pt-4 px-4 pb-20">
+        <Container size="md" py="xl" pb={100} bg="gray.0" style={{ minHeight: '100vh' }}>
             <HealthcareChat
                 serviceType={params.service}
                 serviceName={service.name}
                 initialMessage={service.initialMessage}
             />
-        </div>
+        </Container>
     );
 }

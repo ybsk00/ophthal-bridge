@@ -1,3 +1,6 @@
+"use client";
+
+import { AppShell, Box } from "@mantine/core";
 import DoctorSidebar from "@/components/medical/DoctorSidebar";
 
 export default function DashboardLayout({
@@ -6,13 +9,20 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-gray-50">
-            <DoctorSidebar />
-            <div className="pl-64">
-                <main className="p-8 max-w-7xl mx-auto">
+        <AppShell
+            navbar={{ width: 250, breakpoint: 'sm' }}
+            padding="md"
+            style={{ background: 'var(--mantine-color-gray-0)' }}
+        >
+            <AppShell.Navbar p="md" style={{ borderRight: '1px solid var(--mantine-color-gray-2)' }}>
+                <DoctorSidebar />
+            </AppShell.Navbar>
+
+            <AppShell.Main>
+                <Box maw={1400} mx="auto">
                     {children}
-                </main>
-            </div>
-        </div>
+                </Box>
+            </AppShell.Main>
+        </AppShell>
     );
 }
