@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "@/lib/ai/client";
+import { createClient } from "@/lib/supabase/server";
+import { logAction } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
     try {
@@ -50,6 +52,17 @@ AI:
 
         // 3. Generate Response
         const responseText = await generateText(systemPrompt, "medical");
+
+        // 4. Audit Log
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            await logAction(user.id, "create", "medical_chat", undefined, {
+                message_length: message.length,
+                is_red_flag: false
+            });
+        }
 
         return NextResponse.json({
             role: "ai",

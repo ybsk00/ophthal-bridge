@@ -39,7 +39,7 @@ export default function LandingPage() {
               playsInline
               className="w-full h-full object-cover"
             >
-              <source src="/grok-video-d2ce9230-c0a9-4bed-9097-3443b0c49cfd.mp4" type="video/mp4" />
+              <source src="/2.mp4" type="video/mp4" />
             </video>
           </div>
           {/* Texture Overlay */}
@@ -231,7 +231,7 @@ export default function LandingPage() {
               <span className="text-xl font-bold text-traditional-text font-serif">한의원</span>
             </div>
             <div className="text-sm text-traditional-subtext space-y-2 font-light">
-              <p className="flex items-center gap-2"><span className="w-16 font-medium text-traditional-text/80">주소</span> 대구광역시 달서구 와룡로 282 3-4층</p>
+              <p className="flex items-center gap-2"><span className="w-16 font-medium text-traditional-text/80">주소</span> 경기도 하남시 미사강변서로 22, 에코큐브지식산업센터 1005호</p>
               <p className="flex items-center gap-2"><span className="w-16 font-medium text-traditional-text/80">연락처</span> 0507-1390-5121</p>
               <p className="flex items-center gap-2"><span className="w-16 font-medium text-traditional-text/80">진료시간</span> 9시부터 18시까지 근무 (일요일 휴무)</p>
             </div>

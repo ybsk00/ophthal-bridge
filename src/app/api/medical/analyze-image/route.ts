@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createClient } from "@/lib/supabase/server";
+import { logAction } from "@/lib/audit";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
 
@@ -45,6 +47,19 @@ ${history.map((msg: any) => `${msg.role === 'user' ? '사용자' : 'AI'}: ${msg.
 
         const response = await result.response;
         const text = response.text();
+
+
+
+        // Audit Log
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            await logAction(user.id, "create", "medical_image_analysis", undefined, {
+                mime_type: mimeType,
+                has_history: history.length > 0
+            });
+        }
 
         return NextResponse.json({
             role: "ai",

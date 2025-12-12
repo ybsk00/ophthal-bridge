@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateSummary } from "@/lib/ai/summary";
+import { createClient } from "@/lib/supabase/server";
+import { logAction } from "@/lib/audit";
 
 export async function POST(req: NextRequest) {
     try {
@@ -10,6 +12,17 @@ export async function POST(req: NextRequest) {
         }
 
         const summary = await generateSummary(history, topic);
+
+        // Audit Log
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+            await logAction(user.id, "create", "medical_summary", undefined, {
+                topic,
+                message_count: history.length
+            });
+        }
 
         return NextResponse.json(summary);
 
