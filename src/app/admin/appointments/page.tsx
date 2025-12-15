@@ -24,7 +24,7 @@ import {
     Select,
     Alert,
 } from '@mantine/core'
-import { DateTimePicker } from '@mantine/dates'
+import { DatePickerInput } from '@mantine/dates'
 import { useDisclosure } from '@mantine/hooks'
 import { X, MessageSquare, User, Bot, CalendarPlus, CheckCircle, AlertCircle } from 'lucide-react'
 
@@ -71,7 +71,8 @@ export default function AppointmentsPage() {
     const [patients, setPatients] = useState<{ value: string; label: string }[]>([])
     const [newAppointment, setNewAppointment] = useState({
         patientId: '',
-        scheduledAt: '',
+        scheduledDate: null as Date | null,
+        scheduledTime: '',
         department: '',
         memo: ''
     })
@@ -159,10 +160,15 @@ export default function AppointmentsPage() {
     }
 
     const handleCreateAppointment = async () => {
-        if (!newAppointment.patientId || !newAppointment.scheduledAt) {
+        if (!newAppointment.patientId || !newAppointment.scheduledDate || !newAppointment.scheduledTime) {
             setCreateError('환자와 예약 일시를 선택해주세요.')
             return
         }
+
+        // 날짜와 시간 결합
+        const [hours, minutes] = newAppointment.scheduledTime.split(':').map(Number)
+        const scheduledDate = new Date(newAppointment.scheduledDate)
+        scheduledDate.setHours(hours, minutes, 0, 0)
 
         setCreateLoading(true)
         setCreateError(null)
@@ -180,8 +186,8 @@ export default function AppointmentsPage() {
                     .from('appointment_slots')
                     .insert({
                         department: newAppointment.department,
-                        starts_at: new Date(newAppointment.scheduledAt).toISOString(),
-                        ends_at: new Date(new Date(newAppointment.scheduledAt).getTime() + 30 * 60000).toISOString() // 30 min duration
+                        starts_at: scheduledDate.toISOString(),
+                        ends_at: new Date(scheduledDate.getTime() + 30 * 60000).toISOString() // 30 min duration
                     })
                     .select()
                     .single()
@@ -190,14 +196,16 @@ export default function AppointmentsPage() {
                 slotId = slot.id
             }
 
+            const appointmentData = {
+                patient_id: newAppointment.patientId,
+                scheduled_at: scheduledDate.toISOString(),
+                status: 'scheduled',
+                slot_id: slotId
+            }
+
             const { error } = await supabase
                 .from('appointments')
-                .insert({
-                    patient_id: newAppointment.patientId,
-                    scheduled_at: new Date(newAppointment.scheduledAt).toISOString(),
-                    status: 'scheduled',
-                    slot_id: slotId
-                })
+                .insert(appointmentData)
 
             if (error) throw error
 
@@ -205,7 +213,7 @@ export default function AppointmentsPage() {
             fetchAppointments()
             setTimeout(() => {
                 closeCreate()
-                setNewAppointment({ patientId: '', scheduledAt: '', department: '', memo: '' })
+                setNewAppointment({ patientId: '', scheduledDate: null, scheduledTime: '', department: '', memo: '' })
                 setCreateSuccess(null)
             }, 1500)
         } catch (err: any) {
@@ -440,26 +448,79 @@ export default function AppointmentsPage() {
                         required
                     />
 
-                    <DateTimePicker
-                        label="예약 일시"
-                        placeholder="날짜와 시간을 선택하세요"
-                        value={newAppointment.scheduledAt ? new Date(newAppointment.scheduledAt) : null}
-                        onChange={(val) => {
-                            if (val) {
-                                // Date 객체로 변환 (타입 안전)
-                                const date = new Date(val as Date | string)
-                                // 30분 단위로 맞추기
-                                const minutes = date.getMinutes()
-                                const roundedMinutes = Math.round(minutes / 30) * 30
-                                date.setMinutes(roundedMinutes, 0, 0)
-                                setNewAppointment(prev => ({ ...prev, scheduledAt: date.toISOString() }))
-                            } else {
-                                setNewAppointment(prev => ({ ...prev, scheduledAt: '' }))
-                            }
-                        }}
+                    <DatePickerInput
+                        label="예약 날짜"
+                        placeholder="날짜를 선택하세요"
+                        value={newAppointment.scheduledDate}
+                        onChange={(date) => setNewAppointment(prev => ({ ...prev, scheduledDate: date as Date | null }))}
                         required
-                        valueFormat="YYYY-MM-DD HH:mm"
                         minDate={new Date()}
+                    />
+
+                    <Select
+                        label="예약 시간"
+                        placeholder="시간을 선택하세요"
+                        data={[
+                            { value: '09:00', label: '오전 09:00' },
+                            { value: '09:10', label: '오전 09:10' },
+                            { value: '09:20', label: '오전 09:20' },
+                            { value: '09:30', label: '오전 09:30' },
+                            { value: '09:40', label: '오전 09:40' },
+                            { value: '09:50', label: '오전 09:50' },
+                            { value: '10:00', label: '오전 10:00' },
+                            { value: '10:10', label: '오전 10:10' },
+                            { value: '10:20', label: '오전 10:20' },
+                            { value: '10:30', label: '오전 10:30' },
+                            { value: '10:40', label: '오전 10:40' },
+                            { value: '10:50', label: '오전 10:50' },
+                            { value: '11:00', label: '오전 11:00' },
+                            { value: '11:10', label: '오전 11:10' },
+                            { value: '11:20', label: '오전 11:20' },
+                            { value: '11:30', label: '오전 11:30' },
+                            { value: '11:40', label: '오전 11:40' },
+                            { value: '11:50', label: '오전 11:50' },
+                            { value: '12:00', label: '오후 12:00' },
+                            { value: '12:10', label: '오후 12:10' },
+                            { value: '12:20', label: '오후 12:20' },
+                            { value: '12:30', label: '오후 12:30' },
+                            { value: '12:40', label: '오후 12:40' },
+                            { value: '12:50', label: '오후 12:50' },
+                            { value: '13:00', label: '오후 01:00' },
+                            { value: '13:10', label: '오후 01:10' },
+                            { value: '13:20', label: '오후 01:20' },
+                            { value: '13:30', label: '오후 01:30' },
+                            { value: '13:40', label: '오후 01:40' },
+                            { value: '13:50', label: '오후 01:50' },
+                            { value: '14:00', label: '오후 02:00' },
+                            { value: '14:10', label: '오후 02:10' },
+                            { value: '14:20', label: '오후 02:20' },
+                            { value: '14:30', label: '오후 02:30' },
+                            { value: '14:40', label: '오후 02:40' },
+                            { value: '14:50', label: '오후 02:50' },
+                            { value: '15:00', label: '오후 03:00' },
+                            { value: '15:10', label: '오후 03:10' },
+                            { value: '15:20', label: '오후 03:20' },
+                            { value: '15:30', label: '오후 03:30' },
+                            { value: '15:40', label: '오후 03:40' },
+                            { value: '15:50', label: '오후 03:50' },
+                            { value: '16:00', label: '오후 04:00' },
+                            { value: '16:10', label: '오후 04:10' },
+                            { value: '16:20', label: '오후 04:20' },
+                            { value: '16:30', label: '오후 04:30' },
+                            { value: '16:40', label: '오후 04:40' },
+                            { value: '16:50', label: '오후 04:50' },
+                            { value: '17:00', label: '오후 05:00' },
+                            { value: '17:10', label: '오후 05:10' },
+                            { value: '17:20', label: '오후 05:20' },
+                            { value: '17:30', label: '오후 05:30' },
+                            { value: '17:40', label: '오후 05:40' },
+                            { value: '17:50', label: '오후 05:50' },
+                            { value: '18:00', label: '오후 06:00' },
+                        ]}
+                        value={newAppointment.scheduledTime}
+                        onChange={(val) => setNewAppointment(prev => ({ ...prev, scheduledTime: val || '' }))}
+                        searchable
+                        required
                     />
 
                     <Select
