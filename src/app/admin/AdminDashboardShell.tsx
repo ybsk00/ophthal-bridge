@@ -1,8 +1,21 @@
 'use client';
 
-import { AppShell, Burger, Group, NavLink, Text, Button, Stack, ThemeIcon, Badge } from '@mantine/core';
+import { AppShell, Burger, Group, NavLink, Text, Button, Stack, ThemeIcon, Badge, Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Home, Users, Calendar, MessageSquare, Settings, LogOut, Stethoscope } from 'lucide-react';
+import {
+    Home,
+    Users,
+    Calendar,
+    MessageSquare,
+    Settings,
+    LogOut,
+    Stethoscope,
+    ClipboardList,
+    Building2,
+    UserPlus,
+    Bell,
+    Send
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -42,7 +55,7 @@ export function AdminDashboardShell({ children }: { children: React.ReactNode })
 
                     <Link href="/admin" style={{ textDecoration: 'none' }}>
                         <NavLink
-                            label="대시보드"
+                            label="진료 대시보드"
                             description="오늘 예약 환자 현황"
                             leftSection={<Home size={16} />}
                             active={pathname === '/admin'}
@@ -59,33 +72,50 @@ export function AdminDashboardShell({ children }: { children: React.ReactNode })
                         />
                     </Link>
 
+                    <Divider my="sm" />
+
                     {/* CRM 관리 섹션 */}
-                    <Text size="xs" fw={500} c="dimmed" mt="md">CRM 관리</Text>
+                    <Text size="xs" fw={500} c="dimmed">CRM 관리</Text>
 
                     <Link href="/admin/patients" style={{ textDecoration: 'none' }}>
                         <NavLink
-                            label="환자 관리"
-                            description="환자 등록 및 조회"
-                            leftSection={<Users size={16} />}
+                            label="환자 등록/관리"
+                            description="오프라인 환자 등록 및 조회"
+                            leftSection={<UserPlus size={16} />}
                             active={pathname === '/admin/patients'}
                             variant="filled"
                         />
                     </Link>
                     <Link href="/admin/messages" style={{ textDecoration: 'none' }}>
                         <NavLink
-                            label="메시지 센터"
-                            description="알림톡/푸시 전송"
-                            leftSection={<MessageSquare size={16} />}
+                            label="메시지 전송"
+                            description="앱 푸시/카카오 알림톡"
+                            leftSection={<Send size={16} />}
                             active={pathname === '/admin/messages' || pathname.startsWith('/admin/messages/')}
                             variant="filled"
                         />
                     </Link>
                     <Link href="/admin/settings" style={{ textDecoration: 'none' }}>
                         <NavLink
-                            label="설정"
-                            description="메시지 템플릿 등"
-                            leftSection={<Settings size={16} />}
+                            label="메시지 규칙 설정"
+                            description="자동 발송 템플릿 관리"
+                            leftSection={<Bell size={16} />}
                             active={pathname === '/admin/settings'}
+                            variant="filled"
+                        />
+                    </Link>
+
+                    <Divider my="sm" />
+
+                    {/* 시스템 설정 */}
+                    <Text size="xs" fw={500} c="dimmed">시스템</Text>
+
+                    <Link href="/admin/system" style={{ textDecoration: 'none' }}>
+                        <NavLink
+                            label="시스템 설정"
+                            description="관리자 계정 및 설정"
+                            leftSection={<Settings size={16} />}
+                            active={pathname === '/admin/system'}
                             variant="filled"
                         />
                     </Link>
