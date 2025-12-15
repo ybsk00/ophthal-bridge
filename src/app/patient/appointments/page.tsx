@@ -66,7 +66,7 @@ export default async function AppointmentListPage() {
                         <div className="flex items-center justify-between mt-4">
                             <div>
                                 <h3 className="text-xl font-bold text-white mb-1">
-                                    {nextAppointment.notes || '죽전한의원 진료'}
+                                    {nextAppointment.notes || 'AI한의원 진료'}
                                 </h3>
                                 <div className="flex items-center gap-2 text-gray-300 text-sm">
                                     <Calendar size={16} />
