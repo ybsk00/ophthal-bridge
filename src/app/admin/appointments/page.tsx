@@ -445,6 +445,7 @@ export default function AppointmentsPage() {
                         value={newAppointment.scheduledAt}
                         onChange={(e) => setNewAppointment(prev => ({ ...prev, scheduledAt: e.target.value }))}
                         required
+                        step={1800}
                         styles={{ input: { colorScheme: 'dark' } }}
                     />
 
