@@ -7,19 +7,19 @@ export default function PatientHomePage() {
     return (
         <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#0a0f1a' }}>
             {/* Header */}
-            <header className="px-4 py-4 flex items-center justify-between">
+            <header className="px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div
-                        className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center"
                         style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
                     >
-                        <Building2 size={18} className="text-white" />
+                        <Building2 size={14} className="text-white" />
                     </div>
-                    <span className="text-base sm:text-lg font-bold text-white">AI한의원</span>
+                    <span className="text-sm font-bold text-white">AI한의원</span>
                 </div>
                 <Link
                     href="/patient/login"
-                    className="px-3 py-1.5 sm:px-4 sm:py-2 text-sm font-medium text-white rounded-lg transition-colors"
+                    className="px-3 py-1 text-xs font-medium text-white rounded-md transition-colors"
                     style={{ backgroundColor: '#3b82f6' }}
                 >
                     로그인
