@@ -93,6 +93,25 @@ export default function NewAppointmentPage() {
         return date.toDateString() === selectedDate.toDateString()
     }
 
+    // 과거 날짜인지 확인
+    const isPastDate = (date: Date) => {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const checkDate = new Date(date)
+        checkDate.setHours(0, 0, 0, 0)
+        return checkDate < today
+    }
+
+    // 과거 시간인지 확인 (오늘의 경우)
+    const isPastTime = (time: string) => {
+        if (!isToday(selectedDate)) return false
+        const [hours, minutes] = time.split(':').map(Number)
+        const now = new Date()
+        const slotTime = new Date()
+        slotTime.setHours(hours, minutes, 0, 0)
+        return slotTime <= now
+    }
+
     const formatDate = (date: Date) => {
         return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })
     }
@@ -136,24 +155,31 @@ export default function NewAppointmentPage() {
 
                     {/* Week Days Grid */}
                     <div className="grid grid-cols-7 gap-2">
-                        {weekDays.map((date, i) => (
-                            <button
-                                key={i}
-                                onClick={() => {
-                                    setSelectedDate(date)
-                                    setSelectedTime(null)
-                                }}
-                                className={`flex flex-col items-center py-3 rounded-xl transition-all ${isSelected(date)
-                                    ? 'bg-blue-500 text-white'
-                                    : isToday(date)
-                                        ? 'bg-blue-500/20 text-blue-400'
-                                        : 'text-gray-400 hover:bg-white/5'
-                                    }`}
-                            >
-                                <span className="text-xs mb-1">{dayNames[i]}</span>
-                                <span className="text-lg font-bold">{date.getDate()}</span>
-                            </button>
-                        ))}
+                        {weekDays.map((date, i) => {
+                            const past = isPastDate(date)
+                            return (
+                                <button
+                                    key={i}
+                                    onClick={() => {
+                                        if (past) return
+                                        setSelectedDate(date)
+                                        setSelectedTime(null)
+                                    }}
+                                    disabled={past}
+                                    className={`flex flex-col items-center py-3 rounded-xl transition-all ${past
+                                        ? 'text-gray-600 cursor-not-allowed opacity-50'
+                                        : isSelected(date)
+                                            ? 'bg-blue-500 text-white'
+                                            : isToday(date)
+                                                ? 'bg-blue-500/20 text-blue-400'
+                                                : 'text-gray-400 hover:bg-white/5'
+                                        }`}
+                                >
+                                    <span className="text-xs mb-1">{dayNames[i]}</span>
+                                    <span className="text-lg font-bold">{date.getDate()}</span>
+                                </button>
+                            )
+                        })}
                     </div>
                 </div>
 
@@ -202,22 +228,28 @@ export default function NewAppointmentPage() {
                         <span className="text-sm font-bold text-white">오전</span>
                     </div>
                     <div className="grid grid-cols-4 gap-2">
-                        {morningSlots.map(time => (
-                            <button
-                                key={time}
-                                onClick={() => setSelectedTime(time)}
-                                className={`py-3 rounded-xl text-sm font-medium transition-all ${selectedTime === time
-                                    ? 'bg-blue-500 text-white'
-                                    : 'text-gray-400 hover:bg-white/5'
-                                    }`}
-                                style={{
-                                    backgroundColor: selectedTime === time ? '#3b82f6' : '#1f2937',
-                                    border: selectedTime === time ? 'none' : '1px solid #374151'
-                                }}
-                            >
-                                {time}
-                            </button>
-                        ))}
+                        {morningSlots.map(time => {
+                            const past = isPastTime(time)
+                            return (
+                                <button
+                                    key={time}
+                                    onClick={() => !past && setSelectedTime(time)}
+                                    disabled={past}
+                                    className={`py-3 rounded-xl text-sm font-medium transition-all ${past
+                                        ? 'text-gray-600 cursor-not-allowed opacity-50'
+                                        : selectedTime === time
+                                            ? 'bg-blue-500 text-white'
+                                            : 'text-gray-400 hover:bg-white/5'
+                                        }`}
+                                    style={{
+                                        backgroundColor: past ? '#111827' : selectedTime === time ? '#3b82f6' : '#1f2937',
+                                        border: selectedTime === time ? 'none' : '1px solid #374151'
+                                    }}
+                                >
+                                    {time}
+                                </button>
+                            )
+                        })}
                     </div>
                 </div>
 
@@ -228,22 +260,28 @@ export default function NewAppointmentPage() {
                         <span className="text-sm font-bold text-white">오후</span>
                     </div>
                     <div className="grid grid-cols-4 gap-2">
-                        {afternoonSlots.map(time => (
-                            <button
-                                key={time}
-                                onClick={() => setSelectedTime(time)}
-                                className={`py-3 rounded-xl text-sm font-medium transition-all ${selectedTime === time
-                                    ? 'bg-blue-500 text-white'
-                                    : 'text-gray-400 hover:bg-white/5'
-                                    }`}
-                                style={{
-                                    backgroundColor: selectedTime === time ? '#3b82f6' : '#1f2937',
-                                    border: selectedTime === time ? 'none' : '1px solid #374151'
-                                }}
-                            >
-                                {time}
-                            </button>
-                        ))}
+                        {afternoonSlots.map(time => {
+                            const past = isPastTime(time)
+                            return (
+                                <button
+                                    key={time}
+                                    onClick={() => !past && setSelectedTime(time)}
+                                    disabled={past}
+                                    className={`py-3 rounded-xl text-sm font-medium transition-all ${past
+                                        ? 'text-gray-600 cursor-not-allowed opacity-50'
+                                        : selectedTime === time
+                                            ? 'bg-blue-500 text-white'
+                                            : 'text-gray-400 hover:bg-white/5'
+                                        }`}
+                                    style={{
+                                        backgroundColor: past ? '#111827' : selectedTime === time ? '#3b82f6' : '#1f2937',
+                                        border: selectedTime === time ? 'none' : '1px solid #374151'
+                                    }}
+                                >
+                                    {time}
+                                </button>
+                            )
+                        })}
                     </div>
                 </div>
             </div>
