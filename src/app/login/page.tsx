@@ -171,7 +171,7 @@ export default function LoginPage() {
                     </p>
                 </div>
 
-                <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
+                <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4" autoComplete="off">
                     {isSignUp && (
                         <div>
                             <label className="block text-sm font-medium text-traditional-text mb-1">성명</label>
@@ -189,6 +189,8 @@ export default function LoginPage() {
                         <label className="block text-sm font-medium text-traditional-text mb-1">이메일</label>
                         <input
                             type="email"
+                            name="medical-email"
+                            autoComplete="new-email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-4 py-2 border border-traditional-muted rounded-lg focus:outline-none focus:border-traditional-primary focus:ring-1 focus:ring-traditional-primary"
@@ -200,6 +202,8 @@ export default function LoginPage() {
                         <label className="block text-sm font-medium text-traditional-text mb-1">비밀번호</label>
                         <input
                             type="password"
+                            name="medical-password"
+                            autoComplete="new-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-2 border border-traditional-muted rounded-lg focus:outline-none focus:border-traditional-primary focus:ring-1 focus:ring-traditional-primary"

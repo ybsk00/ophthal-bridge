@@ -12,7 +12,7 @@ type Message = {
     timestamp?: Date
 }
 
-// 약물 정보 데이터베이스 (샘플)
+// 약물 정보 데이터베이스 (확장)
 const medicationDatabase: { [key: string]: { name: string, dose: string, frequency: string, timing: string, warnings: string[], interactions: string[] } } = {
     '타이레놀': { name: '타이레놀 (아세트아미노펜)', dose: '500mg', frequency: '4-6시간 간격', timing: '식후', warnings: ['하루 4g 초과 금지', '음주 시 간 손상 위험'], interactions: ['와파린 효과 증가'] },
     '아세트아미노펜': { name: '아세트아미노펜', dose: '500mg', frequency: '4-6시간 간격', timing: '식후', warnings: ['하루 4g 초과 금지', '음주 시 간 손상 위험'], interactions: ['와파린 효과 증가'] },
@@ -23,6 +23,15 @@ const medicationDatabase: { [key: string]: { name: string, dose: string, frequen
     '오메가3': { name: '오메가3', dose: '1000mg', frequency: '1일 1-2회', timing: '식후', warnings: ['혈액 희석 효과 주의'], interactions: ['아스피린과 병용 시 출혈 위험'] },
     '유산균': { name: '유산균 (프로바이오틱스)', dose: '1캡슐', frequency: '1일 1회', timing: '아침 공복', warnings: ['냉장 보관 필요한 제품도 있음'], interactions: ['항생제와 2시간 간격'] },
     '한약': { name: '한약 (탕약)', dose: '1첩 또는 1봉', frequency: '1일 2-3회', timing: '식전 30분', warnings: ['따뜻하게 데워 복용', '커피/녹차와 30분 간격'], interactions: ['양약과 30분 이상 간격 유지'] },
+    // 추가 약물
+    '란스톤': { name: '란스톤 (란소프라졸)', dose: '15-30mg', frequency: '1일 1회', timing: '아침 식전', warnings: ['장기 복용 시 골다공증 위험', '마그네슘 결핍 주의'], interactions: ['메토트렉세이트 농도 증가 가능'] },
+    '란소프라졸': { name: '란소프라졸 (PPI)', dose: '15-30mg', frequency: '1일 1회', timing: '아침 식전', warnings: ['장기 복용 시 골다공증 위험', '마그네슘 결핍 주의'], interactions: ['메토트렉세이트 농도 증가 가능'] },
+    '게보린': { name: '게보린', dose: '1정', frequency: '4-6시간 간격', timing: '식후', warnings: ['하루 3정 초과 금지', '졸음 유발 가능'], interactions: ['알코올과 병용 주의'] },
+    '판피린': { name: '판피린', dose: '1정', frequency: '4-6시간 간격', timing: '식후', warnings: ['졸음 유발 가능', '운전 주의'], interactions: ['알코올과 병용 주의'] },
+    '펙소페나딘': { name: '펙소페나딘 (알레그라)', dose: '180mg', frequency: '1일 1회', timing: '식전/식후 무관', warnings: ['졸음 유발 적음'], interactions: ['에리스로마이신과 병용 시 혈중 농도 증가'] },
+    '아스피린': { name: '아스피린', dose: '100-325mg', frequency: '1일 1회', timing: '식후', warnings: ['위장 출혈 주의', '수술 전 복용 중단'], interactions: ['NSAID와 병용 시 출혈 위험 증가'] },
+    '오메프라졸': { name: '오메프라졸', dose: '20-40mg', frequency: '1일 1회', timing: '아침 식전', warnings: ['장기 복용 시 비타민B12 결핍'], interactions: ['클로피도그렐 효과 감소 가능'] },
+    '메포민': { name: '메트포르민', dose: '500-1000mg', frequency: '1일 2회', timing: '식사와 함께', warnings: ['신장 기능 확인 필요', '알코올 제한'], interactions: ['조영제 검사 시 일시 중단'] },
 }
 
 // AI 분석 함수
@@ -185,10 +194,35 @@ export default function MedicationsPage() {
         removeImage()
         setIsLoading(true)
 
-        // AI 분석
-        setTimeout(() => {
-            const { message } = analyzeMedication(currentInput, hasImage)
+        try {
+            // AI API 호출
+            const response = await fetch('/api/patient/medications/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: currentInput || '사진을 분석해주세요',
+                    history: messages.filter(m => m.id !== 'init'),
+                    hasImage: hasImage
+                })
+            })
 
+            if (!response.ok) {
+                throw new Error('API 요청 실패')
+            }
+
+            const data = await response.json()
+
+            const aiMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: data.content || '죄송합니다. 응답을 생성하지 못했습니다.',
+                timestamp: new Date()
+            }
+            setMessages(prev => [...prev, aiMessage])
+        } catch (error) {
+            console.error('Medication API error:', error)
+            // 폴백: 로컬 분석 사용
+            const { message } = analyzeMedication(currentInput, hasImage)
             const aiMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
@@ -196,8 +230,9 @@ export default function MedicationsPage() {
                 timestamp: new Date()
             }
             setMessages(prev => [...prev, aiMessage])
+        } finally {
             setIsLoading(false)
-        }, 1200)
+        }
     }
 
     // 메시지 렌더링 (마크다운 처리)
