@@ -33,7 +33,8 @@ type Appointment = {
     id: string
     scheduled_at: string
     status: string
-    patient_id: string
+    patient_id: string | null
+    user_id: string | null
     patient: {
         id: string
         name: string
@@ -135,20 +136,32 @@ export default function AppointmentsPage() {
         setLoading(false)
     }
 
-    const handleViewChat = async (patientId: string, patientName: string) => {
-        setSelectedPatient({ id: patientId, name: patientName })
+    const handleViewChat = async (appt: Appointment) => {
+        const patientName = appt.patient?.name || '환자'
+        setSelectedPatient({ id: appt.patient_id || appt.user_id || '', name: patientName })
         open()
         setLoadingChat(true)
 
-        const { data: sessions } = await supabase
-            .from('intake_sessions')
-            .select(`
-                id,
-                status,
-                created_at
-            `)
-            .eq('patient_id', patientId)
-            .order('created_at', { ascending: false })
+        let sessions: any[] | null = null
+
+        // user_id가 있으면 Medical 채팅 (user_id로 조회)
+        if (appt.user_id) {
+            const { data } = await supabase
+                .from('intake_sessions')
+                .select('id, status, created_at')
+                .eq('user_id', appt.user_id)
+                .order('created_at', { ascending: false })
+            sessions = data
+        }
+        // user_id가 없고 patient_id만 있으면 CRM 채팅 (patient_id로 조회)
+        else if (appt.patient_id) {
+            const { data } = await supabase
+                .from('intake_sessions')
+                .select('id, status, created_at')
+                .eq('patient_id', appt.patient_id)
+                .order('created_at', { ascending: false })
+            sessions = data
+        }
 
         if (sessions && sessions.length > 0) {
             const sessionsWithMessages: IntakeSession[] = []
@@ -294,11 +307,10 @@ export default function AppointmentsPage() {
 
             if (messageError) throw messageError
 
-            // 세션 목록 새로고침
-            if (selectedPatient) {
-                await handleViewChat(selectedPatient.id, selectedPatient.name)
-            }
+            // 세션 목록 새로고침 - 간단히 closeModal 후 다시 열지 않음 (사용자가 다시 클릭하면 됨)
+            setChatSessions([])
             setManualNote('')
+            alert('메모가 저장되었습니다. 다시 증상보기를 클릭하면 확인할 수 있습니다.')
         } catch (err: any) {
             console.error('Error saving manual note:', err)
             alert('메모 저장 중 오류가 발생했습니다.')
@@ -434,12 +446,12 @@ export default function AppointmentsPage() {
                                     {getStatusBadge(appt.status)}
                                 </Table.Td>
                                 <Table.Td>
-                                    {appt.patient && (
+                                    {(appt.patient || appt.user_id) && (
                                         <Button
                                             variant="light"
                                             size="xs"
                                             leftSection={<MessageSquare size={14} />}
-                                            onClick={() => handleViewChat(appt.patient!.id, appt.patient!.name)}
+                                            onClick={() => handleViewChat(appt)}
                                         >
                                             증상 보기
                                         </Button>
