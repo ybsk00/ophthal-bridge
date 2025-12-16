@@ -123,7 +123,7 @@ function LoginContent() {
                     )}
 
                     {/* Form */}
-                    <form className="space-y-4">
+                    <form className="space-y-4" autoComplete="off">
                         {activeTab === 'signup' && (
                             <>
                                 <div>
@@ -161,7 +161,8 @@ function LoginContent() {
                                 <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                                 <input
                                     type="email"
-                                    name="email"
+                                    name="patient-email"
+                                    autoComplete="new-email"
                                     placeholder="example@email.com"
                                     required
                                     className="w-full pl-10 pr-4 py-3 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -176,7 +177,8 @@ function LoginContent() {
                                 <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                                 <input
                                     type="password"
-                                    name="password"
+                                    name="patient-password"
+                                    autoComplete="new-password"
                                     placeholder="••••••••"
                                     required
                                     minLength={6}

@@ -53,15 +53,18 @@ export default function DoctorSidebar() {
             {/* Footer */}
             <Box>
                 <Divider mb="md" />
-                <Button
-                    variant="subtle"
-                    color="gray"
-                    fullWidth
-                    justify="flex-start"
-                    leftSection={<LogOut size={20} />}
-                >
-                    로그아웃
-                </Button>
+                <form action="/auth/signout" method="post">
+                    <Button
+                        type="submit"
+                        variant="subtle"
+                        color="gray"
+                        fullWidth
+                        justify="flex-start"
+                        leftSection={<LogOut size={20} />}
+                    >
+                        로그아웃
+                    </Button>
+                </form>
             </Box>
         </Stack>
     );

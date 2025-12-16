@@ -7,8 +7,8 @@ import { createClient } from '@/lib/supabase/server'
 export async function patientLogin(formData: FormData) {
     const supabase = await createClient()
 
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+    const email = formData.get('patient-email') as string
+    const password = formData.get('patient-password') as string
 
     if (!email || !password) {
         redirect('/patient/login?error=' + encodeURIComponent('이메일과 비밀번호를 입력해주세요.'))
@@ -31,8 +31,8 @@ export async function patientLogin(formData: FormData) {
 export async function patientSignup(formData: FormData) {
     const supabase = await createClient()
 
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+    const email = formData.get('patient-email') as string
+    const password = formData.get('patient-password') as string
     const name = formData.get('name') as string || email.split('@')[0]
     const phone = formData.get('phone') as string
 

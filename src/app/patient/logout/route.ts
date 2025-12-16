@@ -13,8 +13,8 @@ export async function POST(request: NextRequest) {
     const protocol = host.includes('localhost') ? 'http' : 'https';
     const origin = `${protocol}://${host}`;
 
-    // Redirect to patient login page instead of medical login
-    return NextResponse.redirect(new URL('/patient/login', origin), {
+    // Redirect to patient login page (CRM app stays within patient routes)
+    return NextResponse.redirect(new URL('/patient', origin), {
         status: 302,
     });
 }

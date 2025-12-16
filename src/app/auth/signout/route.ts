@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const protocol = host.includes('localhost') ? 'http' : 'https';
     const origin = `${protocol}://${host}`;
 
-    return NextResponse.redirect(new URL('/login', origin), {
+    return NextResponse.redirect(new URL('/', origin), {
         status: 302,
     });
 }

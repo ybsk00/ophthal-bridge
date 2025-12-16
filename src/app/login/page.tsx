@@ -43,29 +43,18 @@ export default function LoginPage() {
                 alert("로그인 실패: " + error.message);
                 setLoading(false);
             } else {
-                // Check if user is admin - first check user_metadata, then staff_users
+                // 사용자 역할 확인
                 const { data: { user } } = await supabase.auth.getUser();
 
-                // Check user_metadata for role
-                const userRole = user?.user_metadata?.role;
-
-                // Also check if email indicates admin (fallback)
-                const isAdminEmail = user?.email?.includes('admin') ||
-                    user?.email?.endsWith('@jukjeon.com') ||
-                    user?.email === 'admin@admin.com';
-
-                // Check staff_users table for admin/doctor/staff role
+                // staff_users 테이블에서 역할 확인
                 const { data: staffUser } = await supabase
                     .from('staff_users')
                     .select('role')
                     .eq('user_id', user?.id)
                     .single();
 
-                const isAdmin = userRole === 'admin' || userRole === 'doctor' || userRole === 'staff' ||
-                    staffUser?.role === 'admin' || staffUser?.role === 'doctor' || staffUser?.role === 'staff' ||
-                    isAdminEmail;
-
-                if (isAdmin) {
+                // admin/doctor/staff 역할이면 /admin으로, 아니면 /medical/dashboard로
+                if (staffUser?.role === 'admin' || staffUser?.role === 'doctor' || staffUser?.role === 'staff') {
                     router.push("/admin");
                 } else {
                     router.push("/medical/dashboard");

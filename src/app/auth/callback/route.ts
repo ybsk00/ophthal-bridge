@@ -11,25 +11,24 @@ export async function GET(request: Request) {
         const { error, data } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error && data.user) {
-            // Check user role for redirect
+            // If explicit next is provided, use it (CRM uses ?next=/patient)
+            if (next) {
+                return NextResponse.redirect(`${origin}${next}`)
+            }
+
+            // 헬스케어 로그인: 역할에 따라 분기
             const { data: staffUser } = await supabase
                 .from('staff_users')
                 .select('role')
                 .eq('user_id', data.user.id)
                 .single()
 
-            // If explicit next is provided, use it
-            if (next) {
-                return NextResponse.redirect(`${origin}${next}`)
-            }
-
-            // Admin/doctor/staff goes to admin dashboard
+            // admin/doctor/staff는 /admin으로, 일반 사용자는 /medical/dashboard로
             if (staffUser?.role === 'admin' || staffUser?.role === 'doctor' || staffUser?.role === 'staff') {
                 return NextResponse.redirect(`${origin}/admin`)
             }
 
-            // Regular patients go to patient portal
-            return NextResponse.redirect(`${origin}/patient`)
+            return NextResponse.redirect(`${origin}/medical/dashboard`)
         }
     }
 
