@@ -7,9 +7,9 @@ export default async function PatientHome() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Redirect to login if not authenticated
+    // Redirect to home (intro page) if not authenticated
     if (!user) {
-        redirect('/patient/login')
+        redirect('/patient/home')
     }
 
     let patientName = '환자'

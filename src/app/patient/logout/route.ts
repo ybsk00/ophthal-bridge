@@ -13,8 +13,8 @@ export async function POST(request: NextRequest) {
     const protocol = host.includes('localhost') ? 'http' : 'https';
     const origin = `${protocol}://${host}`;
 
-    // Redirect to patient login page directly (avoid redirect loop)
-    return NextResponse.redirect(new URL('/patient/login', origin), {
+    // Redirect to patient home page (intro/landing page)
+    return NextResponse.redirect(new URL('/patient/home', origin), {
         status: 302,
     });
 }
