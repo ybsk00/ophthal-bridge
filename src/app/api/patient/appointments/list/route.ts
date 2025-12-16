@@ -10,7 +10,9 @@ export async function GET() {
     }
 
     try {
-        console.log('Fetching appointments for user:', user.id)
+        console.log('=== APPOINTMENTS LIST DEBUG ===')
+        console.log('User ID:', user.id)
+        console.log('User email:', user.email)
 
         // 1. user_id로 직접 연결된 예약 조회
         const { data: directAppointments, error: directError } = await supabase
@@ -18,6 +20,12 @@ export async function GET() {
             .select('*')
             .eq('user_id', user.id)
             .order('scheduled_at', { ascending: true })
+
+        console.log('Direct appointments query result:', {
+            count: directAppointments?.length || 0,
+            error: directError,
+            data: directAppointments
+        })
 
         // 2. patient_id를 통해 연결된 예약도 조회 (환자 레코드의 user_id가 현재 사용자인 경우)
         const { data: patientRecord } = await supabase

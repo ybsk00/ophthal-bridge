@@ -6,26 +6,6 @@ import { Building2, Calendar, MessageSquare, Pill, Heart, ArrowRight, ShieldChec
 export default function PatientHomePage() {
     return (
         <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#0a0f1a' }}>
-            {/* Header */}
-            <header className="px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <div
-                        className="w-7 h-7 rounded-lg flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
-                    >
-                        <Building2 size={14} className="text-white" />
-                    </div>
-                    <span className="text-sm font-bold text-white">AI한의원</span>
-                </div>
-                <Link
-                    href="/patient/login"
-                    className="px-3 py-1 text-xs font-medium text-white rounded-md transition-colors"
-                    style={{ backgroundColor: '#3b82f6' }}
-                >
-                    로그인
-                </Link>
-            </header>
-
             {/* Hero Section */}
             <main className="flex-1 flex flex-col items-center justify-center px-6 text-center">
                 <div
