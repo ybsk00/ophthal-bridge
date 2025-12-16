@@ -269,7 +269,7 @@ export default function AdminDashboard() {
                                     </Table.Td>
                                     <Table.Td>
                                         <Group gap={4}>
-                                            {patient.keywords.map((keyword, idx) => (
+                                            {(patient.keywords || []).map((keyword, idx) => (
                                                 <Badge key={idx} variant="outline" color="gray" size="sm" fw={500}>
                                                     #{keyword}
                                                 </Badge>
