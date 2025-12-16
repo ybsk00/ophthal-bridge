@@ -10,11 +10,14 @@ export async function GET() {
     }
 
     try {
+        console.log('Fetching appointments for user:', user.id)
         const { data, error } = await supabase
             .from('appointments')
             .select('*')
             .eq('user_id', user.id)
             .order('scheduled_at', { ascending: true })
+
+        console.log('Appointments found:', data?.length, 'Error:', error)
 
         if (error) {
             console.error('Appointments fetch error:', error)

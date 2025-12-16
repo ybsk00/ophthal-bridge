@@ -144,8 +144,13 @@ export default function MedicationsPage() {
     const [isLoading, setIsLoading] = useState(false)
     const [selectedImage, setSelectedImage] = useState<File | null>(null)
     const [imagePreview, setImagePreview] = useState<string | null>(null)
+    const [turnCount, setTurnCount] = useState(0)
+    const [showReservationModal, setShowReservationModal] = useState(false)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // 상담 필요 키워드
+    const consultationKeywords = ['부작용', '심한', '심각', '응급', '의사', '상담', '진료', '병원', '급성', '출혈', '호흡곤란', '두드러기', '알레르기']
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -219,6 +224,18 @@ export default function MedicationsPage() {
                 timestamp: new Date()
             }
             setMessages(prev => [...prev, aiMessage])
+
+            // 턴 카운트 증가 및 모달 체크
+            const newTurnCount = turnCount + 1
+            setTurnCount(newTurnCount)
+
+            // 3턴마다 또는 상담 키워드가 있으면 예약 모달 표시
+            const hasConsultationKeyword = consultationKeywords.some(keyword =>
+                currentInput.includes(keyword) || (data.content || '').includes(keyword)
+            )
+            if (newTurnCount % 3 === 0 || hasConsultationKeyword) {
+                setTimeout(() => setShowReservationModal(true), 1500)
+            }
         } catch (error) {
             console.error('Medication API error:', error)
             // 폴백: 로컬 분석 사용
@@ -230,6 +247,15 @@ export default function MedicationsPage() {
                 timestamp: new Date()
             }
             setMessages(prev => [...prev, aiMessage])
+
+            // 턴 카운트 증가 및 모달 체크
+            const newTurnCount = turnCount + 1
+            setTurnCount(newTurnCount)
+
+            const hasConsultationKeyword = consultationKeywords.some(keyword => currentInput.includes(keyword))
+            if (newTurnCount % 3 === 0 || hasConsultationKeyword) {
+                setTimeout(() => setShowReservationModal(true), 1500)
+            }
         } finally {
             setIsLoading(false)
         }
@@ -443,6 +469,55 @@ export default function MedicationsPage() {
                         </button>
                     </div>
                 </div>
+
+                {/* 예약 모달 */}
+                {showReservationModal && (
+                    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                        <div className="bg-[#1a2332] rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-700">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div
+                                    className="w-12 h-12 rounded-full flex items-center justify-center"
+                                    style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}
+                                >
+                                    <Pill className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-lg text-white">
+                                        전문 상담이 필요하신가요?
+                                    </h3>
+                                    <p className="text-sm text-gray-400">
+                                        한의사와 직접 상담해보세요
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p className="text-sm text-gray-300 mb-6 leading-relaxed">
+                                복약에 대한 더 자세한 상담이 필요하시면 한의원을 방문하시는 것을 권장합니다.
+                                전문 한의사가 직접 상담해드립니다.
+                            </p>
+
+                            <div className="space-y-3">
+                                <Link
+                                    href="/patient/appointments/new"
+                                    className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Clock size={18} />
+                                    진료 예약하기
+                                </Link>
+                                <button
+                                    onClick={() => setShowReservationModal(false)}
+                                    className="w-full py-3 text-gray-400 hover:text-gray-200 transition-colors"
+                                >
+                                    계속 상담하기
+                                </button>
+                            </div>
+
+                            <p className="text-xs text-gray-500 mt-4 text-center">
+                                ※ AI 복약 가이드는 참고용이며 전문 상담을 대체하지 않습니다.
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )
