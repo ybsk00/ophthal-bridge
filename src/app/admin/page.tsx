@@ -220,17 +220,45 @@ export default function AdminDashboard() {
                         </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>
-                        {patients.length === 0 ? (
-                            <Table.Tr>
-                                <Table.Td colSpan={5}>
-                                    <Stack align="center" py={60} c="dimmed">
-                                        <Calendar size={40} />
-                                        <Text>예약된 환자가 없습니다.</Text>
-                                    </Stack>
-                                </Table.Td>
-                            </Table.Tr>
-                        ) : (
-                            patients.map((patient) => (
+                        {(() => {
+                            // 필터링 로직
+                            let filteredPatients = patients
+
+                            // 상태 필터링
+                            if (activeFilter === "대기") {
+                                filteredPatients = filteredPatients.filter(p => p.status === "pending")
+                            } else if (activeFilter === "완료") {
+                                filteredPatients = filteredPatients.filter(p => p.status === "completed")
+                            }
+                            // "전체"는 필터링 없이 모두 표시
+
+                            // 검색어 필터링
+                            if (searchTerm) {
+                                filteredPatients = filteredPatients.filter(p =>
+                                    p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    p.keywords?.some(k => k.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                                    p.complaint?.toLowerCase().includes(searchTerm.toLowerCase())
+                                )
+                            }
+
+                            if (filteredPatients.length === 0) {
+                                return (
+                                    <Table.Tr>
+                                        <Table.Td colSpan={5}>
+                                            <Stack align="center" py={60} c="dimmed">
+                                                <Calendar size={40} />
+                                                <Text>
+                                                    {activeFilter === "완료" ? "완료된 환자가 없습니다." :
+                                                        activeFilter === "대기" ? "대기 중인 환자가 없습니다." :
+                                                            "예약된 환자가 없습니다."}
+                                                </Text>
+                                            </Stack>
+                                        </Table.Td>
+                                    </Table.Tr>
+                                )
+                            }
+
+                            return filteredPatients.map((patient) => (
                                 <Table.Tr key={patient.id}>
                                     <Table.Td>
                                         <Text fw={500} ff="monospace" c="white">{patient.time}</Text>
