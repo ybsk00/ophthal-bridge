@@ -17,12 +17,36 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: '예약 날짜/시간이 필요합니다.' }, { status: 400 })
         }
 
-        // 1. 사용자가 이미 환자 테이블에 있는지 확인
-        let { data: existingPatient } = await supabase
+        // 1. 사용자가 이미 환자 테이블에 있는지 확인 (user_id 또는 email로)
+        let existingPatient = null
+
+        // user_id로 먼저 확인
+        const { data: patientByUserId } = await supabase
             .from('patients')
             .select('id')
             .eq('user_id', user.id)
             .single()
+
+        if (patientByUserId) {
+            existingPatient = patientByUserId
+        } else if (user.email) {
+            // email로 확인
+            const { data: patientByEmail } = await supabase
+                .from('patients')
+                .select('id')
+                .eq('email', user.email)
+                .single()
+
+            if (patientByEmail) {
+                existingPatient = patientByEmail
+
+                // 기존 환자에 user_id 연결 (없는 경우)
+                await supabase
+                    .from('patients')
+                    .update({ user_id: user.id })
+                    .eq('id', patientByEmail.id)
+            }
+        }
 
         let patientId = existingPatient?.id
 
