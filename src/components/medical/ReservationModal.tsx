@@ -20,6 +20,8 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
 
     const doctors = ['전체', '최서형 이사장', '노기환 원장', '나병조 원장', '최규호 원장'];
 
+    const [name, setName] = useState("");
+
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
