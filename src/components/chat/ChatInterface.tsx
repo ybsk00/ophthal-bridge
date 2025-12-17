@@ -80,9 +80,31 @@ export default function ChatInterface(props: ChatInterfaceProps) {
             const currentModule = modules.find(m => m.id === topic);
             const moduleName = currentModule ? currentModule.label : "건강 가이드";
 
+            // 모듈별 맞춤형 초기 질문 설정
+            let initialQuestion = "";
+            switch (topic) {
+                case "digestion":
+                    initialQuestion = "식사가 규칙적인지, 과식은 자주 하는지 등 식습관에 대해 편하게 알려주세요.";
+                    break;
+                case "cognitive":
+                    initialQuestion = "최근 깜빡하는 일이 잦거나, 집중하기 어려우신 적이 있는지 편하게 알려주세요.";
+                    break;
+                case "stress-sleep":
+                    initialQuestion = "잠은 푹 주무시는지, 평소 스트레스는 많이 받으시는지 편하게 알려주세요.";
+                    break;
+                case "vascular":
+                    initialQuestion = "평소 운동은 자주 하시는지, 기름진 음식이나 짠 음식은 자주 드시는지 알려주세요.";
+                    break;
+                case "women":
+                    initialQuestion = "월경 주기가 규칙적인지, 그날의 컨디션 변화는 어떠신지 편하게 알려주세요.";
+                    break;
+                default:
+                    initialQuestion = "식사, 수면, 운동 등 평소 생활 습관에 대해 편하게 알려주세요.";
+            }
+
             setMessages([{
                 role: "ai",
-                content: `안녕하세요! **${moduleName}** 체크를 도와드릴 위담 건강가이드입니다. 🌿\n\n이 대화는 **진단이 아닌 생활 리듬 점검(참고용)** 입니다.\n\n식사가 규칙적인지, 과식은 자주 하는지 등 생활 습관에 대해 편하게 알려주세요.`
+                content: `안녕하세요! **${moduleName}** 체크를 도와드릴 위담 건강가이드입니다. 🌿\n\n이 대화는 **진단이 아닌 생활 리듬 점검(참고용)** 입니다.\n\n${initialQuestion}`
             }]);
         }
         setTurnCount(0);
