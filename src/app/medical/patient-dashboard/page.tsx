@@ -49,6 +49,7 @@ export default function PatientDashboard() {
                     .from('appointments')
                     .select('*')
                     .eq('naver_user_id', nextAuthSession.user.id)
+                    .in('status', ['scheduled', 'pending', 'confirmed'])  // 취소된 예약 제외
                     .gte('scheduled_at', new Date().toISOString())
                     .order('scheduled_at', { ascending: true })
                     .limit(1)
