@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { AppointmentsClientPage } from './AppointmentsClient'
 
 export default async function AppointmentsPage() {
@@ -7,7 +8,7 @@ export default async function AppointmentsPage() {
     const { data: { user } } = await supabase.auth.getUser()
 
     // NextAuth 세션 확인 (네이버 로그인용)
-    const nextAuthSession = await getServerSession()
+    const nextAuthSession = await getServerSession(authOptions)
 
     let appointments: any[] = []
 

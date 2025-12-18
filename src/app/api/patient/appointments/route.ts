@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     // NextAuth 세션 확인 (네이버 로그인용)
-    const nextAuthSession = await getServerSession()
+    const nextAuthSession = await getServerSession(authOptions)
 
     // Supabase 또는 NextAuth 중 하나라도 있어야 함
     if (!user && !nextAuthSession?.user) {

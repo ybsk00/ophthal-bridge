@@ -1,6 +1,7 @@
 import { Calendar, Clock, User, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import Link from 'next/link'
 
 export default async function ReservationHistoryPage() {
@@ -8,7 +9,7 @@ export default async function ReservationHistoryPage() {
     const { data: { user } } = await supabase.auth.getUser()
 
     // NextAuth 세션 확인 (네이버 로그인용)
-    const nextAuthSession = await getServerSession()
+    const nextAuthSession = await getServerSession(authOptions)
 
     let appointments: any[] = []
 

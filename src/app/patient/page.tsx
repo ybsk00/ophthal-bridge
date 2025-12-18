@@ -3,13 +3,14 @@ import { redirect } from 'next/navigation'
 import { Bell, Mic, ChevronRight, Calendar, FileText, Pill, MessageSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export default async function PatientHome() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     // NextAuth 세션 확인 (네이버 로그인용)
-    const nextAuthSession = await getServerSession()
+    const nextAuthSession = await getServerSession(authOptions)
 
     // Supabase 또는 NextAuth 중 하나라도 로그인되어 있으면 통과
     const isAuthenticated = !!user || !!nextAuthSession?.user
