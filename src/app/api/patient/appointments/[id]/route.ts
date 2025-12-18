@@ -51,10 +51,19 @@ export async function PATCH(
         }
 
         // 예약 상태 업데이트 (cancel_reason은 notes에 저장)
-        const updateData: any = { status }
-        if (cancel_reason) {
-            updateData.notes = cancel_reason  // cancel_reason 컬럼이 없으면 notes에 저장
+        const updateData: any = {}
+
+        if (status) {
+            updateData.status = status
         }
+        if (cancel_reason) {
+            updateData.notes = cancel_reason
+        }
+        if (body.scheduled_at) {
+            updateData.scheduled_at = body.scheduled_at
+        }
+
+        console.log('[PATCH] Update data:', updateData)
 
         const { data, error } = await supabase
             .from('appointments')

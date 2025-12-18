@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Bell, Sparkles, ArrowRight, Clock, Edit2, X } from 'lucide-react'
+import { Bell, Sparkles, ArrowRight, Clock, Edit2, X, Calendar } from 'lucide-react'
 
 type Appointment = {
     id: string
@@ -18,9 +18,13 @@ export function AppointmentsClientPage({ initialAppointments }: { initialAppoint
     const router = useRouter()
     const [appointments, setAppointments] = useState(initialAppointments)
     const [showCancelModal, setShowCancelModal] = useState(false)
+    const [showRescheduleModal, setShowRescheduleModal] = useState(false)
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
     const [cancelReason, setCancelReason] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [newDate, setNewDate] = useState('')
+    const [newHour, setNewHour] = useState('09')
+    const [newMinute, setNewMinute] = useState('00')
 
     // 미래 예약만 필터링 (취소된 예약 제외)
     const upcomingAppointments = appointments.filter(a =>
@@ -49,6 +53,15 @@ export function AppointmentsClientPage({ initialAppointments }: { initialAppoint
         setShowCancelModal(true)
     }
 
+    const handleRescheduleClick = (apt: Appointment) => {
+        setSelectedAppointment(apt)
+        const date = new Date(apt.scheduled_at)
+        setNewDate(date.toISOString().split('T')[0])
+        setNewHour(String(date.getHours()).padStart(2, '0'))
+        setNewMinute(String(date.getMinutes()).padStart(2, '0'))
+        setShowRescheduleModal(true)
+    }
+
     const handleConfirmCancel = async () => {
         if (!selectedAppointment) return
 
@@ -61,7 +74,6 @@ export function AppointmentsClientPage({ initialAppointments }: { initialAppoint
             })
 
             if (response.ok) {
-                // Update local state
                 setAppointments(prev =>
                     prev.map(a => a.id === selectedAppointment.id ? { ...a, status: 'cancelled' } : a)
                 )
@@ -77,6 +89,39 @@ export function AppointmentsClientPage({ initialAppointments }: { initialAppoint
             setIsLoading(false)
         }
     }
+
+    const handleConfirmReschedule = async () => {
+        if (!selectedAppointment || !newDate) return
+
+        setIsLoading(true)
+        try {
+            const newScheduledAt = new Date(`${newDate}T${newHour}:${newMinute}:00`).toISOString()
+
+            const response = await fetch(`/api/patient/appointments/${selectedAppointment.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ scheduled_at: newScheduledAt })
+            })
+
+            if (response.ok) {
+                setAppointments(prev =>
+                    prev.map(a => a.id === selectedAppointment.id ? { ...a, scheduled_at: newScheduledAt } : a)
+                )
+                setShowRescheduleModal(false)
+                setSelectedAppointment(null)
+                alert('예약이 변경되었습니다.')
+            } else {
+                alert('예약 변경에 실패했습니다.')
+            }
+        } catch (error) {
+            alert('오류가 발생했습니다.')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const hours = Array.from({ length: 10 }, (_, i) => String(i + 9).padStart(2, '0'))
+    const minutes = ['00', '10', '20', '30', '40', '50']
 
     return (
         <div className="min-h-screen pb-24" style={{ backgroundColor: '#0a0f1a' }}>
@@ -181,13 +226,13 @@ export function AppointmentsClientPage({ initialAppointments }: { initialAppoint
 
                                                 {/* Action Buttons */}
                                                 <div className="flex gap-2 mt-3">
-                                                    <Link
-                                                        href="/patient/appointments/new"
+                                                    <button
+                                                        onClick={() => handleRescheduleClick(apt)}
                                                         className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
                                                     >
                                                         <Edit2 size={12} />
                                                         예약 변경
-                                                    </Link>
+                                                    </button>
                                                     <button
                                                         onClick={() => handleCancelClick(apt)}
                                                         className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors"
@@ -256,6 +301,78 @@ export function AppointmentsClientPage({ initialAppointments }: { initialAppoint
                                 className="flex-1 py-3 rounded-xl text-white font-medium bg-red-500 hover:bg-red-600 disabled:opacity-50"
                             >
                                 {isLoading ? '처리중...' : '예약 취소'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reschedule Modal */}
+            {showRescheduleModal && selectedAppointment && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+                    <div className="w-full max-w-sm rounded-2xl p-6" style={{ backgroundColor: '#1a2332' }}>
+                        <div className="flex items-center gap-2 mb-4">
+                            <Calendar size={24} className="text-blue-400" />
+                            <h3 className="text-xl font-bold text-white">예약 변경</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm text-gray-400 mb-2">날짜</label>
+                                <input
+                                    type="date"
+                                    value={newDate}
+                                    onChange={(e) => setNewDate(e.target.value)}
+                                    min={new Date().toISOString().split('T')[0]}
+                                    className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-700"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm text-gray-400 mb-2">시간</label>
+                                    <select
+                                        value={newHour}
+                                        onChange={(e) => setNewHour(e.target.value)}
+                                        className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-700"
+                                    >
+                                        {hours.map(h => (
+                                            <option key={h} value={h}>{h}시</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-gray-400 mb-2">분</label>
+                                    <select
+                                        value={newMinute}
+                                        onChange={(e) => setNewMinute(e.target.value)}
+                                        className="w-full p-3 rounded-xl bg-gray-800 text-white border border-gray-700"
+                                    >
+                                        {minutes.map(m => (
+                                            <option key={m} value={m}>{m}분</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3 mt-6">
+                            <button
+                                onClick={() => {
+                                    setShowRescheduleModal(false)
+                                    setSelectedAppointment(null)
+                                }}
+                                className="flex-1 py-3 rounded-xl text-white font-medium"
+                                style={{ backgroundColor: '#374151' }}
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={handleConfirmReschedule}
+                                disabled={isLoading || !newDate}
+                                className="flex-1 py-3 rounded-xl text-white font-medium bg-blue-500 hover:bg-blue-600 disabled:opacity-50"
+                            >
+                                {isLoading ? '처리중...' : '변경 확인'}
                             </button>
                         </div>
                     </div>
