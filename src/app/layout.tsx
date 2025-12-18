@@ -19,8 +19,8 @@ const notoSerifKr = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "한의원 - 100년 전통의 맥",
-  description: "2대째 이어오는 100년 전통 한의원입니다.",
+  title: "위담한방병원환자포털",
+  description: "위담한방병원 환자 포털에 오신 것을 환영합니다. 진료 예약, 내역 조회, 건강 관리 서비스를 편리하게 이용하세요.",
 };
 
 export default function RootLayout({
