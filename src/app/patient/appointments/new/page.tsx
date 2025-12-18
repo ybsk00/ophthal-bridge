@@ -89,7 +89,7 @@ export default function NewAppointmentPage() {
     }
 
     const handleConfirm = async () => {
-        if (!selectedTime || isLoading) return
+        if (!selectedTime || isLoading || selectedDoctor === '전체') return
         setIsLoading(true)
 
         try {
@@ -234,8 +234,8 @@ export default function NewAppointmentPage() {
                                 key={doctor}
                                 onClick={() => setSelectedDoctor(doctor)}
                                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${selectedDoctor === doctor
-                                        ? 'bg-blue-500 text-white'
-                                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                                    ? 'bg-blue-500 text-white'
+                                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                                     }`}
                             >
                                 {doctor}
@@ -289,8 +289,8 @@ export default function NewAppointmentPage() {
                                             key={time}
                                             onClick={() => setSelectedTime(time)}
                                             className={`py-3 px-2 rounded-xl text-sm font-medium transition-all ${selectedTime === time
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700 border border-gray-700'
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700 border border-gray-700'
                                                 }`}
                                         >
                                             {time}
@@ -316,8 +316,8 @@ export default function NewAppointmentPage() {
                                             key={time}
                                             onClick={() => setSelectedTime(time)}
                                             className={`py-3 px-2 rounded-xl text-sm font-medium transition-all ${selectedTime === time
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700 border border-gray-700'
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700 border border-gray-700'
                                                 }`}
                                         >
                                             {time}
@@ -345,13 +345,13 @@ export default function NewAppointmentPage() {
                 {/* Confirm Button */}
                 <button
                     onClick={handleConfirm}
-                    disabled={!selectedTime || isLoading}
-                    className={`w-full py-4 rounded-full font-bold text-lg transition-all ${selectedTime && !isLoading
+                    disabled={!selectedTime || isLoading || selectedDoctor === '전체'}
+                    className={`w-full py-4 rounded-full font-bold text-lg transition-all ${selectedTime && !isLoading && selectedDoctor !== '전체'
                             ? 'bg-blue-500 text-white hover:bg-blue-600'
                             : 'bg-gray-700 text-gray-500 cursor-not-allowed'
                         }`}
                 >
-                    {isLoading ? '예약 중...' : '예약 확정'}
+                    {isLoading ? '예약 중...' : selectedDoctor === '전체' ? '의사를 선택해주세요' : '예약 확정'}
                 </button>
             </div>
 
