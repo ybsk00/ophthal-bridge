@@ -11,6 +11,8 @@ export async function GET(request: Request) {
         const { error, data } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error && data.user) {
+            console.log('Auth Callback: User authenticated', data.user.id)
+
             // 헬스케어 로그인: 역할에 따라 분기
             const { data: staffUser } = await supabase
                 .from('staff_users')
@@ -18,8 +20,11 @@ export async function GET(request: Request) {
                 .eq('user_id', data.user.id)
                 .single()
 
+            console.log('Auth Callback: Staff role', staffUser?.role)
+
             // admin/doctor/staff는 /admin으로
             if (staffUser?.role === 'admin' || staffUser?.role === 'doctor' || staffUser?.role === 'staff') {
+                console.log('Auth Callback: Redirecting to /admin')
                 return NextResponse.redirect(`${origin}/admin`)
             }
 
@@ -30,16 +35,21 @@ export async function GET(request: Request) {
                 .eq('user_id', data.user.id)
                 .single()
 
+            console.log('Auth Callback: Patient found', !!patient)
+
             // 환자 정보가 없으면 추가 정보 입력 페이지로 이동
             if (!patient) {
+                console.log('Auth Callback: Redirecting to signup')
                 return NextResponse.redirect(`${origin}/patient/signup/social`)
             }
 
             // If explicit next is provided, use it (CRM uses ?next=/patient)
             if (next) {
+                console.log('Auth Callback: Redirecting to next', next)
                 return NextResponse.redirect(`${origin}${next}`)
             }
 
+            console.log('Auth Callback: Redirecting to /patient')
             return NextResponse.redirect(`${origin}/patient`)
         }
     }

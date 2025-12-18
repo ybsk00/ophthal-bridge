@@ -17,7 +17,13 @@ const handler = NextAuth({
             if (url.startsWith("/")) return `${baseUrl}${url}`
             // Allows callback URLs on the same origin
             else if (new URL(url).origin === baseUrl) return url
-            return baseUrl
+
+            // Default to /patient for Naver login if no other url is specified
+            return `${baseUrl}/patient`
+        },
+        async signIn({ user, account, profile }) {
+            console.log('NextAuth SignIn:', user.email, account?.provider)
+            return true
         }
     },
     debug: true, // Enable debug logs for Vercel
