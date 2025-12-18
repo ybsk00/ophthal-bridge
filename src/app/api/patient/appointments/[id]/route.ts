@@ -5,8 +5,9 @@ import { authOptions } from '@/lib/auth'
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     const nextAuthSession = await getServerSession(authOptions)
@@ -27,7 +28,7 @@ export async function PATCH(
             const { data } = await supabase
                 .from('appointments')
                 .select('id')
-                .eq('id', params.id)
+                .eq('id', id)
                 .eq('user_id', user.id)
                 .single()
             appointment = data
@@ -35,7 +36,7 @@ export async function PATCH(
             const { data } = await supabase
                 .from('appointments')
                 .select('id')
-                .eq('id', params.id)
+                .eq('id', id)
                 .eq('naver_user_id', nextAuthSession.user.id)
                 .single()
             appointment = data
@@ -54,7 +55,7 @@ export async function PATCH(
         const { data, error } = await supabase
             .from('appointments')
             .update(updateData)
-            .eq('id', params.id)
+            .eq('id', id)
             .select()
             .single()
 
@@ -72,8 +73,9 @@ export async function PATCH(
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     const nextAuthSession = await getServerSession(authOptions)
@@ -89,7 +91,7 @@ export async function GET(
         const { data } = await supabase
             .from('appointments')
             .select('*')
-            .eq('id', params.id)
+            .eq('id', id)
             .eq('user_id', user.id)
             .single()
         appointment = data
@@ -97,7 +99,7 @@ export async function GET(
         const { data } = await supabase
             .from('appointments')
             .select('*')
-            .eq('id', params.id)
+            .eq('id', id)
             .eq('naver_user_id', nextAuthSession.user.id)
             .single()
         appointment = data
