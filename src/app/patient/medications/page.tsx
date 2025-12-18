@@ -152,6 +152,9 @@ export default function MedicationsPage() {
     // 상담 필요 키워드
     const consultationKeywords = ['부작용', '심한', '심각', '응급', '의사', '상담', '진료', '병원', '급성', '출혈', '호흡곤란', '두드러기', '알레르기']
 
+    // 예약 요청 키워드
+    const reservationKeywords = ['예약', '진료 예약', '예약하고', '예약할', '예약해', '방문하고', '방문할', '방문해']
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
@@ -229,12 +232,20 @@ export default function MedicationsPage() {
             const newTurnCount = turnCount + 1
             setTurnCount(newTurnCount)
 
-            // 3턴마다 또는 상담 키워드가 있으면 예약 모달 표시
-            const hasConsultationKeyword = consultationKeywords.some(keyword =>
-                currentInput.includes(keyword) || (data.content || '').includes(keyword)
+            // 예약 요청 키워드가 있으면 즉시 모달 표시
+            const hasReservationKeyword = reservationKeywords.some(keyword =>
+                currentInput.includes(keyword)
             )
-            if (newTurnCount % 3 === 0 || hasConsultationKeyword) {
-                setTimeout(() => setShowReservationModal(true), 1500)
+            if (hasReservationKeyword) {
+                setTimeout(() => setShowReservationModal(true), 500)
+            } else {
+                // 3턴마다 또는 상담 키워드가 있으면 예약 모달 표시
+                const hasConsultationKeyword = consultationKeywords.some(keyword =>
+                    currentInput.includes(keyword) || (data.content || '').includes(keyword)
+                )
+                if (newTurnCount % 3 === 0 || hasConsultationKeyword) {
+                    setTimeout(() => setShowReservationModal(true), 1500)
+                }
             }
         } catch (error) {
             console.error('Medication API error:', error)
@@ -252,9 +263,17 @@ export default function MedicationsPage() {
             const newTurnCount = turnCount + 1
             setTurnCount(newTurnCount)
 
-            const hasConsultationKeyword = consultationKeywords.some(keyword => currentInput.includes(keyword))
-            if (newTurnCount % 3 === 0 || hasConsultationKeyword) {
-                setTimeout(() => setShowReservationModal(true), 1500)
+            // 예약 요청 키워드가 있으면 즉시 모달 표시
+            const hasReservationKeyword = reservationKeywords.some(keyword =>
+                currentInput.includes(keyword)
+            )
+            if (hasReservationKeyword) {
+                setTimeout(() => setShowReservationModal(true), 500)
+            } else {
+                const hasConsultationKeyword = consultationKeywords.some(keyword => currentInput.includes(keyword))
+                if (newTurnCount % 3 === 0 || hasConsultationKeyword) {
+                    setTimeout(() => setShowReservationModal(true), 1500)
+                }
             }
         } finally {
             setIsLoading(false)
