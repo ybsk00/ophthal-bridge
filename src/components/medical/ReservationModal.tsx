@@ -26,7 +26,8 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
 
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [userId, setUserId] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);  // Supabase Auth only (UUID)
+    const [naverUserId, setNaverUserId] = useState<string | null>(null);  // NextAuth/Naver only (not UUID)
     const [existingReservation, setExistingReservation] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -78,7 +79,8 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
             } else if (nextAuthSession?.user) {
                 // 2. Fallback to NextAuth session (for Naver login)
                 const nextAuthUser = nextAuthSession.user;
-                setUserId(nextAuthUser.id || null);  // naver_user_id
+                setUserId(null);  // Keep userId null - it's for Supabase Auth only (UUID type)
+                setNaverUserId(nextAuthUser.id || null);  // Store naver ID separately
                 const userName = nextAuthUser.name || nextAuthUser.email?.split('@')[0] || "";
                 setName(userName);
 
@@ -170,13 +172,13 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                     // Check if there is ALREADY a pending reservation
                     // For Supabase Auth users, check patients table
                     // For NextAuth users, check appointments table
-                    const isNextAuthUser = !!nextAuthSession?.user?.id && !userId;
+                    const isNextAuthUser = !!naverUserId && !userId;
 
                     if (isNextAuthUser) {
                         const { data: dupCheck } = await supabase
                             .from('appointments')
                             .select('id')
-                            .eq('naver_user_id', nextAuthSession.user.id)
+                            .eq('naver_user_id', naverUserId)
                             .in('status', ['scheduled', 'pending'])
                             .gte('scheduled_at', new Date().toISOString())
                             .maybeSingle();
@@ -203,7 +205,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                 }
 
                 const timeString = `${date} ${hour}:${minute}`;
-                const isNextAuthUser = !!nextAuthSession?.user?.id && !userId;
+                const isNextAuthUser = !!naverUserId && !userId;
 
                 if (activeTab === 'reschedule' && existingReservation) {
                     // Update existing
