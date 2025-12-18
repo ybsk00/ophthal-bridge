@@ -220,17 +220,8 @@ export default async function PatientHome() {
                                     </span>
                                 </div>
                                 <h4 className="text-white font-bold mb-0.5">진료 예약</h4>
-                                <p className="text-sm text-gray-400">죽전한의원</p>
+                                <p className="text-sm text-gray-400">위담한방병원</p>
                             </div>
-
-                            {/* Arrow Button */}
-                            <Link
-                                href={`/patient/appointments/${upcomingAppointment.id}`}
-                                className="p-3 rounded-full"
-                                style={{ backgroundColor: '#3b82f6' }}
-                            >
-                                <ChevronRight size={20} className="text-white" />
-                            </Link>
                         </div>
                     ) : (
                         <div
