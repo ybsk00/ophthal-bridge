@@ -39,12 +39,26 @@ export default async function PatientHome() {
 
     let upcomingAppointment = null
 
-    // Supabase user가 있을 때만 예약 조회
     if (user) {
+        // Supabase Auth 사용자: user.id로 예약 조회
         const { data: appointment } = await supabase
             .from('appointments')
             .select('*')
             .eq('user_id', user.id)
+            .gte('scheduled_at', new Date().toISOString())
+            .order('scheduled_at', { ascending: true })
+            .limit(1)
+            .single()
+
+        if (appointment) {
+            upcomingAppointment = appointment
+        }
+    } else if (nextAuthSession?.user?.id) {
+        // NextAuth 사용자 (네이버 로그인): naver_user_id로 예약 조회
+        const { data: appointment } = await supabase
+            .from('appointments')
+            .select('*')
+            .eq('naver_user_id', nextAuthSession.user.id)
             .gte('scheduled_at', new Date().toISOString())
             .order('scheduled_at', { ascending: true })
             .limit(1)
