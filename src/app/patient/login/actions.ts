@@ -123,22 +123,6 @@ export async function signInWithKakao() {
     return { url: data.url }
 }
 
-export async function signInWithNaver() {
-    const supabase = await createClient()
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'naver' as any,
-        options: {
-            redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://www.widamcare.co.kr'}/auth/callback?next=/patient`,
-        },
-    })
-
-    if (error) {
-        return { error: '네이버 로그인에 실패했습니다.' }
-    }
-
-    return { url: data.url }
-}
 
 export async function completeSocialSignup(formData: FormData) {
     const supabase = await createClient()

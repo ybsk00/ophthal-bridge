@@ -246,14 +246,9 @@ function LoginContent() {
                             onClick={async () => {
                                 setIsLoading(true)
                                 setError(null)
-                                const { signInWithNaver } = await import('./actions')
-                                const result = await signInWithNaver()
-                                if (result.error) {
-                                    setError(result.error)
-                                    setIsLoading(false)
-                                } else if (result.url) {
-                                    window.location.href = result.url
-                                }
+                                // NextAuth for Naver - completely separate from Supabase
+                                const { signIn } = await import('next-auth/react')
+                                await signIn('naver', { callbackUrl: '/patient' })
                             }}
                             disabled={isLoading}
                             className="w-full flex items-center justify-center gap-3 py-3 rounded-xl font-medium transition-all hover:opacity-90 disabled:opacity-50"
