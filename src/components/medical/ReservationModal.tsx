@@ -30,6 +30,8 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
     const [naverUserId, setNaverUserId] = useState<string | null>(null);  // NextAuth/Naver only (not UUID)
     const [existingReservation, setExistingReservation] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+    const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
     const supabase = createClient();
 
@@ -38,6 +40,27 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
             fetchUserAndReservation();
         }
     }, [isOpen, nextAuthSession]);
+
+    // 예약 가능 시간 조회
+    useEffect(() => {
+        const fetchAvailableSlots = async () => {
+            if (!date || !doctor) return;
+            setIsLoadingSlots(true);
+            try {
+                const doctorParam = doctor ? `&doctor_name=${encodeURIComponent(doctor)}` : '';
+                const response = await fetch(`/api/appointments/available-slots?date=${date}${doctorParam}`);
+                const data = await response.json();
+                if (data.available_slots) {
+                    setAvailableSlots(data.available_slots);
+                }
+            } catch (error) {
+                console.error('Error fetching slots:', error);
+            } finally {
+                setIsLoadingSlots(false);
+            }
+        };
+        fetchAvailableSlots();
+    }, [date, doctor]);
 
     const fetchUserAndReservation = async () => {
         setIsLoading(true);
@@ -305,11 +328,21 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
         onClose();
     };
 
-    // Generate hours (0-23)
-    const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
+    // Generate hours (9-17 for operating hours)
+    const hours = Array.from({ length: 9 }, (_, i) => (9 + i).toString().padStart(2, '0'));
 
-    // Generate minutes (0, 10, 20, 30, 40, 50)
-    const minutes = ["00", "10", "20", "30", "40", "50"];
+    // Generate minutes (00, 30)
+    const minutes = ["00", "30"];
+
+    // 현재 선택된 시간이 예약 가능한지 체크
+    const isTimeAvailable = (h: string, m: string) => {
+        if (availableSlots.length === 0) return true;  // 아직 로딩 전이면 모두 가능
+        const timeStr = `${h}:${m}`;
+        return availableSlots.includes(timeStr);
+    };
+
+    // 현재 선택된 시간 조합이 예약 가능한지
+    const currentTimeAvailable = isTimeAvailable(hour, minute);
 
     if (!isOpen) return null;
 
@@ -428,7 +461,10 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                                         />
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <label className="text-xs font-medium text-gray-500">시간</label>
+                                                        <label className="text-xs font-medium text-gray-500">
+                                                            시간 {isLoadingSlots && <span className="text-blue-500">(조회중...)</span>}
+                                                            {!currentTimeAvailable && date && doctor && <span className="text-red-500 ml-2">⚠️ 예약됨</span>}
+                                                        </label>
                                                         <div className="flex gap-2">
                                                             <div className="relative flex-1">
                                                                 <select
@@ -436,9 +472,14 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                                                     onChange={(e) => setHour(e.target.value)}
                                                                     className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all appearance-none"
                                                                 >
-                                                                    {hours.map(h => (
-                                                                        <option key={h} value={h}>{h}시</option>
-                                                                    ))}
+                                                                    {hours.map(h => {
+                                                                        const hasAvailableMinute = minutes.some(m => isTimeAvailable(h, m));
+                                                                        return (
+                                                                            <option key={h} value={h} disabled={!hasAvailableMinute && availableSlots.length > 0}>
+                                                                                {h}시 {!hasAvailableMinute && availableSlots.length > 0 ? '(마감)' : ''}
+                                                                            </option>
+                                                                        );
+                                                                    })}
                                                                 </select>
                                                                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
                                                             </div>
@@ -448,9 +489,14 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                                                     onChange={(e) => setMinute(e.target.value)}
                                                                     className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all appearance-none"
                                                                 >
-                                                                    {minutes.map(m => (
-                                                                        <option key={m} value={m}>{m}분</option>
-                                                                    ))}
+                                                                    {minutes.map(m => {
+                                                                        const available = isTimeAvailable(hour, m);
+                                                                        return (
+                                                                            <option key={m} value={m} disabled={!available && availableSlots.length > 0}>
+                                                                                {m}분 {!available && availableSlots.length > 0 ? '(예약됨)' : ''}
+                                                                            </option>
+                                                                        );
+                                                                    })}
                                                                 </select>
                                                                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
                                                             </div>
