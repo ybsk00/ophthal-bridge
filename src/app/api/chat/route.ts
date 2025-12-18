@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "@/lib/ai/client";
 import { createClient } from "@/lib/supabase/server";
 import { logAction } from "@/lib/audit";
-import { getMedicalSystemPrompt, RED_FLAG_KEYWORDS, RESERVATION_CONFIRM_KEYWORDS } from "@/lib/ai/prompts";
+import { getMedicalSystemPrompt, RED_FLAG_KEYWORDS, RESERVATION_CONFIRM_KEYWORDS, detectMedicalTrack } from "@/lib/ai/prompts";
 
 // 환자포털 AI 상담 - 메디컬 AI와 동일한 프롬프트 사용
 export async function POST(req: NextRequest) {
     try {
-        const { message, history, turnCount = 0 } = await req.json();
+        const { message, history, turnCount = 0, track: existingTrack } = await req.json();
 
         // 1. Red Flag Detection
         const isRedFlag = RED_FLAG_KEYWORDS.some(flag => message.includes(flag));
@@ -19,8 +19,11 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        // 2. System Prompt from centralized prompts.ts (메디컬과 동일)
-        const systemPrompt = getMedicalSystemPrompt(turnCount);
+        // 2. Track Detection (첫 턴에서 감지, 이후 유지)
+        const track = existingTrack || detectMedicalTrack(message);
+
+        // 3. System Prompt with track
+        const systemPrompt = getMedicalSystemPrompt(turnCount, track);
 
         const fullPrompt = `
 ${systemPrompt}
@@ -31,10 +34,10 @@ ${history.map((msg: any) => `${msg.role === 'user' ? '환자' : '위담한방병
 위담한방병원:
 `;
 
-        // 3. Generate Response
+        // 4. Generate Response
         let responseText = await generateText(fullPrompt, "medical");
 
-        // 4. Check if user confirmed reservation
+        // 5. Check if user confirmed reservation
         const isReservationConfirm = RESERVATION_CONFIRM_KEYWORDS.some(word => message.includes(word));
 
         const lastAiMessage = history.filter((m: any) => m.role === 'ai').slice(-1)[0]?.content || '';
@@ -50,7 +53,7 @@ ${history.map((msg: any) => `${msg.role === 'user' ? '환자' : '위담한방병
             responseText += " [RESERVATION_TRIGGER]";
         }
 
-        // 5. Audit Log
+        // 6. Audit Log
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -58,13 +61,15 @@ ${history.map((msg: any) => `${msg.role === 'user' ? '환자' : '위담한방병
             await logAction(user.id, "create", "patient_chat", undefined, {
                 message_length: message.length,
                 turn_count: turnCount,
+                track: track,
                 is_red_flag: false
             });
         }
 
         return NextResponse.json({
             role: "ai",
-            content: responseText.trim()
+            content: responseText.trim(),
+            track: track
         });
 
     } catch (error) {
