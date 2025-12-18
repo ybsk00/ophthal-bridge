@@ -24,35 +24,40 @@ export async function GET(request: NextRequest) {
         const startOfDay = new Date(`${date}T00:00:00+09:00`)
         const endOfDay = new Date(`${date}T23:59:59+09:00`)
 
-        // 해당 날짜 + 의사에 대한 기존 예약 조회
-        let query = supabase
+        // 해당 날짜의 모든 예약 조회 (doctor_name 또는 notes에서 확인)
+        const { data: bookedAppointments, error } = await supabase
             .from('appointments')
-            .select('scheduled_at, doctor_name')
+            .select('scheduled_at, doctor_name, notes')
             .gte('scheduled_at', startOfDay.toISOString())
             .lte('scheduled_at', endOfDay.toISOString())
             .neq('status', 'cancelled')
-
-        if (doctorName && doctorName !== '전체') {
-            query = query.eq('doctor_name', doctorName)
-        }
-
-        const { data: bookedAppointments, error } = await query
 
         if (error) {
             console.error('Error fetching appointments:', error)
             return NextResponse.json({ error: '예약 조회 실패' }, { status: 500 })
         }
 
-        // 예약된 시간 슬롯 추출 (HH:MM 형식)
+        // 의사 이름 매칭 함수 (doctor_name 또는 notes에서 확인)
+        const matchesDoctor = (apt: any, targetDoctor: string) => {
+            if (!targetDoctor || targetDoctor === '전체') return true
+            if (apt.doctor_name === targetDoctor) return true
+            if (apt.notes && apt.notes.includes(targetDoctor)) return true
+            return false
+        }
+
+        // 예약된 시간 슬롯 추출 (HH:MM 형식) - 선택된 의사와 매칭되는 예약만
         const bookedSlots = new Set<string>()
         bookedAppointments?.forEach(apt => {
-            const aptDate = new Date(apt.scheduled_at)
-            const timeStr = aptDate.toLocaleTimeString('ko-KR', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            })
-            bookedSlots.add(timeStr)
+            // 선택된 의사와 매칭되는 경우만 예약된 시간으로 처리
+            if (matchesDoctor(apt, doctorName || '')) {
+                const aptDate = new Date(apt.scheduled_at)
+                const timeStr = aptDate.toLocaleTimeString('ko-KR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                })
+                bookedSlots.add(timeStr)
+            }
         })
 
         // 전체 시간 슬롯 생성
