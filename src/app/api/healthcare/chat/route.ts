@@ -53,7 +53,7 @@ AI(분석 결과):
         }
 
         // 3. 시스템 프롬프트 from prompts.ts
-        const systemPrompt = getHealthcareSystemPrompt(turnCount);
+        const systemPrompt = getHealthcareSystemPrompt(topic || "default", turnCount);
 
         const fullPrompt = `
 ${systemPrompt}
