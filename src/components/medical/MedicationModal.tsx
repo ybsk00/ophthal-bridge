@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { X, Pill, Camera, AlertCircle, Clock, Sun, Moon, Utensils } from "lucide-react";
+import { X, Pill, Camera, AlertCircle, Loader2 } from "lucide-react";
 
 type MedicationModalProps = {
     isOpen: boolean;
@@ -12,19 +12,74 @@ type MedicationModalProps = {
 export default function MedicationModal({ isOpen, onClose }: MedicationModalProps) {
     const [step, setStep] = useState<'upload' | 'result'>('upload');
     const [isProcessing, setIsProcessing] = useState(false);
+    const [analysisResult, setAnalysisResult] = useState<string>('');
+    const [error, setError] = useState<string>('');
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleUpload = () => {
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            setError('이미지 파일만 업로드 가능합니다.');
+            return;
+        }
+
         setIsProcessing(true);
-        // Simulate processing
-        setTimeout(() => {
-            setIsProcessing(false);
+        setError('');
+
+        try {
+            // Convert to base64
+            const base64 = await fileToBase64(file);
+
+            // Call Gemini Vision API with medication-specific prompt
+            const response = await fetch('/api/medical/analyze-medication', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    image: base64,
+                    mimeType: file.type
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('분석 중 오류가 발생했습니다.');
+            }
+
+            const data = await response.json();
+            setAnalysisResult(data.content);
             setStep('result');
-        }, 2000);
+        } catch (err: any) {
+            setError(err.message || '분석 중 오류가 발생했습니다.');
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const fileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const result = reader.result as string;
+                // Remove data:image/xxx;base64, prefix
+                const base64 = result.split(',')[1];
+                resolve(base64);
+            };
+            reader.onerror = error => reject(error);
+        });
+    };
+
+    const triggerFileInput = () => {
+        fileInputRef.current?.click();
     };
 
     const resetAndClose = () => {
         setStep('upload');
         setIsProcessing(false);
+        setAnalysisResult('');
+        setError('');
         onClose();
     };
 
@@ -51,19 +106,30 @@ export default function MedicationModal({ isOpen, onClose }: MedicationModalProp
                             <div className="bg-purple-50 p-4 rounded-xl border border-purple-100">
                                 <p className="text-sm text-purple-800">
                                     <strong>약봉지</strong> 또는 <strong>처방전</strong> 사진을 업로드하면<br />
-                                    복용 방법을 안내해드립니다.
+                                    AI가 복용 방법을 분석해드립니다.
                                 </p>
                             </div>
 
-                            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-300 transition-colors cursor-pointer"
-                                onClick={handleUpload}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                capture="environment"
+                                onChange={handleFileSelect}
+                                className="hidden"
+                            />
+
+                            <div
+                                onClick={triggerFileInput}
+                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-300 transition-colors cursor-pointer"
                             >
                                 {isProcessing ? (
                                     <div className="animate-pulse">
                                         <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Pill className="w-8 h-8 text-purple-500 animate-spin" />
+                                            <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
                                         </div>
-                                        <p className="text-sm text-purple-600 font-medium">분석 중...</p>
+                                        <p className="text-sm text-purple-600 font-medium">AI 분석 중...</p>
+                                        <p className="text-xs text-gray-400 mt-1">잠시만 기다려주세요</p>
                                     </div>
                                 ) : (
                                     <>
@@ -76,6 +142,13 @@ export default function MedicationModal({ isOpen, onClose }: MedicationModalProp
                                 )}
                             </div>
 
+                            {error && (
+                                <div className="bg-red-50 p-4 rounded-xl border border-red-100 flex items-start gap-3">
+                                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                                    <p className="text-sm text-red-800">{error}</p>
+                                </div>
+                            )}
+
                             <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex items-start gap-3">
                                 <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                                 <p className="text-xs text-amber-800">
@@ -87,51 +160,25 @@ export default function MedicationModal({ isOpen, onClose }: MedicationModalProp
                     ) : (
                         <div className="space-y-4">
                             <div className="bg-green-50 p-4 rounded-xl border border-green-200">
-                                <p className="text-sm text-green-800 font-medium mb-2">✅ 분석 완료</p>
-                                <p className="text-xs text-green-700">아래는 일반적인 복용 안내입니다.</p>
+                                <p className="text-sm text-green-800 font-medium mb-2">✅ AI 분석 완료</p>
+                                <p className="text-xs text-green-700">아래는 AI가 분석한 복용 안내입니다.</p>
                             </div>
 
-                            {/* Sample medication info */}
-                            <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-4">
-                                <h4 className="font-bold text-gray-900">복용 안내 (예시)</h4>
-
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                        <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                                            <Sun className="w-5 h-5 text-yellow-600" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-700">아침</p>
-                                            <p className="text-xs text-gray-500">식후 30분</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                                            <Utensils className="w-5 h-5 text-orange-600" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-700">점심</p>
-                                            <p className="text-xs text-gray-500">식후 30분</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                                        <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                                            <Moon className="w-5 h-5 text-indigo-600" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-700">저녁</p>
-                                            <p className="text-xs text-gray-500">식후 30분</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="border-t pt-4">
-                                    <p className="text-sm font-medium text-gray-700 mb-2">⚠️ 주의사항</p>
-                                    <ul className="text-xs text-gray-600 space-y-1">
-                                        <li>• 공복에 복용 시 위장 장애가 있을 수 있습니다</li>
-                                        <li>• 음주를 삼가해주세요</li>
-                                        <li>• 졸음이 올 수 있으니 운전에 주의하세요</li>
-                                    </ul>
+                            {/* AI Analysis Result */}
+                            <div className="bg-white border border-gray-200 rounded-xl p-4">
+                                <div className="prose prose-sm max-w-none">
+                                    {analysisResult.split('\n').map((line, idx) => {
+                                        if (line.startsWith('**') && line.endsWith('**')) {
+                                            return <h4 key={idx} className="font-bold text-gray-900 mt-3 mb-2">{line.replace(/\*\*/g, '')}</h4>;
+                                        }
+                                        if (line.startsWith('- ') || line.startsWith('• ')) {
+                                            return <li key={idx} className="text-gray-700 text-sm ml-4">{line.replace(/^[-•]\s*/, '')}</li>;
+                                        }
+                                        if (line.trim()) {
+                                            return <p key={idx} className="text-gray-700 text-sm mb-2">{line}</p>;
+                                        }
+                                        return null;
+                                    })}
                                 </div>
                             </div>
 
@@ -146,6 +193,14 @@ export default function MedicationModal({ isOpen, onClose }: MedicationModalProp
 
                 {/* Footer */}
                 <div className="p-4 border-t border-gray-100">
+                    {step === 'result' && (
+                        <button
+                            onClick={() => setStep('upload')}
+                            className="w-full py-3 mb-2 border border-purple-300 text-purple-600 rounded-xl font-medium hover:bg-purple-50 transition-colors"
+                        >
+                            다른 사진 분석하기
+                        </button>
+                    )}
                     <button
                         onClick={resetAndClose}
                         className="w-full py-3 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-colors"
