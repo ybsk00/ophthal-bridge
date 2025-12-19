@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Calendar, Clock, X, CheckCircle2, AlertCircle, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "next-auth/react";
@@ -346,8 +347,8 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
 
     if (!isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    const modalContent = (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
                 {/* Header */}
                 <div className="bg-traditional-bg p-4 flex justify-between items-center border-b border-traditional-muted/20">
@@ -632,6 +633,12 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
             </div>
         </div>
     );
+
+    // Render modal to body using portal to avoid parent container clipping
+    if (typeof document !== 'undefined') {
+        return createPortal(modalContent, document.body);
+    }
+    return modalContent;
 }
 
 function ChevronDown({ className, size }: { className?: string, size?: number }) {

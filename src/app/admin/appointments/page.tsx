@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { format } from 'date-fns'
+import { format, startOfDay, endOfDay, addDays } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import {
     Container,
@@ -23,10 +23,13 @@ import {
     TextInput,
     Select,
     Alert,
+    Pagination,
+    SegmentedControl,
 } from '@mantine/core'
+import { DatePickerInput } from '@mantine/dates'
 import '@mantine/dates/styles.css'
 import { useDisclosure } from '@mantine/hooks'
-import { X, MessageSquare, User, Bot, CalendarPlus, CheckCircle, AlertCircle, Edit, Plus, Trash2 } from 'lucide-react'
+import { X, MessageSquare, User, Bot, CalendarPlus, CheckCircle, AlertCircle, Edit, Plus, Trash2, Calendar } from 'lucide-react'
 import { Textarea } from '@mantine/core'
 
 type Appointment = {
@@ -99,12 +102,22 @@ export default function AppointmentsPage() {
     const [manualNote, setManualNote] = useState('')
     const [savingNote, setSavingNote] = useState(false)
 
+    // 날짜 필터 상태
+    const [dateFilter, setDateFilter] = useState<string>('today')
+    const [customDateFrom, setCustomDateFrom] = useState<Date | null>(new Date())
+    const [customDateTo, setCustomDateTo] = useState<Date | null>(new Date())
+
+    // 페이지네이션 상태
+    const [currentPage, setCurrentPage] = useState(1)
+    const [totalCount, setTotalCount] = useState(0)
+    const ITEMS_PER_PAGE = 20
+
     const supabase = createClient()
 
     useEffect(() => {
         fetchAppointments()
         fetchPatients()
-    }, [])
+    }, [dateFilter, customDateFrom, customDateTo, currentPage])
 
     const fetchPatients = async () => {
         const { data } = await supabase
@@ -121,6 +134,44 @@ export default function AppointmentsPage() {
     }
 
     const fetchAppointments = async () => {
+        setLoading(true)
+
+        // 날짜 범위 계산
+        let fromDate: Date
+        let toDate: Date
+
+        const now = new Date()
+
+        switch (dateFilter) {
+            case 'today':
+                fromDate = startOfDay(now)
+                toDate = endOfDay(now)
+                break
+            case 'tomorrow':
+                fromDate = startOfDay(addDays(now, 1))
+                toDate = endOfDay(addDays(now, 1))
+                break
+            case 'custom':
+                fromDate = customDateFrom ? startOfDay(customDateFrom) : startOfDay(now)
+                toDate = customDateTo ? endOfDay(customDateTo) : endOfDay(now)
+                break
+            default:
+                fromDate = startOfDay(now)
+                toDate = endOfDay(now)
+        }
+
+        // 전체 개수 조회
+        const { count } = await supabase
+            .from('appointments')
+            .select('*', { count: 'exact', head: true })
+            .gte('scheduled_at', fromDate.toISOString())
+            .lte('scheduled_at', toDate.toISOString())
+
+        setTotalCount(count || 0)
+
+        // 페이지네이션 적용하여 데이터 조회
+        const offset = (currentPage - 1) * ITEMS_PER_PAGE
+
         const { data } = await supabase
             .from('appointments')
             .select(`
@@ -128,7 +179,10 @@ export default function AppointmentsPage() {
                 patient:patients(id, name, phone),
                 slot:appointment_slots(department)
             `)
+            .gte('scheduled_at', fromDate.toISOString())
+            .lte('scheduled_at', toDate.toISOString())
             .order('scheduled_at', { ascending: true })
+            .range(offset, offset + ITEMS_PER_PAGE - 1)
 
         if (data) {
             setAppointments(data as Appointment[])
@@ -415,6 +469,57 @@ export default function AppointmentsPage() {
                 </Button>
             </Group>
 
+            {/* 날짜 필터 바 */}
+            <Paper shadow="sm" radius="md" bg="dark.7" p="md" mb="md" withBorder style={{ borderColor: 'var(--mantine-color-dark-5)' }}>
+                <Group gap="md" align="flex-end">
+                    <SegmentedControl
+                        value={dateFilter}
+                        onChange={(val) => {
+                            setDateFilter(val)
+                            setCurrentPage(1)
+                        }}
+                        data={[
+                            { label: '오늘', value: 'today' },
+                            { label: '내일', value: 'tomorrow' },
+                            { label: '기간 선택', value: 'custom' },
+                        ]}
+                        color="orange"
+                    />
+                    {dateFilter === 'custom' && (
+                        <>
+                            <DatePickerInput
+                                label="시작일"
+                                value={customDateFrom}
+                                onChange={(val: Date | null) => {
+                                    setCustomDateFrom(val)
+                                    setCurrentPage(1)
+                                }}
+                                locale="ko"
+                                size="sm"
+                                w={150}
+                                styles={{ input: { backgroundColor: 'var(--mantine-color-dark-6)', color: 'white' } }}
+                            />
+                            <Text c="dimmed">~</Text>
+                            <DatePickerInput
+                                label="종료일"
+                                value={customDateTo}
+                                onChange={(val: Date | null) => {
+                                    setCustomDateTo(val)
+                                    setCurrentPage(1)
+                                }}
+                                locale="ko"
+                                size="sm"
+                                w={150}
+                                styles={{ input: { backgroundColor: 'var(--mantine-color-dark-6)', color: 'white' } }}
+                            />
+                        </>
+                    )}
+                    <Text c="dimmed" size="sm" ml="auto">
+                        총 {totalCount}건
+                    </Text>
+                </Group>
+            </Paper>
+
             <Paper shadow="sm" radius="md" bg="dark.7" withBorder style={{ borderColor: 'var(--mantine-color-dark-5)', overflow: 'hidden' }}>
                 <Table highlightOnHover highlightOnHoverColor="dark.6">
                     <Table.Thead>
@@ -479,6 +584,18 @@ export default function AppointmentsPage() {
                     </Table.Tbody>
                 </Table>
             </Paper>
+
+            {/* 페이지네이션 */}
+            {totalCount > ITEMS_PER_PAGE && (
+                <Group justify="center" mt="md">
+                    <Pagination
+                        total={Math.ceil(totalCount / ITEMS_PER_PAGE)}
+                        value={currentPage}
+                        onChange={setCurrentPage}
+                        color="orange"
+                    />
+                </Group>
+            )}
 
             {/* Chat History Modal */}
             <Modal

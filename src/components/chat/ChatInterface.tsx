@@ -214,11 +214,11 @@ export default function ChatInterface(props: ChatInterfaceProps) {
             {/* Header - Hidden if embedded */}
             {!props.isEmbedded && (
                 <header className="bg-white/80 backdrop-blur-md border-b border-traditional-muted/50 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-all duration-300">
-                    <Link href="/" className="flex items-center gap-3 group">
+                    <Link href="/" className="flex items-center gap-3 group cursor-pointer">
                         <img
-                            src={props.isLoggedIn ? "/logo_medical.png" : "/images/logo_weedahm.png"}
+                            src="/logo_new.png"
                             alt="위담 건강가이드 챗"
-                            className="h-10 w-auto object-contain"
+                            className="h-[72px] w-auto object-contain"
                         />
                     </Link>
                     <div className="hidden md:flex items-center gap-6 text-sm font-medium text-traditional-subtext">
