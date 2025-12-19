@@ -2,14 +2,15 @@
 
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { X, Pill, Camera, AlertCircle, Loader2 } from "lucide-react";
+import { X, Pill, Camera, AlertCircle, Loader2, CheckCircle } from "lucide-react";
 
 type MedicationModalProps = {
     isOpen: boolean;
     onClose: () => void;
+    onComplete?: (analysisResult: string) => void;
 };
 
-export default function MedicationModal({ isOpen, onClose }: MedicationModalProps) {
+export default function MedicationModal({ isOpen, onClose, onComplete }: MedicationModalProps) {
     const [step, setStep] = useState<'upload' | 'result'>('upload');
     const [isProcessing, setIsProcessing] = useState(false);
     const [analysisResult, setAnalysisResult] = useState<string>('');
@@ -81,6 +82,15 @@ export default function MedicationModal({ isOpen, onClose }: MedicationModalProp
         setAnalysisResult('');
         setError('');
         onClose();
+    };
+
+    // 완료 버튼 클릭 시 분석 결과를 채팅으로 전달
+    const handleComplete = () => {
+        if (analysisResult && onComplete) {
+            const fullMessage = `복약도우미 분석 결과입니다.\n\n${analysisResult}\n\n---\n\n저는 현재 위 약을 복용 중입니다. 복용 목적과 관련 증상에 대해 상담해주세요.`;
+            onComplete(fullMessage);
+        }
+        resetAndClose();
     };
 
     if (!isOpen) return null;
@@ -202,10 +212,17 @@ export default function MedicationModal({ isOpen, onClose }: MedicationModalProp
                         </button>
                     )}
                     <button
-                        onClick={resetAndClose}
-                        className="w-full py-3 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-colors"
+                        onClick={step === 'result' && analysisResult ? handleComplete : resetAndClose}
+                        className="w-full py-3 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-colors flex items-center justify-center gap-2"
                     >
-                        {step === 'upload' ? '닫기' : '확인'}
+                        {step === 'upload' ? (
+                            '닫기'
+                        ) : (
+                            <>
+                                <CheckCircle size={18} />
+                                분석 결과로 상담 시작
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

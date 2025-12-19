@@ -196,12 +196,20 @@ export default function PatientDashboardClient() {
                 <MedicationModal
                     isOpen={showMedicationModal}
                     onClose={() => setShowMedicationModal(false)}
+                    onComplete={(result) => {
+                        setSymptomSummary(result);
+                        setShowMedicationModal(false);
+                    }}
                 />
 
-                {/* File Upload Modal */}
+                {/* File Upload Modal (검사결과지 분석) */}
                 <FileUploadModal
                     isOpen={showUploadModal}
                     onClose={() => setShowUploadModal(false)}
+                    onComplete={(result) => {
+                        setSymptomSummary(result);
+                        setShowUploadModal(false);
+                    }}
                 />
 
                 {/* Video Section with Glassmorphism Quick Actions */}
@@ -257,7 +265,7 @@ export default function PatientDashboardClient() {
                                     <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-orange-500/80 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                                         <Upload className="w-4 h-4 md:w-5 md:h-5 text-white" />
                                     </div>
-                                    <span className="text-[10px] md:text-xs font-medium text-white/90 whitespace-nowrap">문서업로드</span>
+                                    <span className="text-[10px] md:text-xs font-medium text-white/90 whitespace-nowrap">검사결과지</span>
                                 </button>
                             </div>
                         </div>

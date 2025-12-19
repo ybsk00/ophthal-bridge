@@ -2,11 +2,12 @@
 
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { X, Upload, FileText, Image, Trash2, Eye, Loader2 } from "lucide-react";
+import { X, Upload, FileText, Image, Trash2, Eye, Loader2, CheckCircle } from "lucide-react";
 
 type FileUploadModalProps = {
     isOpen: boolean;
     onClose: () => void;
+    onComplete?: (analysisResult: string) => void;
 };
 
 type UploadedFile = {
@@ -20,7 +21,7 @@ type UploadedFile = {
     isAnalyzing?: boolean;
 };
 
-export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProps) {
+export default function FileUploadModal({ isOpen, onClose, onComplete }: FileUploadModalProps) {
     const [files, setFiles] = useState<UploadedFile[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
@@ -60,54 +61,44 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
         });
     };
 
+    // 파일 업로드 후 자동 분석
     const handleFiles = async (fileList: FileList) => {
         setIsUploading(true);
-
-        const newFiles: UploadedFile[] = [];
 
         for (const file of Array.from(fileList)) {
             if (file.type.startsWith('image/') || file.type === 'application/pdf') {
                 const base64 = file.type.startsWith('image/') ? await fileToBase64(file) : undefined;
-                newFiles.push({
+                const newFile: UploadedFile = {
                     id: `file-${Date.now()}-${Math.random()}`,
                     name: file.name,
                     type: file.type.includes('pdf') ? 'pdf' : 'image',
                     uploadedAt: new Date().toLocaleString('ko-KR'),
                     base64,
-                    mimeType: file.type
-                });
+                    mimeType: file.type,
+                    isAnalyzing: file.type.startsWith('image/') // 이미지면 자동 분석 시작
+                };
+
+                setFiles(prev => [newFile, ...prev].slice(0, 5));
+
+                // 이미지 파일이면 자동 분석
+                if (file.type.startsWith('image/') && base64) {
+                    autoAnalyzeFile(newFile.id, base64, file.type);
+                }
             }
         }
 
-        setFiles(prev => [...newFiles, ...prev].slice(0, 5));
         setIsUploading(false);
     };
 
-    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            handleFiles(e.target.files);
-        }
-    };
-
-    const removeFile = (fileId: string) => {
-        setFiles(prev => prev.filter(f => f.id !== fileId));
-    };
-
-    const analyzeFile = async (fileId: string) => {
-        const file = files.find(f => f.id === fileId);
-        if (!file || !file.base64 || file.type !== 'image') return;
-
-        setFiles(prev => prev.map(f =>
-            f.id === fileId ? { ...f, isAnalyzing: true } : f
-        ));
-
+    // 자동 분석 함수
+    const autoAnalyzeFile = async (fileId: string, base64: string, mimeType: string) => {
         try {
             const response = await fetch('/api/medical/analyze-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    image: file.base64,
-                    mimeType: file.mimeType,
+                    image: base64,
+                    mimeType: mimeType,
                     history: []
                 })
             });
@@ -126,6 +117,35 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
         }
     };
 
+    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            handleFiles(e.target.files);
+        }
+    };
+
+    const removeFile = (fileId: string) => {
+        setFiles(prev => prev.filter(f => f.id !== fileId));
+    };
+
+    // 완료 버튼 클릭 시 분석 결과를 채팅으로 전달
+    const handleComplete = () => {
+        const analyzedFiles = files.filter(f => f.analysis);
+        if (analyzedFiles.length > 0 && onComplete) {
+            const summary = analyzedFiles.map(f =>
+                `**[${f.name}] 분석 결과:**\n${f.analysis}`
+            ).join('\n\n---\n\n');
+
+            const fullMessage = `검사결과지 분석 결과입니다.\n\n${summary}\n\n위 분석 결과를 바탕으로 상담을 진행해주세요.`;
+            onComplete(fullMessage);
+        }
+        setFiles([]);
+        setSelectedAnalysis(null);
+        onClose();
+    };
+
+    const hasAnalyzedFiles = files.some(f => f.analysis);
+    const isAnyAnalyzing = files.some(f => f.isAnalyzing);
+
     if (!isOpen) return null;
 
     const modalContent = (
@@ -135,7 +155,7 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
                 <div className="bg-orange-50 p-4 flex justify-between items-center border-b border-orange-100">
                     <div className="flex items-center gap-2">
                         <Upload className="w-5 h-5 text-orange-600" />
-                        <h3 className="font-bold text-lg text-gray-900">문서 업로드</h3>
+                        <h3 className="font-bold text-lg text-gray-900">검사결과지 분석</h3>
                     </div>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
                         <X size={20} />
@@ -182,7 +202,7 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
                                 <p className="text-sm text-gray-600 font-medium mb-1">
                                     {isUploading ? '업로드 중...' : '파일을 드래그하거나 클릭하세요'}
                                 </p>
-                                <p className="text-xs text-gray-400">JPG, PNG, PDF 지원</p>
+                                <p className="text-xs text-gray-400">JPG, PNG, PDF 지원 (이미지는 자동 분석)</p>
                             </div>
 
                             {/* File List */}
@@ -198,7 +218,9 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
                                             )}
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium text-gray-700 truncate">{file.name}</p>
-                                                <p className="text-xs text-gray-400">{file.uploadedAt}</p>
+                                                <p className="text-xs text-gray-400">
+                                                    {file.isAnalyzing ? '분석 중...' : file.analysis ? '✅ 분석 완료' : file.uploadedAt}
+                                                </p>
                                             </div>
                                             <div className="flex gap-1">
                                                 {file.type === 'image' && (
@@ -214,15 +236,7 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
                                                         <div className="p-2">
                                                             <Loader2 size={16} className="animate-spin text-orange-500" />
                                                         </div>
-                                                    ) : (
-                                                        <button
-                                                            onClick={() => analyzeFile(file.id)}
-                                                            className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors text-xs font-medium"
-                                                            title="AI 분석"
-                                                        >
-                                                            분석
-                                                        </button>
-                                                    )
+                                                    ) : null
                                                 )}
                                                 <button
                                                     onClick={() => removeFile(file.id)}
@@ -239,7 +253,7 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
                             {/* Info */}
                             <div className="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
                                 <p className="text-xs text-blue-800">
-                                    <strong>💡 팁:</strong> 이미지 업로드 후 "분석" 버튼을 누르면 AI가 내용을 분석합니다.
+                                    <strong>💡 자동 분석:</strong> 이미지 업로드 시 자동으로 AI가 분석합니다. 완료 후 상담으로 연결됩니다.
                                 </p>
                             </div>
                         </>
@@ -249,10 +263,26 @@ export default function FileUploadModal({ isOpen, onClose }: FileUploadModalProp
                 {/* Footer */}
                 <div className="p-4 border-t border-gray-100">
                     <button
-                        onClick={onClose}
-                        className="w-full py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition-colors"
+                        onClick={handleComplete}
+                        disabled={isAnyAnalyzing}
+                        className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${hasAnalyzedFiles
+                                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                                : 'bg-gray-100 text-gray-500'
+                            } disabled:opacity-50`}
                     >
-                        완료
+                        {isAnyAnalyzing ? (
+                            <>
+                                <Loader2 size={18} className="animate-spin" />
+                                분석 중...
+                            </>
+                        ) : hasAnalyzedFiles ? (
+                            <>
+                                <CheckCircle size={18} />
+                                분석 결과로 상담 시작
+                            </>
+                        ) : (
+                            '완료'
+                        )}
                     </button>
                 </div>
             </div>
