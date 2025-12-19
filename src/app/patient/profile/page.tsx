@@ -1,24 +1,17 @@
+"use client";
+
 import { User, ChevronRight, Bell, Shield, HelpCircle, LogOut } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { useSession, signOut } from 'next-auth/react'
+import { useState } from 'react'
+import PrivacyPolicyModal from '@/components/common/PrivacyPolicyModal'
 
-export default async function ProfilePage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+export default function ProfilePage() {
+    const { data: session } = useSession();
+    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
-    let profile = { full_name: '환자', phone: '' }
-
-    if (user) {
-        const { data } = await supabase
-            .from('patient_profiles')
-            .select('full_name, phone')
-            .eq('user_id', user.id)
-            .single()
-
-        if (data) {
-            profile = data
-        }
-    }
+    const userName = session?.user?.name || '환자';
+    const userEmail = session?.user?.email || '';
 
     return (
         <div className="min-h-screen pb-24" style={{ backgroundColor: '#0a0f1a' }}>
@@ -35,12 +28,12 @@ export default async function ProfilePage() {
                         style={{ backgroundColor: '#374151' }}
                     >
                         <span className="text-2xl font-bold text-blue-400">
-                            {(profile.full_name || '환').charAt(0)}
+                            {userName.charAt(0)}
                         </span>
                     </div>
                     <div className="flex-1">
-                        <h2 className="font-bold text-lg text-white">{profile.full_name || '환자'}님</h2>
-                        <p className="text-sm text-gray-400">{profile.phone || user?.email || ''}</p>
+                        <h2 className="font-bold text-lg text-white">{userName}님</h2>
+                        <p className="text-sm text-gray-400">{userEmail}</p>
                     </div>
                     <Link
                         href="/patient/profile/edit"
@@ -76,9 +69,9 @@ export default async function ProfilePage() {
                         <ChevronRight size={18} className="text-gray-500" />
                     </Link>
 
-                    <Link
-                        href="/patient/profile/privacy"
-                        className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors"
+                    <button
+                        onClick={() => setShowPrivacyModal(true)}
+                        className="w-full flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors"
                         style={{ backgroundColor: '#1a2332', border: '1px solid #1f2937' }}
                     >
                         <div className="flex items-center gap-3">
@@ -86,10 +79,10 @@ export default async function ProfilePage() {
                             <span className="text-white">개인정보 처리방침</span>
                         </div>
                         <ChevronRight size={18} className="text-gray-500" />
-                    </Link>
+                    </button>
 
                     <Link
-                        href="/patient/profile/help"
+                        href="/healthcare/chat"
                         className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-colors"
                         style={{ backgroundColor: '#1a2332', border: '1px solid #1f2937' }}
                     >
@@ -102,17 +95,21 @@ export default async function ProfilePage() {
                 </div>
 
                 {/* Logout */}
-                <form action="/patient/logout" method="post" className="mt-6">
-                    <button
-                        type="submit"
-                        className="w-full flex items-center justify-center gap-2 p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors"
-                        style={{ backgroundColor: '#1a2332', border: '1px solid #1f2937' }}
-                    >
-                        <LogOut size={20} />
-                        로그아웃
-                    </button>
-                </form>
+                <button
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                    className="w-full mt-6 flex items-center justify-center gap-2 p-4 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors"
+                    style={{ backgroundColor: '#1a2332', border: '1px solid #1f2937' }}
+                >
+                    <LogOut size={20} />
+                    로그아웃
+                </button>
             </div>
+
+            {/* Privacy Policy Modal */}
+            <PrivacyPolicyModal
+                isOpen={showPrivacyModal}
+                onClose={() => setShowPrivacyModal(false)}
+            />
         </div>
     )
 }
