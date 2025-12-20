@@ -86,62 +86,65 @@ export default function LandingPage() {
           </div>
         </header>
 
-        {/* Features Section - Deep Green Mono Cards */}
-        <section className="relative py-24 px-6 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-traditional-bg to-white z-0"></div>
+        {/* Features Section - Clean Glassmorphism Cards */}
+        <section className="relative py-20 px-6 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-traditional-bg via-[#f5f3ef] to-[#f0ece6] z-0"></div>
 
-          <div className="relative z-10 max-w-7xl mx-auto">
-            <div className="text-center mb-16 space-y-4">
-              <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 font-sans tracking-tight">
+          <div className="relative z-10 max-w-5xl mx-auto">
+            <div className="text-center mb-12 space-y-3">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 font-sans tracking-tight">
                 2분 컨디션 패턴 체크
               </h2>
-              <p className="text-gray-600 max-w-xl mx-auto text-base font-medium leading-relaxed">
+              <p className="text-gray-500 max-w-lg mx-auto text-sm font-medium">
                 간단한 질문으로 생활 습관을 점검하고, 요약을 받아보세요.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {[
                 {
-                  icon: <BarChart2 className="w-7 h-7" />,
+                  icon: <BarChart2 className="w-6 h-6" />,
                   title: "패턴 1장 요약",
                   desc: "식사·수면·스트레스 흐름을 5문답으로 정리합니다.",
-                  label: "약 2분"
+                  label: "약 2분",
+                  labelColor: "bg-slate-700"
                 },
                 {
-                  icon: <CheckCircle className="w-7 h-7" />,
+                  icon: <CheckCircle className="w-6 h-6" />,
                   title: "오늘부터 할 1가지",
                   desc: "현실적으로 가능한 '한 가지 조정'만 제안합니다.",
-                  label: "실천 중심"
+                  label: "실천 중심",
+                  labelColor: "bg-blue-600"
                 },
                 {
-                  icon: <Calendar className="w-7 h-7" />,
+                  icon: <Calendar className="w-6 h-6" />,
                   title: "요약 저장 & 변화 비교",
                   desc: "기록을 저장해 다음에 더 빠르게 이어서 확인합니다.",
-                  label: "로그인 후"
+                  label: "로그인 후",
+                  labelColor: "bg-indigo-600"
                 }
               ].map((feature, idx) => (
                 <div
                   key={idx}
-                  className="group relative bg-[#1a3a2f] hover:bg-[#234a3d] rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl cursor-default"
+                  className="group bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-sm hover:shadow-lg border border-gray-100/80 transition-all duration-300 hover:-translate-y-1"
                 >
                   {/* Icon */}
-                  <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-white/15 transition-colors">
-                    <div className="text-emerald-400">{feature.icon}</div>
+                  <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                    <div className="text-gray-500">{feature.icon}</div>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-lg font-bold text-white mb-2 tracking-tight">
+                  <h3 className="text-base font-bold text-gray-800 mb-2">
                     {feature.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-white/70 text-sm leading-relaxed mb-5">
+                  <p className="text-gray-500 text-sm leading-relaxed mb-4">
                     {feature.desc}
                   </p>
 
                   {/* Bottom Label */}
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-white/10 text-emerald-300 border border-emerald-400/30">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-md text-[11px] font-semibold ${feature.labelColor} text-white`}>
                     {feature.label}
                   </span>
                 </div>
