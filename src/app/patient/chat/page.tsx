@@ -12,7 +12,7 @@ type Message = {
     timestamp?: Date
 }
 
-const quickReplies = ['치통이 있어요', '잇몫 에서 피가 나요', '차가운 게 시려요', '충치 치료 문의']
+const quickReplies = ['치통이 있어요', '잇몸에서 피가 나요', '차가운 게 시려요', '충치 치료 문의']
 
 export default function ChatPage() {
     const router = useRouter()
