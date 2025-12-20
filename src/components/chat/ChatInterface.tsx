@@ -426,18 +426,18 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                             {/* Avatar */}
                             <div
                                 className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden border-2 ${msg.role === "ai"
-                                    ? "border-traditional-primary bg-traditional-bg"
-                                    : "border-traditional-accent bg-traditional-bg"
+                                    ? "border-dental-primary bg-dental-bg"
+                                    : "border-dental-accent bg-dental-bg"
                                     }`}
                             >
                                 {msg.role === "ai" ? (
                                     <img
-                                        src="/images/character-doctor.jpg"
+                                        src="/doctor-avatar.jpg"
                                         alt="Doctor"
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <div className="w-full h-full bg-traditional-accent flex items-center justify-center text-white">
+                                    <div className="w-full h-full bg-dental-accent flex items-center justify-center text-white">
                                         <User size={20} />
                                     </div>
                                 )}
@@ -445,13 +445,13 @@ export default function ChatInterface(props: ChatInterfaceProps) {
 
                             {/* Bubble */}
                             <div className="flex flex-col gap-1 max-w-[80%]">
-                                <span className={`text-xs font-medium ${msg.role === "user" ? "text-right text-traditional-subtext" : "text-left text-traditional-primary"}`}>
+                                <span className={`text-xs font-medium ${msg.role === "user" ? "text-right text-dental-subtext" : "text-left text-dental-primary"}`}>
                                     {msg.role === "ai" ? (props.isLoggedIn ? "평촌이생각치과" : "치과 건강가이드") : "나"}
                                 </span>
                                 <div
                                     className={`px-6 py-4 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-line ${msg.role === "ai"
-                                        ? "bg-white text-traditional-text border border-traditional-muted rounded-tl-none"
-                                        : "bg-traditional-primary text-white rounded-tr-none shadow-md"
+                                        ? "bg-[#1a2332] text-white border border-white/10 rounded-tl-none"
+                                        : "bg-dental-primary text-white rounded-tr-none shadow-md"
                                         }`}
                                 >
                                     {msg.content}
@@ -461,18 +461,18 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                     ))}
                     {isLoading && (
                         <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 rounded-full border-2 border-traditional-primary bg-traditional-bg flex items-center justify-center shadow-md overflow-hidden flex-shrink-0">
+                            <div className="w-12 h-12 rounded-full border-2 border-dental-primary bg-dental-bg flex items-center justify-center shadow-md overflow-hidden flex-shrink-0">
                                 <img
-                                    src="/images/character-doctor.jpg"
+                                    src="/doctor-avatar.jpg"
                                     alt="Doctor"
                                     className="w-full h-full object-cover"
                                 />
                             </div>
-                            <div className="bg-white px-6 py-4 rounded-2xl rounded-tl-none border border-traditional-muted shadow-sm">
+                            <div className="bg-[#1a2332] px-6 py-4 rounded-2xl rounded-tl-none border border-white/10 shadow-sm">
                                 <div className="flex gap-1.5">
-                                    <span className="w-2 h-2 bg-traditional-primary/40 rounded-full animate-bounce"></span>
-                                    <span className="w-2 h-2 bg-traditional-primary/40 rounded-full animate-bounce delay-100"></span>
-                                    <span className="w-2 h-2 bg-traditional-primary/40 rounded-full animate-bounce delay-200"></span>
+                                    <span className="w-2 h-2 bg-dental-primary/50 rounded-full animate-bounce"></span>
+                                    <span className="w-2 h-2 bg-dental-primary/50 rounded-full animate-bounce delay-100"></span>
+                                    <span className="w-2 h-2 bg-dental-primary/50 rounded-full animate-bounce delay-200"></span>
                                 </div>
                             </div>
                         </div>
