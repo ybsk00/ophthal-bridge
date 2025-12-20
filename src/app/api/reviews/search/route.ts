@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 // 환경변수: NAVER_CLIENT_ID, NAVER_CLIENT_SECRET
 // 문서: https://developers.naver.com/docs/serviceapi/search/
 
-const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID;
-const NAVER_CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
+const NAVER_CLIENT_ID = process.env.NAVER_SEARCH_CLIENT_ID;
+const NAVER_CLIENT_SECRET = process.env.NAVER_SEARCH_CLIENT_SECRET;
 const HOSPITAL_NAME = process.env.HOSPITAL_REVIEW_QUERY_BASE || '위담한방병원';
 
 interface NaverSearchItem {
