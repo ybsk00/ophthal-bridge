@@ -78,7 +78,7 @@ export default function PatientDashboardClient() {
                     data = {
                         time: `${scheduledDate.toISOString().split('T')[0]} ${scheduledDate.toTimeString().slice(0, 5)}`,
                         status: appointmentData.status === 'scheduled' ? 'pending' : appointmentData.status,
-                        complaint: appointmentData.notes || '위담한방병원 진료'
+                        complaint: appointmentData.notes || '평촌이생각치과 진료'
                     };
                 }
             }
@@ -292,8 +292,8 @@ export default function PatientDashboardClient() {
                                 <button
                                     onClick={() => setShowReviewModal(true)}
                                     className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-300 group ${highlightedTabs.includes('review')
-                                            ? 'bg-amber-500/30 ring-2 ring-amber-400 ring-offset-2 ring-offset-transparent animate-pulse'
-                                            : 'bg-white/5 hover:bg-white/20'
+                                        ? 'bg-amber-500/30 ring-2 ring-amber-400 ring-offset-2 ring-offset-transparent animate-pulse'
+                                        : 'bg-white/5 hover:bg-white/20'
                                         }`}
                                 >
                                     <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-amber-500/80 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
@@ -304,8 +304,8 @@ export default function PatientDashboardClient() {
                                 <button
                                     onClick={() => setShowMapModal(true)}
                                     className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-300 group ${highlightedTabs.includes('map')
-                                            ? 'bg-rose-500/30 ring-2 ring-rose-400 ring-offset-2 ring-offset-transparent animate-pulse'
-                                            : 'bg-white/5 hover:bg-white/20'
+                                        ? 'bg-rose-500/30 ring-2 ring-rose-400 ring-offset-2 ring-offset-transparent animate-pulse'
+                                        : 'bg-white/5 hover:bg-white/20'
                                         }`}
                                 >
                                     <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-rose-500/80 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">

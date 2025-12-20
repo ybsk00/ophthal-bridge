@@ -51,7 +51,7 @@ export default function PatientHeader() {
         <header className="bg-white/80 backdrop-blur-md border-b border-traditional-muted/50 px-6 py-4 flex items-center justify-between sticky top-0 z-20 transition-all duration-300">
             <Link href="/medical/dashboard" className="flex items-center gap-3 group">
                 <img src="/logo_leaf.png?v=3" alt="Logo" className="h-10 w-auto object-contain" />
-                <span className="text-xl font-bold text-traditional-text">위담한방병원</span>
+                <span className="text-xl font-bold text-traditional-text">평촌이생각치과</span>
             </Link>
 
             <div className="flex items-center gap-4">

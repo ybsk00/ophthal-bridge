@@ -22,10 +22,10 @@ export default function MedicalChatInterface() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Initial Medical Greeting - 위담한방병원 AI 상담
+        // Initial Medical Greeting - 평촌이생각치과 AI 상담
         setMessages([{
             role: "ai",
-            content: "안녕하세요, 위담한방병원 AI 상담입니다.\n\n이 채팅은 **진단이나 처방이 아닌 생활 습관·웰니스 점검(참고용)** 입니다. 정확한 상태 판단과 치료 여부는 **의료진 상담을 통해 확인**이 필요합니다.\n\n지금 겪고 계신 불편한 증상을 말씀해 주세요. 언제부터 시작되었는지, 어디가 가장 불편하신지 편하게 이야기해 주세요."
+            content: "안녕하세요, 평촌이생각치과 AI 상담입니다.\n\n이 채팅은 **진단이나 처방이 아닌 생활 습관·웰니스 점검(참고용)** 입니다. 정확한 상태 판단과 치료 여부는 **의료진 상담을 통해 확인**이 필요합니다.\n\n지금 겪고 계신 불편한 증상을 말씀해 주세요. 언제부터 시작되었는지, 어디가 가장 불편하신지 편하게 이야기해 주세요."
         }]);
     }, []);
 
@@ -130,7 +130,7 @@ export default function MedicalChatInterface() {
                         <ArrowLeft size={24} />
                     </Link>
                     <div className="ml-2">
-                        <h1 className="text-lg font-bold text-slate-800">위담한방병원 AI 상담</h1>
+                        <h1 className="text-lg font-bold text-slate-800">평촌이생각치과 AI 상담</h1>
                         <p className="text-xs text-blue-600 flex items-center font-medium">
                             <span className="w-2 h-2 rounded-full bg-blue-600 mr-1"></span>
                             참고용 건강 점검 · 진단 대체 불가
@@ -167,9 +167,9 @@ export default function MedicalChatInterface() {
                                 : "bg-emerald-700 text-white rounded-tr-none"
                                 }`}
                         >
-                            {/* 위담한방병원 AI Label */}
+                            {/* 평촌이생각치과 AI Label */}
                             {msg.role === "ai" && (
-                                <div className="text-xs text-emerald-700 font-semibold mb-1">위담한방병원</div>
+                                <div className="text-xs text-emerald-700 font-semibold mb-1">평촌이생각치과</div>
                             )}
                             {msg.imageUrl && (
                                 <img src={msg.imageUrl} alt="Uploaded" className="max-w-full rounded-lg mb-2 border border-white/20" />

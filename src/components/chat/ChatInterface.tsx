@@ -104,7 +104,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
             // 로그인 후 - 메디컬 채팅
             setMessages([{
                 role: "ai",
-                content: "안녕하세요, 위담한방병원 AI 상담입니다.\n\n이 채팅은 **진단이나 처방이 아닌 생활 습관·웰니스 점검(참고용)** 입니다.\n\n지금 겪고 계신 불편한 증상을 말씀해 주세요. 언제부터 시작되었는지, 어디가 가장 불편하신지 편하게 이야기해 주세요."
+                content: "안녕하세요, 평촌이생각치과 AI 상담입니다.\n\n이 채팅은 **진단이나 처방이 아닌 생활 습관·웰니스 점검(참고용)** 입니다.\n\n지금 겪고 계신 불편한 증상을 말씀해 주세요. 언제부터 시작되었는지, 어디가 가장 불편하신지 편하게 이야기해 주세요."
             }]);
         } else {
             // 로그인 전 - 헬스케어 채팅 (모듈별 인사말)
@@ -446,7 +446,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                             {/* Bubble */}
                             <div className="flex flex-col gap-1 max-w-[80%]">
                                 <span className={`text-xs font-medium ${msg.role === "user" ? "text-right text-traditional-subtext" : "text-left text-traditional-primary"}`}>
-                                    {msg.role === "ai" ? (props.isLoggedIn ? "위담한방병원" : "위담 건강가이드") : "나"}
+                                    {msg.role === "ai" ? (props.isLoggedIn ? "평촌이생각치과" : "치과 건강가이드") : "나"}
                                 </span>
                                 <div
                                     className={`px-6 py-4 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-line ${msg.role === "ai"

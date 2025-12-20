@@ -40,7 +40,7 @@ export default function EvidenceModal({
                 {/* 고지 문구 */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
                     <Text size="xs">
-                        아래 논문은 위담한방병원 연구진이 참여한 SCI 국제학술지 게재 논문입니다.
+                        아래 논문은 평촌이생각치과 연구진이 참여한 SCI 국제학술지 게재 논문입니다.
                         치료 효과를 보장하거나 우월성을 주장하는 자료가 아님을 안내드립니다.
                     </Text>
                 </div>

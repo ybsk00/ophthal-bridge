@@ -247,7 +247,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                             .from('appointments')
                             .update({
                                 scheduled_at: scheduledAt,
-                                notes: doctor === '전체' ? '위담한방병원 진료' : `위담한방병원 진료 (${doctor})`
+                                notes: doctor === '전체' ? '평촌이생각치과 진료' : `평촌이생각치과 진료 (${doctor})`
                             })
                             .eq('id', existingReservation.id);
 
@@ -275,7 +275,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 scheduled_at: scheduledAt,
-                                notes: `위담한방병원 진료 (${doctor})`,
+                                notes: `평촌이생각치과 진료 (${doctor})`,
                                 doctor_name: doctor  // 의사 이름 추가
                             })
                         });
@@ -295,7 +295,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                     time: timeString,
                                     type: '초진',
                                     status: 'pending',
-                                    complaint: doctor === '전체' ? '위담한방병원 진료' : `위담한방병원 진료 (${doctor})`,
+                                    complaint: doctor === '전체' ? '평촌이생각치과 진료' : `평촌이생각치과 진료 (${doctor})`,
                                     keywords: ['예약']
                                 }
                             ]);
