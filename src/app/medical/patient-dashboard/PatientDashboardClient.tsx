@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, Suspense, useEffect } from "react";
-import { Calendar, Clock, MoreHorizontal, Send, ClipboardList, Pill, Upload, MessageSquare, MapPin } from "lucide-react";
+import { Calendar, Clock, MoreHorizontal, Send, ClipboardList, Pill, Upload, MessageSquare, MapPin, Users, FileText } from "lucide-react";
 import ChatInterface from "@/components/chat/ChatInterface";
 import PatientHeader from "@/components/medical/PatientHeader";
 import ReservationModal from "@/components/medical/ReservationModal";
@@ -10,8 +10,11 @@ import MedicationModal from "@/components/medical/MedicationModal";
 import FileUploadModal from "@/components/medical/FileUploadModal";
 import MapModal from "@/components/medical/MapModal";
 import ReviewModal from "@/components/medical/ReviewModal";
+import DoctorIntroModal from "@/components/medical/DoctorIntroModal";
+import EvidenceModal from "@/components/medical/EvidenceModal";
 import { createClient } from "@/lib/supabase/client";
 import { useSession } from "next-auth/react";
+import { DOCTORS, SCI_EVIDENCE } from "@/lib/ai/prompts";
 
 export default function PatientDashboardClient() {
     const { data: nextAuthSession } = useSession();
@@ -21,6 +24,9 @@ export default function PatientDashboardClient() {
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [showMapModal, setShowMapModal] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
+    const [showDoctorIntroModal, setShowDoctorIntroModal] = useState(false);
+    const [showEvidenceModal, setShowEvidenceModal] = useState(false);
+    const [highlightedTabs, setHighlightedTabs] = useState<('review' | 'map')[]>([]);
     const [symptomSummary, setSymptomSummary] = useState<string | undefined>(undefined);  // 증상정리 요약
     const [appointment, setAppointment] = useState({
         date: "예약 없음",
@@ -285,7 +291,10 @@ export default function PatientDashboardClient() {
                                 </button>
                                 <button
                                     onClick={() => setShowReviewModal(true)}
-                                    className="flex flex-col items-center gap-1.5 p-2 bg-white/5 hover:bg-white/20 rounded-xl transition-all duration-300 group"
+                                    className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-300 group ${highlightedTabs.includes('review')
+                                            ? 'bg-amber-500/30 ring-2 ring-amber-400 ring-offset-2 ring-offset-transparent animate-pulse'
+                                            : 'bg-white/5 hover:bg-white/20'
+                                        }`}
                                 >
                                     <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-amber-500/80 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                                         <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-white" />
@@ -294,7 +303,10 @@ export default function PatientDashboardClient() {
                                 </button>
                                 <button
                                     onClick={() => setShowMapModal(true)}
-                                    className="flex flex-col items-center gap-1.5 p-2 bg-white/5 hover:bg-white/20 rounded-xl transition-all duration-300 group"
+                                    className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-300 group ${highlightedTabs.includes('map')
+                                            ? 'bg-rose-500/30 ring-2 ring-rose-400 ring-offset-2 ring-offset-transparent animate-pulse'
+                                            : 'bg-white/5 hover:bg-white/20'
+                                        }`}
                                 >
                                     <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-rose-500/80 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                                         <MapPin className="w-4 h-4 md:w-5 md:h-5 text-white" />
@@ -336,12 +348,41 @@ export default function PatientDashboardClient() {
                                 mode="medical"
                                 externalMessage={symptomSummary}
                                 onExternalMessageSent={() => setSymptomSummary(undefined)}
+                                onAction={(action, data) => {
+                                    if (action === 'DOCTOR_INTRO_MODAL') {
+                                        setShowDoctorIntroModal(true);
+                                    } else if (action === 'EVIDENCE_MODAL') {
+                                        setShowEvidenceModal(true);
+                                    }
+                                }}
+                                onTabHighlight={(tabs) => {
+                                    setHighlightedTabs(tabs);
+                                    // 3초 후 하이라이트 해제
+                                    setTimeout(() => setHighlightedTabs([]), 3000);
+                                }}
                             />
                         </Suspense>
                     </div>
                 </div>
 
             </div>
+
+            {/* Doctor Intro Modal */}
+            <DoctorIntroModal
+                isOpen={showDoctorIntroModal}
+                onClose={() => setShowDoctorIntroModal(false)}
+                doctors={DOCTORS}
+                onReservation={() => setIsReservationModalOpen(true)}
+                onReviewTabClick={() => setShowReviewModal(true)}
+                onMapTabClick={() => setShowMapModal(true)}
+            />
+
+            {/* Evidence Modal */}
+            <EvidenceModal
+                isOpen={showEvidenceModal}
+                onClose={() => setShowEvidenceModal(false)}
+                evidence={SCI_EVIDENCE}
+            />
         </div>
     );
 }

@@ -17,12 +17,17 @@ type Message = {
     content: string;
 };
 
+type ActionType = 'RESERVATION_MODAL' | 'DOCTOR_INTRO_MODAL' | 'EVIDENCE_MODAL' | null;
+
 type ChatInterfaceProps = {
     isEmbedded?: boolean;
     isLoggedIn?: boolean;
     mode?: 'healthcare' | 'medical';
-    externalMessage?: string;  // 외부에서 주입하는 메시지 (증상정리 요약 등)
-    onExternalMessageSent?: () => void;  // 외부 메시지 발송 완료 콜백
+    externalMessage?: string;
+    onExternalMessageSent?: () => void;
+    // 새로운 액션 콜백
+    onAction?: (action: ActionType, data?: any) => void;
+    onTabHighlight?: (tabs: ('review' | 'map')[]) => void;
 };
 
 export default function ChatInterface(props: ChatInterfaceProps) {
@@ -39,6 +44,8 @@ export default function ChatInterface(props: ChatInterfaceProps) {
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [turnCount, setTurnCount] = useState(0);
+    const [askedQuestionCount, setAskedQuestionCount] = useState(0); // 질문 카운터
+    const [currentTrack, setCurrentTrack] = useState<string | null>(null); // 트랙 유지
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [loginModalContent, setLoginModalContent] = useState({
         title: "상세한 상담이 필요하신가요?",
@@ -204,33 +211,62 @@ export default function ChatInterface(props: ChatInterfaceProps) {
         setIsLoading(true);
 
         try {
-            const response = await fetch(props.isLoggedIn ? "/api/medical/chat" : "/api/healthcare/chat", {
+            // 로그인 상태에 따라 다른 API 사용
+            const apiEndpoint = props.isLoggedIn ? "/api/medical/chat" : "/api/healthcare/chat";
+
+            const response = await fetch(apiEndpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     message: userMessage,
                     history: messages,
-                    turnCount: turnCount, // 현재 턴 카운트 전달
-                    topic: topic, // 주제 전달 (5턴 분석용)
+                    turnCount: turnCount,
+                    topic: topic,
+                    track: currentTrack, // 트랙 유지
+                    askedQuestionCount: askedQuestionCount, // 질문 카운터 전달
                 }),
             });
 
             if (!response.ok) throw new Error("Failed to send message");
 
             const data = await response.json();
-            let aiContent = data.content;
+            const aiContent = data.content;
 
-            // 예약 트리거 확인
-            if (aiContent.includes("[RESERVATION_TRIGGER]")) {
-                aiContent = aiContent.replace("[RESERVATION_TRIGGER]", "").trim();
-                setShowReservationModal(true);
+            // 상태 업데이트 (새 API 응답 구조)
+            if (data.track) setCurrentTrack(data.track);
+            if (typeof data.askedQuestionCount === 'number') {
+                setAskedQuestionCount(data.askedQuestionCount);
             }
 
+            // 메시지 추가
             setMessages(prev => [...prev, { role: "ai", content: aiContent }]);
 
-            // 로그인 필요 응답 확인
+            // 액션 처리 (모달 트리거)
+            if (data.action) {
+                if (data.action === 'RESERVATION_MODAL') {
+                    setShowReservationModal(true);
+                } else {
+                    // DoctorIntroModal, EvidenceModal은 부모 컴포넌트로 전달
+                    props.onAction?.(data.action, {
+                        doctorsData: data.doctorsData,
+                        evidenceData: data.evidenceData
+                    });
+                }
+            }
+
+            // 탭 하이라이트 처리
+            if (data.highlightTabs && data.highlightTabs.length > 0) {
+                props.onTabHighlight?.(data.highlightTabs);
+            }
+
+            // 레드플래그 처리 (이미 API에서 응급 메시지로 대체됨)
+            if (data.isRedFlag) {
+                // 추가 입력 차단
+                setTurnCount(10);
+            }
+
+            // 로그인 필요 응답 확인 (헬스케어 모드)
             if (!props.isLoggedIn && data.requireLogin) {
-                // 1. 증상 감지 또는 5턴 종료 (Hard Stop)
                 if (data.isSymptomTrigger || data.isHardStop) {
                     setTimeout(() => {
                         setLoginModalContent({
@@ -240,14 +276,11 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                                 : "더 자세한 건강 분석과 맞춤 조언을 위해<br />로그인이 필요합니다."
                         });
                         setShowLoginModal(true);
-                        // 증상 트리거 시 턴 카운트를 강제로 5로 만들어 입력 막기 (선택 사항, 여기서는 모달만 띄움)
                         if (data.isSymptomTrigger) {
-                            setTurnCount(5); // 입력을 막기 위해 턴 카운트 최대치로 설정
+                            setTurnCount(5);
                         }
                     }, 500);
-                }
-                // 2. 3턴째 Soft Gate (계속 대화 가능)
-                else {
+                } else {
                     setTimeout(() => {
                         setLoginModalContent({
                             title: "더 자세한 상담을 받아보세요! 🌿",

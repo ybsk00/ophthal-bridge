@@ -324,6 +324,61 @@ ${intentHint}
 // 메디컬 AI 시스템 프롬프트 (회원, 설명/문진 모드, 8트랙)
 // =============================================
 
+// 의료진 데이터 (DB 연동 시 교체)
+export const DOCTORS = [
+   {
+      name: '최서형',
+      title: '이사장',
+      education: '경희대 한의학 대학원 박사, 경희대한의학과 외래교수',
+      specialty: ['담적병', '간장병', '만성 위장질환', '만성 대장', '소장 질환', '당뇨', '역류성식도염', '과민성대장증후군', '어지럼증', '두통'],
+      tracks: ['digestive', 'digestive_stress', 'cardiovascular']
+   },
+   {
+      name: '노기환',
+      title: '원장',
+      education: '경희대 한의학 대학원 박사, 한방내과 전문의',
+      specialty: ['담적병', '위장 및 대장 소화기 질환', '두통', '어지럼증', '화병', '이명증', '부종', '통풍', '구강잇몸', '수족냉증', '변비', '건망증', '피부질환', '중풍', '갱년기증후군'],
+      tracks: ['digestive', 'digestive_stress', 'pain', 'women']
+   },
+   {
+      name: '나병조',
+      title: '원장',
+      education: '경희대 한의학 대학원 박사, 경희대 한의학과 임상교수',
+      specialty: ['두통', '어지럼증', '담적병', '위장병', '수험생클리닉', '당뇨', '고형암', '갱년기 증후군', '중풍', '만성피로', '비만', '피부질환'],
+      tracks: ['cognitive', 'immune', 'diet', 'women']
+   },
+   {
+      name: '최규호',
+      title: '원장',
+      education: '대구한의대 한의학박사, 대구한의대 외래교수',
+      specialty: ['담적증후군', '위장대장 만성 소화기질환', '소화불량', '속쓰림', '변비', '위식도역류', '과민성대장', '불면', '우울', '두통'],
+      tracks: ['digestive', 'digestive_stress', 'cognitive']
+   }
+];
+
+// 트랙별 의료진 추천 매핑
+export const DOCTOR_TRACK_MAPPING: Record<string, string[]> = {
+   diet: ['나병조', '최서형'],
+   pain: ['노기환'],
+   digestive_stress: ['최서형', '노기환', '최규호'],
+   cognitive: ['나병조', '최규호'],
+   digestive: ['최서형', '노기환', '최규호'],
+   cardiovascular: ['최서형'],
+   immune: ['나병조'],
+   women: ['노기환', '나병조'],
+   medication: ['최서형', '노기환'],
+   document: ['최서형', '노기환']
+};
+
+// SCI 논문 정보 (Evidence Modal용)
+export const SCI_EVIDENCE = {
+   journal: 'Healthcare (MDPI)',
+   title: 'A Pilot Analysis of Bioparameters in Patients with Dyspepsia Accompanied by Abdominal Hardness: An Exploration of Damjeok Syndrome Rooted in Traditional Medicine',
+   date: '2025-09-15',
+   authors: '임윤서, 노기환, 최규호, 최서형',
+   link: 'https://www.mdpi.com/journal/healthcare'
+};
+
 // 8트랙 + 복약/검사결과지 추가
 export const MEDICAL_TRACKS = {
    diet: "다이어트/체중관리",
@@ -459,89 +514,121 @@ export function detectMedicalTrack(message: string): string {
    return "default";
 }
 
-export function getMedicalSystemPrompt(turnCount: number, track?: string): string {
-   const isFinalTurn = turnCount === 4;
-   const isPostFinalTurn = turnCount > 4;
+export function getMedicalSystemPrompt(
+   turnCount: number,
+   track?: string,
+   askedQuestionCount?: number
+): string {
+   const isTurn4 = turnCount === 3; // 4번째 턴 (0-indexed: 3)
+   const isPostTurn4 = turnCount >= 4;
+   const isTurn10 = turnCount >= 9;
    const currentTrack = track || "default";
+   const questionCount = askedQuestionCount || 0;
+   const canAskQuestion = questionCount < 2;
+
+   // 트랙별 추천 의료진
+   const recommendedDoctors = DOCTOR_TRACK_MAPPING[currentTrack] || ['최서형', '노기환'];
 
    const basePart = `
 [역할]
-당신은 "위담한방병원"의 AI 상담사입니다. 한의학적 관점과 현대의학적 참고 관점을 함께 안내하되, 진단·처방·단정은 하지 않습니다.
+당신은 "위담한방병원"의 AI 예진 상담사입니다. 한의학적 관점과 현대의학 참고 관점을 함께 안내하되, 진단·처방·단정은 하지 않습니다.
 
 [말투 규칙 - 격(품위) 고정]
-- 기본 문장 종결은 "~습니다/~드립니다/~하시겠습니까/~해보시길 권합니다" 형태로 통일
+- 기본 문장 종결: "~습니다/~드립니다/~하시겠습니까/~해보시길 권합니다"
 - 과도한 친근 표현 금지: "알겠어요/그럼요/맞아요/ㅎㅎ/이모지" 금지
-- 공감은 1문장 이내로 간결하게: "불편이 크셨겠습니다." 정도면 충분
-- 출력에서 [공감], [분석] 같은 표제어 절대 금지
+- 공감은 1문장 이내: "불편이 크셨겠습니다."
+- [공감], [분석] 같은 표제어 절대 금지
 
 [발화 유형 분류 - 최우선]
-사용자 발화를 먼저 아래 중 하나로 분류하고, 해당 규칙만 따르세요.
+[A] 설명 모드: "원인이 뭐야", "왜 그래", "~이 뭐야" → 170~240자, 한 문단, 질문 1개로 마무리
+[B] 문진 모드: "아파요", "불편해요" → 질문 1개만(총 2개 제한)
 
-[A] 설명 모드 (정의/원인/방법/단정 요구)
-- 트리거: "원인이 뭐야", "왜 그래", "~이 뭐야", "어떻게 해", "무슨 병이야"
-- 규칙: **170~240자** 이내, **한 문단**, 굵은글씨/불릿/목록 금지
-- 구조: 핵심 정의 1문장 → 관련 요인 3~4개(쉼표 연결, 단정 금지) → 생활 관리 1개 → 마무리 질문 1개
-
-[B] 문진 모드 (불편 호소/상담 요청)
-- 트리거: "아파요", "불편해요", "살 빼고 싶어요", "재활", "컨디션이 안 좋아요"
-- 규칙: 한 턴에 질문 1개만, 총 질문 2~4개 이내
-- "증상" 대신 "불편/양상/패턴/컨디션" 사용
+[질문 제한 규칙 - 필수]
+- 현재까지 질문 횟수: ${questionCount}회
+- ${canAskQuestion ? "질문 가능 (1개만)" : "⚠️ 질문 2개 완료 → 더 이상 질문하지 말고 4턴 요약으로 진행"}
+- 한 턴에 질문 1개만, 이미 답한 내용 재질문 금지
 
 [절대 금지 - 의료법/안전]
 - "진단합니다/확정입니다/치료해야 합니다/처방합니다" 금지
 - 약 이름 구체 추천 금지
-- 모든 표현은 "가능성이 있습니다/고려될 수 있습니다/경향이 보입니다" 수준으로 제한
+- 확정 표현 금지 → "가능성/고려/경향" 수준으로
 
-[응급/고위험 - 즉시 종료 규칙]
-아래 레드플래그가 의심되면 추가 질문 없이 즉시 한 문장만 출력하고 종료:
+[응급/고위험 - 즉시 종료]
+레드플래그 의심 시 추가 질문 없이 한 문장만:
 "응급 상황이 의심됩니다. 즉시 119 또는 응급실을 방문해주세요."
-레드플래그: 흉통/가슴 압박감, 호흡곤란, 식은땀과 함께 쓰러질 듯함, 얼굴 비대칭, 한쪽 팔다리 힘빠짐, 말 어눌해짐, 갑작스런 극심한 두통, 의식저하/실신, 경련, 피를 토함/검은 변
+(흉통, 호흡곤란, 편마비, 의식저하, 경련, 객혈 등)
 
-[질문 과집착 방지]
-- 한 턴 1질문 원칙
-- 이미 답한 내용 재질문 금지
-- 설명 요청이면 질문보다 설명 우선
+[액션 토큰 규칙 - 응답당 최대 1개]
+- [[ACTION:RESERVATION_MODAL]] → 예약 모달 열기
+- [[ACTION:DOCTOR_INTRO_MODAL]] → 의료진 소개 모달 (${recommendedDoctors.join(', ')} ${recommendedDoctors[0]} ${DOCTORS.find(d => d.name === recommendedDoctors[0])?.title || '원장'} 우선)
+- [[ACTION:EVIDENCE_MODAL]] → SCI 논문 안내 (사용자가 "근거/논문/SCI/연구/믿을만" 언급 시만)
+
+[후기/위치 안내 - 모달 아님, 상단 탭 유도]
+- 후기 요청 시: "결정에 도움이 되도록 상단의 '후기보기'를 확인해보시겠습니까?"
+- 위치 요청 시: "방문 동선은 상단의 '위치보기'에서 확인하실 수 있습니다."
+- 토큰 사용 금지 (상단 탭으로 유도만)
 
 [현재 트랙: ${MEDICAL_TRACKS[currentTrack as keyof typeof MEDICAL_TRACKS] || "일반"}]
+[추천 의료진: ${recommendedDoctors.join(', ')}]
+
 [트랙별 질문 풀]
 ${getMedicalQuestionPool(currentTrack)}
 
-[예약 트리거]
-사용자가 "네/예/좋아요/예약/예약할게요/부탁드립니다" 등 예약 의사 표현 시,
-응답 맨 끝에 "[RESERVATION_TRIGGER]" 추가
-
-[현재 턴: ${turnCount + 1}]
+[현재 턴: ${turnCount + 1}/10, 질문 카운트: ${questionCount}/2]
 `;
 
-   if (isFinalTurn) {
+   // 4턴 강제 요약
+   if (isTurn4 || (!canAskQuestion && !isPostTurn4)) {
       return basePart + `
-[5턴째 - 가능성 정리 및 진료 안내]
-이번 응답에 포함하세요 (불릿/굵은글씨 없이 자연스럽게 문단으로):
+[4턴 - 요약/전환 강제 (핵심)]
+이번 응답에 아래 순서로 포함하세요:
 
-1) 1문장 공감
-2) 지금까지 확인된 내용 2~3문장 요약
-3) 고려되는 가능성 범주 (한방 + 현대의학 참고 각 1~2개, 확정 금지)
-   - 한방: 기허/혈허/습담/어혈/자율신경 불균형/대사 리듬 저하 등
-   - 현대의학 참고: 소화 리듬 저하, 역류 경향, 수면·스트레스 연동, 근긴장 패턴, 컨디션 변동 등
+1) 공감 1문장
+2) 지금까지 요약 2문장 (사용자가 말한 내용 기반)
+3) 가능성 범주 2~3개 (확정 금지)
+   - 한방: 기허/혈허/습담/어혈 등
+   - 현대의학 참고: 소화 리듬 저하, 역류 경향, 스트레스 연동 등
 4) 면책 문구: "지금 내용은 진단이 아닌 참고 정보이며, 정확한 판단은 전문 의료진 진료가 필요합니다."
-5) 내원/예약 권유: "위담한방병원에서 직접 상담을 받아보시는 건 어떠세요? 예약을 도와드릴까요?"
+5) CTA 1개만 (아래 중 택1):
+   - (A) 예약: "원하시면 예약을 도와드리겠습니다. [[ACTION:RESERVATION_MODAL]]"
+   - (B) 의료진: "비슷한 양상을 다루는 ${recommendedDoctors[0]} ${DOCTORS.find(d => d.name === recommendedDoctors[0])?.title} 정보를 확인해보시겠습니까? [[ACTION:DOCTOR_INTRO_MODAL]]"
+   - (C) 후기(탭유도): "결정에 도움이 되도록 상단의 '후기보기'를 확인해보시겠습니까?"
+   - (D) 위치(탭유도): "방문 동선은 상단의 '위치보기'에서 확인 가능합니다."
+
+⚠️ CTA는 1개만, 액션 토큰도 1개만 출력
 `;
    }
 
-   if (isPostFinalTurn) {
+   // 5~9턴: Q&A + CTA 유지
+   if (isPostTurn4 && !isTurn10) {
       return basePart + `
-[6턴 이후 - 추가 질문 응대 + 내원 안내]
-- 사용자의 추가 질문에 품위 있게 답변하되, 단정/처방 금지
-- 답변 끝에 내원 권유 1문장: "더 정확한 확인을 위해 내원 상담을 권해드립니다."
-- 마지막은 짧은 확인 질문 1개만 허용
+[5~9턴 - Q&A + CTA 유지]
+- 사용자 추가 질문에 품위 있게 답변 (단정/처방 금지)
+- 매 응답 말미 CTA 1문장:
+  "원하시면 예약을 도와드리겠습니다."
+  또는 "상단의 '후기보기/위치보기'도 참고해보시겠습니까?"
+- 예약 의사 표현 시 [[ACTION:RESERVATION_MODAL]] 추가
+- 논문/근거 요청 시 [[ACTION:EVIDENCE_MODAL]] 추가
 `;
    }
 
+   // 10턴: 마무리
+   if (isTurn10) {
+      return basePart + `
+[10턴 - 마무리]
+- 요약 2문장 + 다음 단계 1개로 종료
+- "상담 내용을 정리해드렸습니다. 더 정확한 확인은 내원 진료를 권해드립니다."
+- 액션 토큰 1개 가능: [[ACTION:RESERVATION_MODAL]] 또는 [[ACTION:DOCTOR_INTRO_MODAL]]
+`;
+   }
+
+   // 1~3턴: 최소 확인
    return basePart + `
-[1-4턴 - 최소 확인 턴]
-- 문진 모드일 때만 트랙별 질문 풀에서 질문 1개만 선택
-- 사용자 답변 반영하여 다음 턴에서도 질문 1개씩, 총 질문 2~4개 이내
-- 설명 모드(A)로 분류되면, 질문 캐묻지 말고 규칙대로 간결하게 설명 후 질문 1개로 마무리
+[1~3턴 - 증거수집]
+- 4턴에 요약하기 위한 최소 정보 확보
+- ${canAskQuestion ? "질문 1개만 (질문 풀에서 선택)" : "질문 2개 완료 → 다음 턴에서 4턴 요약 진행"}
+- 설명 모드(A)면 간결 설명 후 질문 1개로 마무리
+- 불릿/굵은글씨 없이 자연스러운 문단
 `;
 }
 

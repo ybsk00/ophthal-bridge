@@ -2,12 +2,65 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "@/lib/ai/client";
 import { createClient } from "@/lib/supabase/server";
 import { logAction } from "@/lib/audit";
-import { getMedicalSystemPrompt, RED_FLAG_KEYWORDS, RESERVATION_CONFIRM_KEYWORDS, detectMedicalTrack } from "@/lib/ai/prompts";
+import { getMedicalSystemPrompt, RED_FLAG_KEYWORDS, detectMedicalTrack, DOCTORS, SCI_EVIDENCE } from "@/lib/ai/prompts";
 
-// 환자포털 AI 상담 - 메디컬 AI와 동일한 프롬프트 사용
+// 액션 토큰 타입
+type ActionType = 'RESERVATION_MODAL' | 'DOCTOR_INTRO_MODAL' | 'EVIDENCE_MODAL' | null;
+
+// 토큰 파싱 함수
+function parseActionToken(text: string): { cleanText: string; action: ActionType } {
+    const tokenRegex = /\[\[ACTION:(RESERVATION_MODAL|DOCTOR_INTRO_MODAL|EVIDENCE_MODAL)\]\]/g;
+    let action: ActionType = null;
+
+    const match = tokenRegex.exec(text);
+    if (match) {
+        action = match[1] as ActionType;
+    }
+
+    const cleanText = text.replace(tokenRegex, '').trim();
+    return { cleanText, action };
+}
+
+// 탭 하이라이트 감지 함수
+function detectTabHighlight(text: string): ('review' | 'map')[] {
+    const highlights: ('review' | 'map')[] = [];
+
+    if (text.includes("후기보기") || text.includes("후기 보기")) {
+        highlights.push('review');
+    }
+    if (text.includes("위치보기") || text.includes("위치 보기")) {
+        highlights.push('map');
+    }
+
+    return highlights;
+}
+
+// 질문 카운트 함수 (AI 응답에서 질문 감지)
+function countQuestionInResponse(text: string): boolean {
+    // 질문 패턴: ~습니까?, ~하시겠습니까?, ~일까요?, ~인가요?
+    const questionPatterns = [
+        /[가-힣]+습니까\?/,
+        /[가-힣]+시겠습니까\?/,
+        /[가-힣]+일까요\?/,
+        /[가-힣]+인가요\?/,
+        /[가-힣]+어요\?/,
+        /[가-힣]+나요\?/,
+        /[가-힣]+요\?/
+    ];
+
+    return questionPatterns.some(pattern => pattern.test(text));
+}
+
+// 환자포털 AI 상담 - 메디컬 AI 프롬프트 사용
 export async function POST(req: NextRequest) {
     try {
-        const { message, history, turnCount = 0, track: existingTrack } = await req.json();
+        const {
+            message,
+            history,
+            turnCount = 0,
+            track: existingTrack,
+            askedQuestionCount = 0
+        } = await req.json();
 
         // 1. Red Flag Detection
         const isRedFlag = RED_FLAG_KEYWORDS.some(flag => message.includes(flag));
@@ -15,15 +68,19 @@ export async function POST(req: NextRequest) {
         if (isRedFlag) {
             return NextResponse.json({
                 role: "ai",
-                content: "🚨 [응급 알림] \n지금 말씀하신 증상은 응급 상황일 가능성이 높습니다. \n\n본 서비스는 의학적 진단을 대체할 수 없으므로, 즉시 119에 연락하거나 가까운 응급실을 방문해 주세요."
+                content: "응급 상황이 의심됩니다. 즉시 119 또는 응급실을 방문해주세요.",
+                action: null,
+                highlightTabs: [],
+                track: existingTrack,
+                isRedFlag: true
             });
         }
 
         // 2. Track Detection (첫 턴에서 감지, 이후 유지)
         const track = existingTrack || detectMedicalTrack(message);
 
-        // 3. System Prompt with track
-        const systemPrompt = getMedicalSystemPrompt(turnCount, track);
+        // 3. System Prompt with track and question count
+        const systemPrompt = getMedicalSystemPrompt(turnCount, track, askedQuestionCount);
 
         const fullPrompt = `
 ${systemPrompt}
@@ -37,23 +94,17 @@ ${history.map((msg: any) => `${msg.role === 'user' ? '환자' : '위담한방병
         // 4. Generate Response
         let responseText = await generateText(fullPrompt, "medical");
 
-        // 5. Check if user confirmed reservation
-        const isReservationConfirm = RESERVATION_CONFIRM_KEYWORDS.some(word => message.includes(word));
+        // 5. Parse action tokens
+        const { cleanText, action } = parseActionToken(responseText);
 
-        const lastAiMessage = history.filter((m: any) => m.role === 'ai').slice(-1)[0]?.content || '';
-        const askedForReservation = lastAiMessage.includes("예약을 도와드릴까요") ||
-            lastAiMessage.includes("방문해 보시는 건 어떠세요") ||
-            lastAiMessage.includes("한의원에 한번 방문");
+        // 6. Detect tab highlights
+        const highlightTabs = detectTabHighlight(cleanText);
 
-        const isPostFinalTurn = turnCount > 4;
+        // 7. Count if response contains a question
+        const hasQuestion = countQuestionInResponse(cleanText);
+        const newQuestionCount = hasQuestion ? askedQuestionCount + 1 : askedQuestionCount;
 
-        if (isReservationConfirm && askedForReservation) {
-            responseText = "네, 예약을 도와드리겠습니다. 지금 바로 예약 창을 열어드릴게요. [RESERVATION_TRIGGER]";
-        } else if (isPostFinalTurn) {
-            responseText += " [RESERVATION_TRIGGER]";
-        }
-
-        // 6. Audit Log
+        // 8. Audit Log
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
@@ -62,14 +113,24 @@ ${history.map((msg: any) => `${msg.role === 'user' ? '환자' : '위담한방병
                 message_length: message.length,
                 turn_count: turnCount,
                 track: track,
+                action: action,
+                question_count: newQuestionCount,
                 is_red_flag: false
             });
         }
 
+        // 9. Response with structured data
         return NextResponse.json({
             role: "ai",
-            content: responseText.trim(),
-            track: track
+            content: cleanText,
+            action: action,
+            highlightTabs: highlightTabs,
+            track: track,
+            askedQuestionCount: newQuestionCount,
+            turnCount: turnCount + 1,
+            // 의료진/논문 데이터 (모달용)
+            doctorsData: action === 'DOCTOR_INTRO_MODAL' ? DOCTORS : undefined,
+            evidenceData: action === 'EVIDENCE_MODAL' ? SCI_EVIDENCE : undefined
         });
 
     } catch (error) {
@@ -80,3 +141,4 @@ ${history.map((msg: any) => `${msg.role === 'user' ? '환자' : '위담한방병
         );
     }
 }
+
