@@ -40,11 +40,11 @@ export default function LandingPage() {
               loop
               muted
               playsInline
-              className="w-full h-full object-cover opacity-30"
+              className="w-full h-full object-cover opacity-60"
             >
               <source src="/1.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-b from-dental-bg/50 via-dental-bg/70 to-dental-bg"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-dental-bg/30 via-dental-bg/50 to-dental-bg/80"></div>
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto space-y-8 animate-fade-in">
@@ -161,11 +161,11 @@ export default function LandingPage() {
               loop
               muted
               playsInline
-              className="w-full h-full object-cover opacity-20"
+              className="w-full h-full object-cover opacity-50"
             >
               <source src="/2.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-b from-dental-bg via-dental-bg/90 to-dental-bg"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-dental-bg/40 via-dental-bg/60 to-dental-bg/80"></div>
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6">

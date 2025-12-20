@@ -331,13 +331,12 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                         />
                     ) : (
                         <div className="relative rounded-3xl overflow-hidden mb-8 h-[420px] md:h-[480px] shadow-2xl group">
-                            {/* Video Background */}
                             <video
                                 autoPlay
                                 loop
                                 muted
                                 playsInline
-                                className="absolute inset-0 w-full h-full object-cover opacity-50"
+                                className="absolute inset-0 w-full h-full object-cover opacity-70"
                             >
                                 <source src="/3.mp4" type="video/mp4" />
                             </video>
