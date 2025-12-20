@@ -62,38 +62,38 @@ export default function ChatInterface(props: ChatInterfaceProps) {
     // Modules Definition (Rich UI용)
     const modules = [
         {
-            id: "digestion",
-            label: "소화 리듬",
-            desc: "소화불량, 배변 체크",
-            icon: Leaf,
+            id: "general",
+            label: "일반 치과",
+            desc: "충치, 치료, 검진 안내",
+            icon: Sparkles,
             color: "emerald"
         },
         {
-            id: "cognitive",
-            label: "인지 건강",
-            desc: "기억력, 주의력 테스트",
+            id: "implant",
+            label: "임플란트",
+            desc: "식립, 뼈이식 상담",
             icon: Brain,
             color: "purple"
         },
         {
-            id: "stress-sleep",
-            label: "스트레스·수면",
-            desc: "수면, 피로 패턴 체크",
+            id: "orthodontics",
+            label: "교정",
+            desc: "치아교정, 투명교정",
             icon: Moon,
             color: "blue"
         },
         {
-            id: "vascular",
-            label: "혈관·생활습관",
-            desc: "운동, 식습관 체크",
+            id: "whitening",
+            label: "미백",
+            desc: "치아미백, 라미네이트",
             icon: Heart,
             color: "orange"
         },
         {
-            id: "women",
-            label: "여성 컨디션",
-            desc: "주기, PMS 체크",
-            icon: Sparkles,
+            id: "gum",
+            label: "잇몸",
+            desc: "잇몸치료, 스케일링",
+            icon: Leaf,
             color: "rose"
         },
     ];
@@ -109,33 +109,33 @@ export default function ChatInterface(props: ChatInterfaceProps) {
         } else {
             // 로그인 전 - 헬스케어 채팅 (모듈별 인사말)
             const currentModule = modules.find(m => m.id === topic);
-            const moduleName = currentModule ? currentModule.label : "건강 가이드";
+            const moduleName = currentModule ? currentModule.label : "치과 상담";
 
             // 모듈별 맞춤형 초기 질문 설정
             let initialQuestion = "";
             switch (topic) {
-                case "digestion":
-                    initialQuestion = "식사가 규칙적인지, 과식은 자주 하는지 등 식습관에 대해 편하게 알려주세요.";
+                case "general":
+                    initialQuestion = "어떤 치과 진료를 원하시나요? (충치, 발치, 검진 등)";
                     break;
-                case "cognitive":
-                    initialQuestion = "최근 깜빡하는 일이 잦거나, 집중하기 어려우신 적이 있는지 편하게 알려주세요.";
+                case "implant":
+                    initialQuestion = "임플란트 식립에 관심이 있으신가요? 현재 상태를 알려주세요.";
                     break;
-                case "stress-sleep":
-                    initialQuestion = "잠은 푹 주무시는지, 평소 스트레스는 많이 받으시는지 편하게 알려주세요.";
+                case "orthodontics":
+                    initialQuestion = "치아교정에 관심이 있으신가요? 어떤 부분이 불편하신가요?";
                     break;
-                case "vascular":
-                    initialQuestion = "평소 운동은 자주 하시는지, 기름진 음식이나 짠 음식은 자주 드시는지 알려주세요.";
+                case "whitening":
+                    initialQuestion = "치아미백에 관심이 있으신가요? 현재 치아 상태를 알려주세요.";
                     break;
-                case "women":
-                    initialQuestion = "월경 주기가 규칙적인지, 그날의 컨디션 변화는 어떠신지 편하게 알려주세요.";
+                case "gum":
+                    initialQuestion = "잇몸이 붓거나 피가 나는 증상이 있으신가요?";
                     break;
                 default:
-                    initialQuestion = "식사, 수면, 운동 등 평소 생활 습관에 대해 편하게 알려주세요.";
+                    initialQuestion = "어떤 치과 상담이 필요하신가요?";
             }
 
             setMessages([{
                 role: "ai",
-                content: `안녕하세요! **${moduleName}** 체크를 도와드릴 위담 건강가이드입니다. 🌿\n\n이 대화는 **진단이 아닌 생활 리듬 점검(참고용)** 입니다.\n\n${initialQuestion}`
+                content: `안녕하세요! **${moduleName}** 상담을 도와드릴 평촌이생각치과 가이드입니다. 🦷\n\n이 대화는 **진단이 아닌 일반 정보 안내(참고용)** 입니다.\n\n${initialQuestion}`
             }]);
         }
         setTurnCount(0);
@@ -302,19 +302,18 @@ export default function ChatInterface(props: ChatInterfaceProps) {
     };
 
     return (
-        <div className={`${props.isEmbedded ? "h-full" : "min-h-screen"} bg-traditional-bg font-sans flex flex-col selection:bg-traditional-accent selection:text-white`}>
+        <div className={`${props.isEmbedded ? "h-full" : "min-h-screen"} bg-dental-bg font-sans flex flex-col selection:bg-dental-accent selection:text-white`}>
             {/* Header - Hidden if embedded */}
             {!props.isEmbedded && (
-                <header className="bg-white/80 backdrop-blur-md border-b border-traditional-muted/50 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-all duration-300">
+                <header className="bg-dental-bg/80 backdrop-blur-md border-b border-white/10 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-all duration-300">
                     <Link href="/" className="flex items-center gap-3 group cursor-pointer">
-                        <img
-                            src="/logo_new.png"
-                            alt="위담 건강가이드 챗"
-                            className="h-[72px] w-auto object-contain"
-                        />
+                        <div className="w-12 h-12 rounded-full bg-dental-primary/20 flex items-center justify-center">
+                            <span className="text-2xl">🦷</span>
+                        </div>
+                        <span className="text-xl font-bold text-white">평촌이생각치과</span>
                     </Link>
-                    <div className="hidden md:flex items-center gap-6 text-sm font-medium text-traditional-subtext">
-                        <Link href="/login" className="px-6 py-2 bg-traditional-primary text-white text-sm font-medium rounded-full hover:bg-traditional-accent hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                    <div className="hidden md:flex items-center gap-6 text-sm font-medium text-dental-subtext">
+                        <Link href="/login" className="px-6 py-2 bg-dental-primary text-white text-sm font-medium rounded-full hover:bg-dental-accent hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                             로그인
                         </Link>
                     </div>
