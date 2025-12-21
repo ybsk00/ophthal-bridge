@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "한의원 진료 시스템",
+    title: "평촌이생각치과 진료 시스템",
     description: "의료진 전용 대시보드",
 };
 
