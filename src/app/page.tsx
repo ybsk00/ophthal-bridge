@@ -4,6 +4,7 @@ import { TrackF1View } from "@/components/marketing/MarketingTracker";
 import Footer from "@/components/common/Footer";
 import ThreeBackground from "@/components/common/ThreeBackground";
 import DentalLogo from "@/components/common/DentalLogo";
+import ClinicSearchModule from "@/components/healthcare/ClinicSearchModule";
 
 export default function LandingPage() {
   return (
@@ -81,9 +82,17 @@ export default function LandingPage() {
                 로그인
               </Link>
             </div>
-            <p className="text-xs text-dental-subtext/60 font-light mt-4">
+            <p className="text-xs text-dental-subtext/60 font-light mt-4 mb-8">
               본 서비스는 건강 정보 제공 및 생활 습관 점검을 위한 참고용입니다. 증상이 지속되면 의료진 상담이 필요합니다.
             </p>
+
+            {/* 치과 조회 모듈 - 강력한 CTA */}
+            <div className="pt-4 border-t border-white/10">
+              <p className="text-dental-subtext text-sm mb-4 font-medium">
+                🏥 지금 바로 진료 가능한 치과 찾기
+              </p>
+              <ClinicSearchModule />
+            </div>
           </div>
         </header>
 
