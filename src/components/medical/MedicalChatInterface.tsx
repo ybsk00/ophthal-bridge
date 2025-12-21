@@ -42,10 +42,10 @@ export default function MedicalChatInterface() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        // Initial Medical Greeting - 평촌이생각치과 AI 상담
+        // Initial Medical Greeting - 평촌이생각치과 AI 상담 + 운영정보
         setMessages([{
             role: "ai",
-            content: "안녕하세요, 평촌이생각치과 AI 상담입니다.\n\n이 채팅은 **진단이나 처방이 아닌 생활 습관·웰니스 점검(참고용)** 입니다. 정확한 상태 판단과 치료 여부는 **의료진 상담을 통해 확인**이 필요합니다.\n\n지금 겪고 계신 불편한 증상을 말씀해 주세요. 언제부터 시작되었는지, 어디가 가장 불편하신지 편하게 이야기해 주세요."
+            content: "안녕하세요, 평촌이생각치과 AI 상담입니다.\n\n**📍 평촌이생각치과**는 경기 안양시 동안구 시민대로 312, 201호에 위치하고 있으며, **365일 연중무휴**, 평일 **야간진료 9시까지** 운영하는 치과입니다.\n\n이 채팅은 **진단이나 처방이 아닌 생활 습관·웰니스 점검(참고용)** 입니다.\n\n어떤 점이 궁금하실까요? 치아 건강에 대해서 궁금하신 점이 있으면 질문주세요."
         }]);
     }, []);
 

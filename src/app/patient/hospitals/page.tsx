@@ -49,6 +49,9 @@ export default function HospitalSearchPage() {
     const [nightOpen, setNightOpen] = useState(false);
     const [holidayOpen, setHolidayOpen] = useState(false);
 
+    // 로그인 모달 상태
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
     // 응급실 상태
     const [erList, setErList] = useState<ERStatus[]>([]);
     const [erLoading, setErLoading] = useState(false);
@@ -195,7 +198,7 @@ export default function HospitalSearchPage() {
                         </p>
                         <div className="mt-3 flex gap-2">
                             <button
-                                onClick={() => window.location.href = '/login'}
+                                onClick={() => setShowLoginModal(true)}
                                 className="flex-1 py-2 bg-dental-primary text-white text-center text-sm font-medium rounded-lg hover:bg-dental-accent transition-colors"
                             >
                                 운영정보 보기
@@ -369,6 +372,37 @@ export default function HospitalSearchPage() {
                     )}
                 </main>
             </div>
+
+            {/* 로그인 필요 모달 */}
+            {showLoginModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-[#1a2332] rounded-2xl p-6 max-w-sm w-full border border-white/10 shadow-2xl">
+                        <div className="text-center mb-6">
+                            <div className="w-16 h-16 rounded-full bg-dental-primary/20 flex items-center justify-center mx-auto mb-4">
+                                <Building2 className="w-8 h-8 text-dental-primary" />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">운영정보 보기</h3>
+                            <p className="text-dental-subtext text-sm">
+                                운영정보를 보기 위해서는<br />로그인이 필요합니다.
+                            </p>
+                        </div>
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => window.location.href = '/login?returnTo=/medical/patient-dashboard'}
+                                className="w-full py-3 bg-dental-primary text-white font-medium rounded-xl hover:bg-dental-accent transition-colors"
+                            >
+                                로그인하기
+                            </button>
+                            <button
+                                onClick={() => setShowLoginModal(false)}
+                                className="w-full py-3 bg-white/10 text-dental-subtext font-medium rounded-xl hover:bg-white/20 transition-colors"
+                            >
+                                닫기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
