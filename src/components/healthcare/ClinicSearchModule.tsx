@@ -256,7 +256,7 @@ export default function ClinicSearchModule() {
                                                     </div>
                                                     <p className="text-dental-subtext text-sm mt-2 flex items-center gap-1">
                                                         <MapPin size={14} />
-                                                        경기도 안양시 동안구 평촌대로 389
+                                                        경기 안양시 동안구 시민대로 312
                                                     </p>
                                                 </div>
                                             </div>
