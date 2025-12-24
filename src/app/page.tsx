@@ -230,7 +230,19 @@ export default function LandingPage() {
 
         {/* Modules Grid */}
         <section className="relative py-32 overflow-hidden z-10">
-          <div className="absolute inset-0 bg-gradient-to-b from-skin-bg via-skin-bgSecondary to-skin-bg" />
+          {/* Video Background */}
+          <div className="absolute inset-0 z-0">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-60"
+            >
+              <source src="/1.mp4" type="video/mp4" />
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-b from-skin-bg via-skin-bg/80 to-skin-bg" />
+          </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6">
             <div className="text-center mb-16">

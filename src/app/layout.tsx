@@ -20,17 +20,17 @@ const notoSerifKr = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "평촌이생각치과 환자포털",
-  description: "평촌이생각치과 환자 포털에 오신 것을 환영합니다. 진료 예약, 내역 조회, 건강 관리 서비스를 편리하게 이용하세요.",
+  title: "리원피부과",
+  description: "리원피부과에 오신 것을 환영합니다. 프리미엄 피부 관리와 미용 시술을 경험해보세요.",
   openGraph: {
-    title: "평촌이생각치과 환자포털",
-    description: "평촌이생각치과 환자 포털에 오신 것을 환영합니다.",
+    title: "리원피부과",
+    description: "리원피부과에 오신 것을 환영합니다.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "평촌이생각치과 환자포털",
-    description: "평촌이생각치과 환자 포털에 오신 것을 환영합니다.",
+    title: "리원피부과",
+    description: "리원피부과에 오신 것을 환영합니다.",
   },
 };
 
