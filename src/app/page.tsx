@@ -81,27 +81,27 @@ export default function LandingPage() {
                     src={src}
                     alt={`Routine Reset ${idx + 1}`}
                     fill
-                    className={`object-cover ${isNeonRim ? "scale-125 -translate-y-[15%]" : ""}`}
+                    className={`object-cover object-[70%_center] md:object-center ${isNeonRim ? "scale-125 -translate-y-[15%]" : ""}`}
                     priority={idx === 0}
                     sizes="100vw"
                   />
                 </div>
               );
             })}
-            <div className="absolute inset-0 bg-gradient-to-r from-skin-bg/90 via-skin-bg/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-skin-bg/95 via-skin-bg/70 to-transparent md:from-skin-bg/90 md:via-skin-bg/50" />
             <div className="absolute inset-0 bg-gradient-to-b from-skin-bg/30 via-transparent to-skin-bg/70" />
           </div>
 
           {/* Hero Content */}
           <div className="absolute inset-0 z-10 flex items-center">
-            <div className="w-full pl-[clamp(180px,27vw,440px)] space-y-6 animate-fade-in text-left">
+            <div className="w-full px-6 md:px-0 md:pl-[clamp(180px,27vw,440px)] space-y-6 animate-fade-in text-center md:text-left">
               {/* Eyebrow */}
               <p className="text-skin-secondary font-semibold tracking-[0.15em] uppercase text-xs">
                 ROUTINE · BASE · GLOW · RESET
               </p>
 
               {/* H1 */}
-              <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] font-serif">
+              <h1 className="text-3xl md:text-6xl font-bold tracking-tight leading-[1.1] font-serif">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-skin-primary via-pink-400 to-skin-accent">
                   베이스가 달라지는
                 </span><br />
@@ -109,12 +109,12 @@ export default function LandingPage() {
               </h1>
 
               {/* Body */}
-              <p className="text-base md:text-lg text-skin-subtext leading-relaxed">
+              <p className="text-base md:text-lg text-skin-subtext leading-relaxed max-w-sm mx-auto md:mx-0">
                 지금 내 상태를 빠르게 체크하고, 오늘부터 적용할 루틴 포인트를 정리해보세요.
               </p>
 
               {/* CTA Row */}
-              <div className="flex flex-row items-center gap-4 pt-2">
+              <div className="flex flex-col md:flex-row items-center gap-4 pt-2">
                 {/* Primary CTA */}
                 <Link
                   href="/healthcare/chat?topic=glow-booster"
@@ -158,7 +158,7 @@ export default function LandingPage() {
 
         {/* Clinic Search Section */}
         <section id="clinic-search" className="relative py-16 bg-skin-bgSecondary">
-          <div className="w-full max-w-4xl pl-[clamp(48px,10vw,160px)] pr-[clamp(16px,8vw,180px)] mx-auto">
+          <div className="w-full max-w-4xl px-6 md:px-0 md:pl-[clamp(48px,10vw,160px)] md:pr-[clamp(16px,8vw,180px)] mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-skin-text mb-2">
                 지금 운영 중인 피부과 찾기
@@ -240,7 +240,7 @@ export default function LandingPage() {
               loop
               muted
               playsInline
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-[50%_30%] md:object-center"
             >
               <source src="/1.mp4" type="video/mp4" />
             </video>
