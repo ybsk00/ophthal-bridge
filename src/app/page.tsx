@@ -70,21 +70,24 @@ export default function LandingPage() {
         <header className="relative px-6 pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden min-h-[85vh] flex flex-col justify-center">
           {/* Rolling Images Background */}
           <div className="absolute inset-0 z-0">
-            {HERO_IMAGES.map((src, idx) => (
-              <div
-                key={src}
-                className={`absolute inset-0 transition-opacity duration-500 ${idx === currentSlide ? 'opacity-100' : 'opacity-0'}`}
-              >
-                <Image
-                  src={src}
-                  alt={`Routine Reset ${idx + 1}`}
-                  fill
-                  className="object-cover"
-                  priority={idx === 0}
-                  sizes="100vw"
-                />
-              </div>
-            ))}
+            {HERO_IMAGES.map((src, idx) => {
+              const isNeonRim = src.includes("NEON RIM");
+              return (
+                <div
+                  key={src}
+                  className={`absolute inset-0 transition-opacity duration-500 ${idx === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+                >
+                  <Image
+                    src={src}
+                    alt={`Routine Reset ${idx + 1}`}
+                    fill
+                    className={`object-cover ${isNeonRim ? "scale-125 -translate-y-[15%]" : ""}`}
+                    priority={idx === 0}
+                    sizes="100vw"
+                  />
+                </div>
+              );
+            })}
             <div className="absolute inset-0 bg-gradient-to-r from-skin-bg/90 via-skin-bg/50 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-b from-skin-bg/30 via-transparent to-skin-bg/70" />
           </div>
@@ -241,7 +244,8 @@ export default function LandingPage() {
             >
               <source src="/1.mp4" type="video/mp4" />
             </video>
-            {/* Video overlay removed for 100% visibility */}
+            {/* Slight overlay to reduce brightness */}
+            <div className="absolute inset-0 bg-black/30" />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6">
