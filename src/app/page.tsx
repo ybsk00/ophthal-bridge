@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Sparkles, Droplet, Shield, ArrowUpRight, Heart, CheckCircle, BarChart2, Calendar, Search, ChevronRight } from "lucide-react";
+import { Sparkles, Droplet, Shield, ArrowUpRight, Heart, CheckCircle, BarChart2, Calendar, ChevronRight } from "lucide-react";
 import { TrackF1View } from "@/components/marketing/MarketingTracker";
 import Footer from "@/components/common/Footer";
 import ClinicSearchModule from "@/components/healthcare/ClinicSearchModule";
@@ -11,11 +11,11 @@ import { VALID_TOPICS, TOPIC_LABELS, TOPIC_DESCRIPTIONS, Topic } from "@/lib/con
 
 // 히어로 롤링 이미지 (A→B→C→D→E 순서)
 const HERO_IMAGES = [
-  "/NEON RIM.png",        // A: 네온 림라이트
-  "/GLASS PRISM.png",     // B: 프리즘/라이트스트릭
-  "/WATER CAUSTICS.png",  // C: 워터 라이트
-  "/ROSE-GOLD BLOOM.png", // D: 로즈골드 블룸
-  "/SILHOUETTE RIM.png",  // E: 로우키 실루엣
+  "/NEON RIM.png",
+  "/GLASS PRISM.png",
+  "/WATER CAUSTICS.png",
+  "/ROSE-GOLD BLOOM.png",
+  "/SILHOUETTE RIM.png",
 ];
 
 // 모듈 아이콘/컬러 매핑
@@ -31,7 +31,6 @@ export default function LandingPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(false);
 
-  // 2초 후 자동 롤링 시작 (LCP 최적화)
   useEffect(() => {
     const startTimer = setTimeout(() => {
       setIsAutoPlay(true);
@@ -39,7 +38,6 @@ export default function LandingPage() {
     return () => clearTimeout(startTimer);
   }, []);
 
-  // 자동 롤링
   useEffect(() => {
     if (!isAutoPlay) return;
     const interval = setInterval(() => {
@@ -52,12 +50,12 @@ export default function LandingPage() {
     <TrackF1View>
       <div className="min-h-screen bg-skin-bg text-skin-text font-sans selection:bg-skin-primary selection:text-white">
 
-        {/* Navigation - 반투명 바 (고정) */}
+        {/* Navigation */}
         <nav className="fixed top-0 left-0 right-0 z-50 bg-skin-bg/80 backdrop-blur-md border-b border-white/10">
           <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
             <Link href="/" className="flex items-center gap-3 group cursor-pointer">
               <span className="text-2xl">✨</span>
-              <span className="text-xl font-bold text-skin-text">리원피부과</span>
+              <span className="text-xl font-bold text-skin-text tracking-wide">LEEONE ATELIER</span>
             </Link>
             <Link
               href="/login"
@@ -68,9 +66,7 @@ export default function LandingPage() {
           </div>
         </nav>
 
-        {/* ============================================ */}
-        {/* Hero Section - 목적: 헬스케어 시작 */}
-        {/* ============================================ */}
+        {/* Hero Section */}
         <header className="relative px-6 pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden min-h-[85vh] flex flex-col justify-center">
           {/* Rolling Images Background */}
           <div className="absolute inset-0 z-0">
@@ -81,7 +77,7 @@ export default function LandingPage() {
               >
                 <Image
                   src={src}
-                  alt={`Premium Skin Care ${idx + 1}`}
+                  alt={`Routine Reset ${idx + 1}`}
                   fill
                   className="object-cover"
                   priority={idx === 0}
@@ -89,44 +85,43 @@ export default function LandingPage() {
                 />
               </div>
             ))}
-            {/* 좌측 카피 영역 어두운 그라데이션 (45%) */}
             <div className="absolute inset-0 bg-gradient-to-r from-skin-bg/90 via-skin-bg/50 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-b from-skin-bg/30 via-transparent to-skin-bg/70" />
           </div>
 
-          {/* Hero Content - clamp 기반 패딩으로 반응형 위치 안정화 */}
+          {/* Hero Content */}
           <div className="absolute inset-0 z-10 flex items-center">
-            <div className="w-full pl-[clamp(160px,25vw,400px)] space-y-6 animate-fade-in text-left">
-              {/* Eyebrow - 작게, 간격 확보 */}
-              <p className="text-skin-secondary font-semibold tracking-[0.2em] uppercase text-xs">
-                Premium Skin Care
+            <div className="w-full pl-[clamp(180px,27vw,440px)] space-y-6 animate-fade-in text-left">
+              {/* Eyebrow */}
+              <p className="text-skin-secondary font-semibold tracking-[0.15em] uppercase text-xs">
+                ROUTINE · BASE · GLOW · RESET
               </p>
 
-              {/* H1 - 에서 뒤에서 줄바꿈 */}
+              {/* H1 */}
               <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] font-serif">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-skin-primary via-pink-400 to-skin-accent">
-                  리원피부과
-                </span>에서<br />
-                프리미엄 스킨케어를
+                  베이스가 달라지는
+                </span><br />
+                광채 루틴 리셋
               </h1>
 
               {/* Body */}
-              <p className="text-base md:text-lg text-skin-subtext leading-relaxed whitespace-nowrap">
-                나만의 피부 습관을 체크하고, 맞춤 루틴을 설계해보세요.
+              <p className="text-base md:text-lg text-skin-subtext leading-relaxed">
+                지금 내 상태를 빠르게 체크하고, 오늘부터 적용할 루틴 포인트를 정리해보세요.
               </p>
 
               {/* CTA Row */}
-              <div className="flex flex-row items-center gap-4 pt-2 whitespace-nowrap">
-                {/* Primary CTA - 핫핑크 + 글로우 허용 */}
+              <div className="flex flex-row items-center gap-4 pt-2">
+                {/* Primary CTA */}
                 <Link
                   href="/healthcare/chat?topic=glow-booster"
                   className="px-8 py-4 bg-skin-primary text-white text-base font-bold rounded-2xl shadow-lg shadow-skin-primary/40 hover:bg-skin-accent hover:shadow-xl hover:shadow-skin-primary/50 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
                 >
                   <Sparkles className="w-5 h-5" />
-                  D-7 광채 부스터 시작
+                  7일 루틴 리셋 시작
                 </Link>
 
-                {/* Secondary - 텍스트 링크 */}
+                {/* Secondary */}
                 <a
                   href="#clinic-search"
                   className="text-skin-subtext hover:text-skin-primary text-sm font-medium flex items-center gap-1 transition-colors"
@@ -136,7 +131,7 @@ export default function LandingPage() {
                 </a>
               </div>
 
-              {/* 참고용 배지 - 배지로 이동 */}
+              {/* 참고용 배지 */}
               <div className="pt-2">
                 <span className="inline-flex items-center px-3 py-1 rounded-full bg-skin-muted/50 text-skin-subtext text-xs font-medium">
                   ℹ️ 참고용 안내 · 진단·처방 아님
@@ -144,6 +139,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
+
           {/* Slide Dots */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             {HERO_IMAGES.map((_, idx) => (
@@ -157,9 +153,7 @@ export default function LandingPage() {
           </div>
         </header>
 
-        {/* ============================================ */}
-        {/* Clinic Search Section - 히어로 아래 별도 섹션 */}
-        {/* ============================================ */}
+        {/* Clinic Search Section */}
         <section id="clinic-search" className="relative py-16 bg-skin-bgSecondary">
           <div className="w-full max-w-4xl pl-[clamp(48px,10vw,160px)] pr-[clamp(16px,8vw,180px)] mx-auto">
             <div className="text-center mb-8">
@@ -170,8 +164,6 @@ export default function LandingPage() {
                 지역과 운영 시간을 선택해 가까운 피부과를 검색하세요.
               </p>
             </div>
-
-            {/* Clinic Search Module Card */}
             <div className="bg-skin-surface rounded-3xl p-6 md:p-8 border border-white/10 shadow-xl">
               <ClinicSearchModule />
             </div>
