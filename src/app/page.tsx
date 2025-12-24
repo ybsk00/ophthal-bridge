@@ -96,7 +96,7 @@ export default function LandingPage() {
 
           {/* Hero Content - clamp 기반 패딩으로 반응형 위치 안정화 */}
           <div className="absolute inset-0 z-10 flex items-center">
-            <div className="w-full max-w-4xl pl-[clamp(48px,10vw,160px)] pr-[clamp(16px,8vw,180px)] space-y-8 animate-fade-in text-left">
+            <div className="w-full max-w-4xl pl-[clamp(80px,15vw,240px)] pr-[clamp(16px,8vw,180px)] space-y-8 animate-fade-in text-left">
               {/* Eyebrow - 작게, 간격 확보 */}
               <p className="text-skin-secondary font-semibold tracking-[0.2em] uppercase text-xs">
                 Premium Skin Care
