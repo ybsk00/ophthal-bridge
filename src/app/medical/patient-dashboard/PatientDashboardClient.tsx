@@ -238,7 +238,7 @@ export default function PatientDashboardClient() {
                 {/* Video Section with Glassmorphism Quick Actions */}
                 <div className="w-full rounded-2xl overflow-hidden shadow-lg border border-white/50 relative">
                     {/* BLINDS SHADOW Image Banner */}
-                    <div className="relative w-full h-72 md:h-96">
+                    <div className="relative w-full h-96 md:h-[500px]">
                         <Image
                             src="/BLINDS SHADOW.png"
                             alt="리원피부과 프리미엄 시술"
