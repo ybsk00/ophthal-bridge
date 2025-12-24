@@ -53,7 +53,7 @@ export default function PatientHeader() {
                 <div className="w-10 h-10 rounded-full bg-dental-primary/20 flex items-center justify-center">
                     <span className="text-xl">✨</span>
                 </div>
-                <span className="text-xl font-bold text-white">리원피부과</span>
+                <span className="text-xl font-bold text-white">아이니의원</span>
             </Link>
 
             <div className="flex items-center gap-4">

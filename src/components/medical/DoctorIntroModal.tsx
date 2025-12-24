@@ -21,10 +21,8 @@ interface DoctorIntroModalProps {
 }
 
 const doctorImages: Record<string, string> = {
-    '김기영': '/images/doctors/kim-kiyoung.jpg',
-    '전민제': '/images/doctors/jeon-minje.jpg',
-    '이해정': '/images/doctors/lee-haejung.jpg',
-    '김유진': '/images/doctors/kim-yujin.jpg',
+    '김민승': '/images/doctors/kim-minseung.jpg',
+    '조병옥': '/images/doctors/jo-byeongok.jpg',
 };
 
 export default function DoctorIntroModal({
@@ -42,7 +40,7 @@ export default function DoctorIntroModal({
             title={
                 <div className="flex items-center gap-2">
                     <User className="w-5 h-5 text-traditional-primary" />
-                    <span className="font-bold text-lg">리원피부과 의료진</span>
+                    <span className="font-bold text-lg">아이니의원 의료진</span>
                 </div>
             }
             size="lg"

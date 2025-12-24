@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const NAVER_CLIENT_ID = process.env.NAVER_SEARCH_CLIENT_ID;
 const NAVER_CLIENT_SECRET = process.env.NAVER_SEARCH_CLIENT_SECRET;
-const HOSPITAL_NAME = process.env.HOSPITAL_REVIEW_QUERY_BASE || '리원피부과';
+const HOSPITAL_NAME = process.env.HOSPITAL_REVIEW_QUERY_BASE || '아이니의원';
 
 // 제외 키워드 (잡상인 필터링)
 const EXCLUDE_KEYWORDS = [
@@ -178,7 +178,7 @@ function formatDate(dateStr?: string): string {
 function getDummyItems(source: string) {
     const items = [
         {
-            title: '강남 리원피부과 방문 후기 - 친절한 진료',
+            title: '강남 아이니의원 방문 후기 - 친절한 진료',
             link: 'https://blog.naver.com/example1',
             description: '지인 추천으로 방문했는데 정말 만족스러웠습니다...',
             author: '건강맘',
@@ -186,7 +186,7 @@ function getDummyItems(source: string) {
             origin: 'naver'
         },
         {
-            title: '삼성역 피부과 추천 - 리원피부과',
+            title: '삼성역 피부과 추천 - 아이니의원',
             link: 'https://blog.naver.com/example2',
             description: '소화가 안되서 방문했는데 꼼꼼하게 봐주셨어요...',
             author: '강남직장인',
@@ -194,7 +194,7 @@ function getDummyItems(source: string) {
             origin: 'naver'
         },
         {
-            title: '리원피부과 진료 경험 공유',
+            title: '아이니의원 진료 경험 공유',
             link: 'https://blog.naver.com/example3',
             description: '다이어트 한약 처방받고 효과 좋았습니다...',
             author: '다이어터',
@@ -210,7 +210,7 @@ function getDummyItems(source: string) {
             origin: 'naver'
         },
         {
-            title: '리원피부과 첫 방문기',
+            title: '아이니의원 첫 방문기',
             link: 'https://blog.naver.com/example5',
             description: '처음 피부과 가봤는데 생각보다 좋았어요...',
             author: '피부과초보',

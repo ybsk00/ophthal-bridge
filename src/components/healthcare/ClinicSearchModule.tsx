@@ -309,7 +309,7 @@ export default function ClinicSearchModule() {
                             {/* 성공 - 결과 리스트 */}
                             {(searchState === "success" || searchState === "auto-expanded") && clinics.length > 0 && (
                                 <div className="space-y-4">
-                                    {/* 리원피부과 추천 카드 (강남구에서만 표시 - 의료법 준수) */}
+                                    {/* 아이니의원 추천 카드 (강남구에서만 표시 - 의료법 준수) */}
                                     {selectedRegion === "강남구" && (
                                         <div className="relative bg-gradient-to-r from-skin-primary/20 to-skin-accent/20 rounded-xl p-4 border border-skin-primary/30">
                                             <span className="absolute -top-2 left-4 px-2 py-0.5 bg-skin-primary text-white text-xs font-bold rounded-full">
@@ -320,7 +320,7 @@ export default function ClinicSearchModule() {
                                                 <div className="flex items-start justify-between gap-4">
                                                     <div className="flex-1">
                                                         <h3 className="text-lg font-bold text-white">
-                                                            리원피부과
+                                                            아이니의원
                                                         </h3>
                                                         <div className="flex flex-wrap gap-2 mt-2">
                                                             <span className="px-2 py-0.5 bg-skin-secondary/30 text-skin-secondary text-xs font-medium rounded-full">
@@ -332,7 +332,7 @@ export default function ClinicSearchModule() {
                                                         </div>
                                                         <p className="text-skin-subtext text-sm mt-2 flex items-center gap-1">
                                                             <MapPin size={14} />
-                                                            서울 강남구 도산대로 327 SGF 청담타워
+                                                            서울 강남구 압구정로 152 극동타워 A동 3층
                                                         </p>
                                                     </div>
                                                 </div>
@@ -345,7 +345,7 @@ export default function ClinicSearchModule() {
                                                         상담 예약
                                                     </button>
                                                     <a
-                                                        href="tel:02-543-0210"
+                                                        href="tel:1899-1150"
                                                         className="flex items-center justify-center gap-1 px-4 py-2.5 bg-white/10 text-white rounded-lg font-medium hover:bg-white/20 transition-colors text-sm"
                                                     >
                                                         <Phone size={16} />

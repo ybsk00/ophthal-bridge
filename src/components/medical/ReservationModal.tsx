@@ -21,7 +21,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
     const [minute, setMinute] = useState("00");
     const [doctor, setDoctor] = useState("");
 
-    const doctors = ['', '김기영 대표원장', '전민제 원장', '이해정 교정원장', '김유진 원장'];
+    const doctors = ['', '김민승 대표원장', '조병옥 원장'];
 
     const [name, setName] = useState("");
 
@@ -247,7 +247,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                             .from('appointments')
                             .update({
                                 scheduled_at: scheduledAt,
-                                notes: doctor === '전체' ? '리원피부과 진료' : `리원피부과 진료 (${doctor})`
+                                notes: doctor === '전체' ? '아이니의원 진료' : `아이니의원 진료 (${doctor})`
                             })
                             .eq('id', existingReservation.id);
 
@@ -275,7 +275,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 scheduled_at: scheduledAt,
-                                notes: `리원피부과 진료 (${doctor})`,
+                                notes: `아이니의원 진료 (${doctor})`,
                                 doctor_name: doctor  // 의사 이름 추가
                             })
                         });
@@ -295,7 +295,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                     time: timeString,
                                     type: '초진',
                                     status: 'pending',
-                                    complaint: doctor === '전체' ? '리원피부과 진료' : `리원피부과 진료 (${doctor})`,
+                                    complaint: doctor === '전체' ? '아이니의원 진료' : `아이니의원 진료 (${doctor})`,
                                     keywords: ['예약']
                                 }
                             ]);

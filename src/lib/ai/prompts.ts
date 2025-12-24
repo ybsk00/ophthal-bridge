@@ -1,4 +1,4 @@
-// AI 피부과 프롬프트 - 리원피부과 AI 상담
+// AI 피부과 프롬프트 - 아이니의원 AI 상담
 // 이 파일은 모든 AI 채팅 API에서 중앙 집중식으로 사용됩니다.
 
 import { Topic, TOPIC_LABELS } from '@/lib/constants/topics';
@@ -229,50 +229,41 @@ ${intentHint}
 // 메디컬 AI 시스템 프롬프트 (회원, 예진 상담, 피부과 트랙)
 // =============================================
 
-// 의료진 데이터 (리원피부과)
+// 의료진 데이터 (아이니의원)
 export const SHOW_DOCTOR_EDUCATION = false; // 병원 검수 후 true
 
 export const DOCTORS = [
    {
-      name: '문정윤',
+      name: '김민승',
       title: '대표원장',
       education: '피부과 전문의',
       public_title: '대표원장',
       public_desc: '피부 미용 상담',
       specialty: ['피부미용', '레이저', '리프팅', '피부관리'],
-      tracks: ['aesthetic', 'laser', 'lifting', 'skincare']
+      tracks: ['aesthetic', 'laser', 'lifting', 'skincare', 'acne', 'pigment', 'aging', 'general']
    },
    {
-      name: '김도영',
+      name: '조병옥',
       title: '원장',
       education: '피부과 전문의',
       public_title: '원장',
       public_desc: '피부 트러블 상담',
-      specialty: ['여드름', '색소', '피부관리', '일반피부'],
-      tracks: ['acne', 'pigment', 'skincare', 'general']
-   },
-   {
-      name: '이미혜',
-      title: '원장',
-      education: '피부과 전문의',
-      public_title: '원장',
-      public_desc: '피부 탄력 상담',
-      specialty: ['노화', '리프팅', '레이저', '민감성'],
-      tracks: ['aging', 'lifting', 'laser', 'sensitivity']
+      specialty: ['여드름', '색소', '피부관리', '민감성'],
+      tracks: ['acne', 'pigment', 'skincare', 'sensitivity', 'general']
    }
 ];
 
 // 트랙별 의료진 추천 매핑 (피부과 8트랙)
 export const DOCTOR_TRACK_MAPPING: Record<string, string[]> = {
-   acne: ['김도영'],
-   pigment: ['김도영'],
-   aging: ['이미혜', '문정윤'],
-   lifting: ['문정윤', '이미혜'],
-   laser: ['문정윤', '이미혜'],
-   skincare: ['문정윤', '김도영', '이미혜'],
-   sensitivity: ['이미혜'],
-   general: ['문정윤', '김도영', '이미혜'],
-   aesthetic: ['문정윤'],
+   acne: ['김민승', '조병옥'],
+   pigment: ['김민승', '조병옥'],
+   aging: ['김민승'],
+   lifting: ['김민승'],
+   laser: ['김민승'],
+   skincare: ['김민승', '조병옥'],
+   sensitivity: ['조병옥'],
+   general: ['김민승', '조병옥'],
+   aesthetic: ['김민승'],
 };
 
 // 피부과 8트랙
@@ -392,7 +383,7 @@ export function getMedicalSystemPrompt(
 
    const basePart = `
 [역할]
-당신은 "리원피부과"의 AI 예진 상담사입니다. 
+당신은 "아이니의원"의 AI 예진 상담사입니다. 
 피부 관련 상담을 정리하고 적절한 진료 안내를 도와드립니다.
 진단·처방·단정은 하지 않습니다.
 
@@ -516,6 +507,6 @@ export const SCI_EVIDENCE = {
    journal: "Dermatology Journal",
    title: "피부과 연구 데이터 (추후 업데이트 예정)",
    date: "2025.01",
-   authors: "리원피부과의원 피부과 연구팀",
+   authors: "아이니의원 피부과 연구팀",
    link: "#"
 };

@@ -64,7 +64,7 @@ function LoginContent() {
                     >
                         <Building2 size={32} className="text-white" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white">리원피부과</h1>
+                    <h1 className="text-2xl font-bold text-white">아이니의원</h1>
                     <p className="text-gray-400 text-sm mt-1">환자 포탈</p>
                 </div>
 

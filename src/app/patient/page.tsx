@@ -91,7 +91,7 @@ export default async function PatientHome() {
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <span className="text-xl font-bold text-white">리원피부과</span>
+                            <span className="text-xl font-bold text-white">아이니의원</span>
                             <button className="relative p-2 rounded-full hover:bg-white/10 transition-colors">
                                 <Bell size={24} className="text-gray-400" />
                                 <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -232,7 +232,7 @@ export default async function PatientHome() {
                                     </div>
                                     <h4 className="text-white font-bold mb-0.5">진료 예약</h4>
                                     <p className="text-sm text-gray-400">
-                                        {upcomingAppointment.notes || '리원피부과'}
+                                        {upcomingAppointment.notes || '아이니의원'}
                                     </p>
                                 </div>
                             </div>

@@ -79,7 +79,7 @@ export default function PatientDashboardClient() {
                     data = {
                         time: `${scheduledDate.toISOString().split('T')[0]} ${scheduledDate.toTimeString().slice(0, 5)}`,
                         status: appointmentData.status === 'scheduled' ? 'pending' : appointmentData.status,
-                        complaint: appointmentData.notes || '리원피부과의원 진료'
+                        complaint: appointmentData.notes || '아이니의원 진료'
                     };
                 }
             }
@@ -137,7 +137,7 @@ export default function PatientDashboardClient() {
                         date: displayDate,
                         time: displayTime,
                         type: data.complaint || "일반 진료",
-                        doctor: "김한의 원장"
+                        doctor: "김민승 대표원장"
                     });
                 }
             } else {
@@ -241,7 +241,7 @@ export default function PatientDashboardClient() {
                     <div className="relative w-full h-96 md:h-[500px]">
                         <Image
                             src="/BLINDS SHADOW.png"
-                            alt="리원피부과 프리미엄 시술"
+                            alt="아이니의원 프리미엄 시술"
                             fill
                             className="object-cover object-[center_25%]"
                             priority

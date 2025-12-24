@@ -85,9 +85,9 @@ export async function POST(req: NextRequest) {
 ${systemPrompt}
 
 [대화 내역]
-${history.map((msg: any) => `${msg.role === 'user' ? '환자' : '리원피부과'}: ${msg.content}`).join("\n")}
+${history.map((msg: any) => `${msg.role === 'user' ? '환자' : '아이니의원'}: ${msg.content}`).join("\n")}
 환자: ${message}
-리원피부과:
+아이니의원:
 `;
 
         // 4. Generate Response
