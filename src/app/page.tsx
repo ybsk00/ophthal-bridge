@@ -94,8 +94,8 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-gradient-to-b from-skin-bg/30 via-transparent to-skin-bg/70" />
           </div>
 
-          {/* Hero Content - 좌측 정렬 (얼굴 가리지 않게) */}
-          <div className="relative z-10 max-w-3xl ml-6 md:ml-16 lg:ml-24 space-y-8 animate-fade-in text-left">
+          {/* Hero Content - 하단 검색 섹션과 동일한 너비로 정렬 */}
+          <div className="relative z-10 max-w-4xl mx-auto px-6 space-y-8 animate-fade-in text-left">
             {/* Eyebrow - 작게, 간격 확보 */}
             <p className="text-skin-secondary font-semibold tracking-[0.2em] uppercase text-xs">
               Premium Skin Care
