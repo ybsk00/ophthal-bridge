@@ -102,11 +102,12 @@ export default function LandingPage() {
                 Premium Skin Care
               </p>
 
-              {/* H1 - 줄바꿈 방지 */}
-              <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] font-serif whitespace-nowrap">
+              {/* H1 - 에서 뒤에서 줄바꿈 */}
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] font-serif">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-skin-primary via-pink-400 to-skin-accent">
                   리원피부과
-                </span>에서 프리미엄 스킨케어를
+                </span>에서<br />
+                프리미엄 스킨케어를
               </h1>
 
               {/* Body */}
