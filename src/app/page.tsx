@@ -240,7 +240,7 @@ export default function LandingPage() {
               loop
               muted
               playsInline
-              className="w-full h-full object-cover object-[75%_35%] md:object-center"
+              className="w-full h-full object-cover object-[75%_35%] md:object-center scale-[0.85] md:scale-100 origin-center"
             >
               <source src="/1.mp4" type="video/mp4" />
             </video>
