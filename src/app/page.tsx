@@ -192,26 +192,30 @@ export default function LandingPage() {
                   title: "패턴 1장 요약",
                   desc: "스킨케어·수면·수분 습관을 5문답으로 정리합니다.",
                   label: "약 2분",
-                  labelColor: "bg-skin-muted"
+                  labelColor: "bg-skin-muted",
+                  href: "/healthcare/chat?topic=glow-booster"
                 },
                 {
                   icon: <CheckCircle className="w-6 h-6" />,
                   title: "오늘부터 할 1가지",
                   desc: "현실적으로 가능한 '한 가지 조정'만 제안합니다.",
                   label: "실천 중심",
-                  labelColor: "bg-skin-primary"
+                  labelColor: "bg-skin-primary",
+                  href: "/healthcare/chat?topic=barrier-reset"
                 },
                 {
                   icon: <Calendar className="w-6 h-6" />,
                   title: "요약 저장 & 비교",
                   desc: "기록을 저장해 다음에 더 빠르게 이어서 확인합니다.",
                   label: "로그인 후",
-                  labelColor: "bg-skin-secondary"
+                  labelColor: "bg-skin-secondary",
+                  href: "/login"
                 }
               ].map((feature, idx) => (
-                <div
+                <Link
                   key={idx}
-                  className="group bg-white/5 rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-skin-primary/30 transition-all duration-300 hover:-translate-y-1"
+                  href={feature.href}
+                  className="group bg-white/5 rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-skin-primary/30 transition-all duration-300 hover:-translate-y-1 cursor-pointer block"
                 >
                   <div className="w-10 h-10 bg-skin-surface rounded-xl flex items-center justify-center mb-4 border border-white/10">
                     <div className="text-skin-primary">{feature.icon}</div>
@@ -225,7 +229,7 @@ export default function LandingPage() {
                   <span className={`inline-flex items-center px-3 py-1 rounded-lg text-[11px] font-semibold ${feature.labelColor} text-white`}>
                     {feature.label}
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
