@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "@/lib/ai/client";
-import { getHealthcareSystemPrompt, getHealthcareFinalAnalysisPrompt, MEDICAL_KEYWORDS, EntryIntent } from "@/lib/ai/prompts";
+import { getHealthcareSystemPrompt, getHealthcareFinalAnalysisPrompt, MEDICAL_KEYWORDS, EntryIntent, detectSkinConcern, getSkinConcernResponsePrompt } from "@/lib/ai/prompts";
 
 export async function POST(req: NextRequest) {
     try {
@@ -20,7 +20,31 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        // 2. 5턴째 (마지막 턴) - 종합 분석 및 결과 제공
+        // 2. 피부과 고민 자유발화 감지 - 공감 응답 + 로그인 유도
+        const skinConcern = detectSkinConcern(message, topic);
+
+        if (skinConcern.hasConcern) {
+            // AI에게 특별 지시를 주어 공감 + 로그인 유도 응답 생성
+            const concernPrompt = getSkinConcernResponsePrompt(skinConcern.concernType, skinConcern.isProcedure);
+
+            const fullPrompt = `
+${concernPrompt}
+
+사용자: ${message}
+AI:
+`;
+            const responseText = await generateText(fullPrompt, "healthcare");
+
+            return NextResponse.json({
+                role: "ai",
+                content: responseText.trim(),
+                requireLogin: true,
+                isSkinConcernRedirect: true,
+                concernType: skinConcern.concernType
+            });
+        }
+
+        // 3. 5턴째 (마지막 턴) - 종합 분석 및 결과 제공
         if (turnCount === 4) {
             const finalAnalysisPrompt = getHealthcareFinalAnalysisPrompt(
                 topic || "default",
@@ -55,7 +79,7 @@ AI(분석 결과):
             });
         }
 
-        // 3. 시스템 프롬프트 from prompts.ts (entryIntent 전달)
+        // 4. 시스템 프롬프트 from prompts.ts (entryIntent 전달)
         const systemPrompt = getHealthcareSystemPrompt(
             topic || "default",
             turnCount,
@@ -73,7 +97,7 @@ AI:
 
         const responseText = await generateText(fullPrompt, "healthcare");
 
-        // 4. 3턴째 - Soft Gate (로그인 유도하지만 계속 가능)
+        // 5. 3턴째 - Soft Gate (로그인 유도하지만 계속 가능)
         const isTurn3 = turnCount === 2;
 
         return NextResponse.json({

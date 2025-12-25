@@ -479,6 +479,93 @@ ${getMedicalQuestionPool(currentTrack)}
 `;
 }
 
+// =============================================
+// 피부과 고민 키워드 (헬스케어 자유발화 감지용)
+// =============================================
+
+// 피부과 상담이 필요한 고민 키워드
+export const SKIN_CONCERN_KEYWORDS = [
+   // 노화/주름
+   "주름", "눈밑", "눈가", "이마 주름", "팔자", "미간", "처짐", "탄력",
+   // 트러블
+   "여드름", "뾰루지", "트러블", "피지", "블랙헤드",
+   // 색소
+   "기미", "잡티", "색소", "검은점", "주근깨", "다크써클",
+   // 모공/피부결
+   "모공", "피부결", "울퉁불퉁", "오돌토돌",
+   // 민감/홍조
+   "홍조", "붉은기", "민감", "아토피", "알레르기",
+   // 기타
+   "흉터", "튼살", "건조", "각질", "피부 고민", "피부가 안 좋"
+];
+
+// 시술/미용 관련 키워드 (로그인 강하게 유도)
+export const PROCEDURE_KEYWORDS = [
+   "리프팅", "보톡스", "필러", "레이저", "피코", "토닝", "울쎄라", "하이푸",
+   "실리프팅", "윤곽", "브이라인", "턱선", "시술", "주사"
+];
+
+// 피부 고민 감지 함수
+export function detectSkinConcern(message: string, currentTopic?: string): {
+   hasConcern: boolean;
+   concernType: string;
+   isProcedure: boolean;
+} {
+   const lowerMessage = message.toLowerCase();
+
+   // 시술 관련 키워드 먼저 체크
+   for (const keyword of PROCEDURE_KEYWORDS) {
+      if (lowerMessage.includes(keyword)) {
+         return { hasConcern: true, concernType: keyword, isProcedure: true };
+      }
+   }
+
+   // 피부 고민 키워드 체크
+   for (const keyword of SKIN_CONCERN_KEYWORDS) {
+      if (lowerMessage.includes(keyword)) {
+         return { hasConcern: true, concernType: keyword, isProcedure: false };
+      }
+   }
+
+   return { hasConcern: false, concernType: '', isProcedure: false };
+}
+
+// 피부 고민 자유발화에 대한 응답 프롬프트
+export function getSkinConcernResponsePrompt(concernType: string, isProcedure: boolean): string {
+   if (isProcedure) {
+      return `
+[역할] 피부 습관 체크 안내자 (비의료인)
+
+[상황] 사용자가 "${concernType}" 관련 시술에 대해 언급하셨습니다.
+
+[응답 규칙 - 120자 이내]
+1) 공감 1문장: "${concernType}에 관심이 있으시군요."
+2) 안내: "시술 관련 상담은 전문 상담이 필요합니다."
+3) 로그인 유도: "로그인 후 전문 상담을 이용해주세요."
+
+[절대 금지]
+- 시술 효과/비용/방법 설명
+- 추천/권유
+`;
+   }
+
+   return `
+[역할] 피부 습관 체크 안내자 (비의료인)
+
+[상황] 사용자가 "${concernType}" 관련 고민을 말씀하셨습니다.
+
+[응답 규칙 - 150자 이내]
+1) 공감 1문장: "${concernType}이(가) 고민이시군요." (단정 금지)
+2) 상식적 팁 1문장: 수분 섭취, 자외선 차단, 충분한 수면 등 일반적 생활 관리 언급 (의료 조언 금지)
+3) 로그인 유도: "${concernType}에 대한 더 자세한 상담을 원하시면 로그인 후 전문 상담을 이용해주세요."
+
+[절대 금지]
+- 진단/치료/처방/시술 언급
+- 확정적 표현 ("~때문입니다", "~해야 합니다")
+- 특정 제품/성분 추천
+`;
+}
+
 // 의료 키워드 목록 (헬스케어에서 로그인 유도용)
 export const MEDICAL_KEYWORDS = [
    "치료", "약", "처방", "투약", "복용", "진단", "질환", "질병",
