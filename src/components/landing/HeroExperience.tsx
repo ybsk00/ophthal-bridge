@@ -207,13 +207,14 @@ export default function HeroExperience({ className = "" }: HeroExperienceProps) 
                         unoptimized
                     />
 
-                    {/* Reveal 이미지 (마스크로 표시) */}
+                    {/* Reveal 이미지 (마스크로 표시) - 마스크가 없으면 숨김 */}
                     {selectedVariant !== "natural" && (
                         <div
-                            className="absolute inset-0 pointer-events-none"
+                            className="absolute inset-0 pointer-events-none transition-opacity duration-100"
                             style={{
-                                maskImage: maskDataUrl ? `url(${maskDataUrl})` : "none",
-                                WebkitMaskImage: maskDataUrl ? `url(${maskDataUrl})` : "none",
+                                opacity: maskDataUrl ? 1 : 0,
+                                maskImage: maskDataUrl ? `url(${maskDataUrl})` : undefined,
+                                WebkitMaskImage: maskDataUrl ? `url(${maskDataUrl})` : undefined,
                                 maskSize: "100% 100%",
                                 WebkitMaskSize: "100% 100%",
                             }}
@@ -293,8 +294,8 @@ export default function HeroExperience({ className = "" }: HeroExperienceProps) 
                             initCanvas();
                         }}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${variant.key === selectedVariant
-                                ? "bg-skin-primary text-white shadow-lg shadow-skin-primary/30"
-                                : "bg-white/10 text-skin-subtext hover:bg-white/20 hover:text-white"
+                            ? "bg-skin-primary text-white shadow-lg shadow-skin-primary/30"
+                            : "bg-white/10 text-skin-subtext hover:bg-white/20 hover:text-white"
                             }`}
                     >
                         {variant.label}
