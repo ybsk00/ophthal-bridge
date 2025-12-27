@@ -4,7 +4,7 @@ import Link from "next/link";
 import { User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 
 export default function PatientHeader() {
@@ -34,6 +34,8 @@ export default function PatientHeader() {
         getUser();
     }, [supabase, nextAuthSession]);
 
+    const pathname = usePathname();
+
     const handleLogout = async () => {
         // 1. Supabase 로그아웃
         await supabase.auth.signOut();
@@ -43,7 +45,12 @@ export default function PatientHeader() {
             await nextAuthSignOut({ redirect: false });
         }
 
-        router.push("/patient/home");
+        // 현재 경로가 메디컬 대시보드인 경우 메인으로, 그 외(환자 포털 등)는 환자 홈으로 이동
+        if (pathname?.includes('/medical/patient-dashboard')) {
+            router.push("/");
+        } else {
+            router.push("/patient/home");
+        }
         router.refresh();
     };
 
