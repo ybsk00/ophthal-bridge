@@ -98,7 +98,11 @@ export async function GET(req: NextRequest) {
             const text = `${item.title} ${item.description}`.toLowerCase();
 
             // 1. 병원명 포함 여부 (필수)
-            if (!text.includes(HOSPITAL_NAME.toLowerCase())) {
+            // "의정부"가 반드시 포함되어야 하며, "세인트의원" 또는 "세인트 의원"이 포함되어야 함
+            const hasLocation = text.includes('의정부');
+            const hasName = text.includes('세인트의원') || text.includes('세인트 의원');
+
+            if (!hasLocation || !hasName) {
                 return false;
             }
 
