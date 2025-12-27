@@ -149,15 +149,15 @@ export default function FileUploadModal({ isOpen, onClose, onComplete }: FileUpl
     if (!isOpen) return null;
 
     const modalContent = (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col border border-gray-700">
                 {/* Header */}
-                <div className="bg-orange-50 p-4 flex justify-between items-center border-b border-orange-100">
+                <div className="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700">
                     <div className="flex items-center gap-2">
-                        <Upload className="w-5 h-5 text-orange-600" />
-                        <h3 className="font-bold text-lg text-gray-900">검사결과지 분석</h3>
+                        <Upload className="w-5 h-5 text-orange-400" />
+                        <h3 className="font-bold text-lg text-white">검사결과지 분석</h3>
                     </div>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <button onClick={onClose} className="text-gray-400 hover:text-white">
                         <X size={20} />
                     </button>
                 </div>
@@ -168,13 +168,13 @@ export default function FileUploadModal({ isOpen, onClose, onComplete }: FileUpl
                         <div className="space-y-4">
                             <button
                                 onClick={() => setSelectedAnalysis(null)}
-                                className="text-sm text-orange-600 hover:underline"
+                                className="text-sm text-orange-400 hover:underline"
                             >
                                 ← 목록으로 돌아가기
                             </button>
-                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                                <h4 className="font-bold text-gray-900 mb-3">AI 분석 결과</h4>
-                                <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
+                            <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
+                                <h4 className="font-bold text-white mb-3">AI 분석 결과</h4>
+                                <div className="prose prose-sm max-w-none text-gray-300 whitespace-pre-wrap">
                                     {selectedAnalysis}
                                 </div>
                             </div>
@@ -188,7 +188,7 @@ export default function FileUploadModal({ isOpen, onClose, onComplete }: FileUpl
                                 onDragOver={handleDrag}
                                 onDrop={handleDrop}
                                 onClick={() => fileInputRef.current?.click()}
-                                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${dragActive ? 'border-orange-500 bg-orange-50' : 'border-gray-300 hover:border-orange-300'}`}
+                                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer bg-gray-800/50 ${dragActive ? 'border-orange-500 bg-orange-500/10' : 'border-gray-600 hover:border-orange-400'}`}
                             >
                                 <input
                                     ref={fileInputRef}
@@ -198,27 +198,27 @@ export default function FileUploadModal({ isOpen, onClose, onComplete }: FileUpl
                                     onChange={handleFileInput}
                                     className="hidden"
                                 />
-                                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                                <p className="text-sm text-gray-600 font-medium mb-1">
+                                <Upload className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                                <p className="text-sm text-gray-300 font-medium mb-1">
                                     {isUploading ? '업로드 중...' : '파일을 드래그하거나 클릭하세요'}
                                 </p>
-                                <p className="text-xs text-gray-400">JPG, PNG, PDF 지원 (이미지는 자동 분석)</p>
+                                <p className="text-xs text-gray-500">JPG, PNG, PDF 지원 (이미지는 자동 분석)</p>
                             </div>
 
                             {/* File List */}
                             {files.length > 0 && (
                                 <div className="mt-6 space-y-3">
-                                    <h4 className="text-sm font-medium text-gray-700">업로드된 파일 ({files.length})</h4>
+                                    <h4 className="text-sm font-medium text-gray-300">업로드된 파일 ({files.length})</h4>
                                     {files.map(file => (
-                                        <div key={file.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                                        <div key={file.id} className="flex items-center gap-3 p-3 bg-gray-800/50 rounded-xl border border-gray-700">
                                             {file.type === 'pdf' ? (
-                                                <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
+                                                <FileText className="w-8 h-8 text-red-400 flex-shrink-0" />
                                             ) : (
-                                                <Image className="w-8 h-8 text-blue-500 flex-shrink-0" />
+                                                <Image className="w-8 h-8 text-blue-400 flex-shrink-0" />
                                             )}
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-gray-700 truncate">{file.name}</p>
-                                                <p className="text-xs text-gray-400">
+                                                <p className="text-sm font-medium text-gray-200 truncate">{file.name}</p>
+                                                <p className="text-xs text-gray-500">
                                                     {file.isAnalyzing ? '분석 중...' : file.analysis ? '✅ 분석 완료' : file.uploadedAt}
                                                 </p>
                                             </div>
@@ -227,20 +227,20 @@ export default function FileUploadModal({ isOpen, onClose, onComplete }: FileUpl
                                                     file.analysis ? (
                                                         <button
                                                             onClick={() => setSelectedAnalysis(file.analysis!)}
-                                                            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                            className="p-2 text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
                                                             title="분석 결과 보기"
                                                         >
                                                             <Eye size={16} />
                                                         </button>
                                                     ) : file.isAnalyzing ? (
                                                         <div className="p-2">
-                                                            <Loader2 size={16} className="animate-spin text-orange-500" />
+                                                            <Loader2 size={16} className="animate-spin text-orange-400" />
                                                         </div>
                                                     ) : null
                                                 )}
                                                 <button
                                                     onClick={() => removeFile(file.id)}
-                                                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                                                    className="p-2 text-gray-500 hover:text-red-400 transition-colors"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>
@@ -251,8 +251,8 @@ export default function FileUploadModal({ isOpen, onClose, onComplete }: FileUpl
                             )}
 
                             {/* Info */}
-                            <div className="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                <p className="text-xs text-blue-800">
+                            <div className="mt-6 bg-blue-500/10 p-4 rounded-xl border border-blue-500/30">
+                                <p className="text-xs text-blue-300">
                                     <strong>💡 자동 분석:</strong> 이미지 업로드 시 자동으로 AI가 분석합니다. 완료 후 상담으로 연결됩니다.
                                 </p>
                             </div>
@@ -261,13 +261,13 @@ export default function FileUploadModal({ isOpen, onClose, onComplete }: FileUpl
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-gray-100">
+                <div className="p-4 border-t border-gray-700">
                     <button
                         onClick={handleComplete}
                         disabled={isAnyAnalyzing}
                         className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${hasAnalyzedFiles
-                                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                                : 'bg-gray-100 text-gray-500'
+                            ? 'bg-orange-500 text-white hover:bg-orange-600'
+                            : 'bg-gray-700 text-gray-400'
                             } disabled:opacity-50`}
                     >
                         {isAnyAnalyzing ? (

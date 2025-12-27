@@ -183,18 +183,18 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
     if (!isOpen) return null;
 
     const modalContent = (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col border border-gray-700">
                 {/* Header */}
-                <div className="bg-purple-50 p-4 flex justify-between items-center border-b border-purple-100">
+                <div className="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700">
                     <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                            <Sparkles className="w-5 h-5 text-purple-600" />
-                            <h3 className="font-bold text-lg text-gray-900">미용 시술 상담 체크</h3>
+                            <Sparkles className="w-5 h-5 text-purple-400" />
+                            <h3 className="font-bold text-lg text-white">미용 시술 상담 체크</h3>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">나에게 맞는 시술을 찾기 위한 기초 설문입니다.</p>
+                        <p className="text-xs text-gray-400 mt-1">나에게 맞는 시술을 찾기 위한 기초 설문입니다.</p>
                     </div>
-                    <button onClick={resetAndClose} className="text-gray-400 hover:text-gray-600">
+                    <button onClick={resetAndClose} className="text-gray-400 hover:text-white">
                         <X size={20} />
                     </button>
                 </div>
@@ -204,10 +204,10 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                     <div className="px-4 pt-4">
                         <div className="flex gap-1">
                             {Array.from({ length: totalSteps }).map((_, i) => (
-                                <div key={i} className={`h-1 flex-1 rounded-full ${i < step ? 'bg-purple-500' : 'bg-gray-200'}`} />
+                                <div key={i} className={`h-1 flex-1 rounded-full ${i < step ? 'bg-purple-500' : 'bg-gray-700'}`} />
                             ))}
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">단계 {step}/{totalSteps}</p>
+                        <p className="text-xs text-gray-400 mt-2">단계 {step}/{totalSteps}</p>
                     </div>
                 )}
 
@@ -215,18 +215,18 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                 <div className="flex-1 overflow-y-auto p-6">
                     {step === 1 ? (
                         <div className="space-y-4">
-                            <h4 className="text-lg font-bold text-gray-900">어떤 시술에 관심이 있으신가요?</h4>
+                            <h4 className="text-lg font-bold text-white">어떤 시술에 관심이 있으신가요?</h4>
                             <div className="grid grid-cols-2 gap-3">
                                 {AESTHETIC_CATEGORIES.map(cat => (
                                     <button
                                         key={cat.id}
                                         onClick={() => setCategory(cat.id)}
-                                        className={`p-4 rounded-xl border-2 transition-all text-left flex flex-col items-center text-center gap-2 ${category === cat.id ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-200'}`}
+                                        className={`p-4 rounded-xl border-2 transition-all text-left flex flex-col items-center text-center gap-2 ${category === cat.id ? 'border-purple-500 bg-purple-500/20' : 'border-gray-700 hover:border-purple-400 bg-gray-800/50'}`}
                                     >
                                         <div className="mb-1">{cat.icon}</div>
                                         <div>
-                                            <span className="text-sm font-bold text-gray-800 block">{cat.label}</span>
-                                            <span className="text-xs text-gray-500">{cat.desc}</span>
+                                            <span className="text-sm font-bold text-white block">{cat.label}</span>
+                                            <span className="text-xs text-gray-400">{cat.desc}</span>
                                         </div>
                                     </button>
                                 ))}
@@ -234,14 +234,14 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                         </div>
                     ) : step === 2 ? (
                         <div className="space-y-4">
-                            <h4 className="text-lg font-bold text-gray-900">어느 부위가 고민이신가요?</h4>
-                            <p className="text-sm text-gray-500">복수 선택 가능</p>
+                            <h4 className="text-lg font-bold text-white">어느 부위가 고민이신가요?</h4>
+                            <p className="text-sm text-gray-400">복수 선택 가능</p>
                             <div className="grid grid-cols-2 gap-2">
                                 {AREA_OPTIONS.map(opt => (
                                     <button
                                         key={opt.id}
                                         onClick={() => handleMultiSelect(opt.id, area, setArea)}
-                                        className={`p-3 rounded-xl border-2 transition-all ${area.includes(opt.id) ? 'border-purple-500 bg-purple-50 text-purple-700 font-medium' : 'border-gray-200 hover:border-purple-200 text-gray-600'}`}
+                                        className={`p-3 rounded-xl border-2 transition-all ${area.includes(opt.id) ? 'border-purple-500 bg-purple-500/20 text-purple-300 font-medium' : 'border-gray-700 hover:border-purple-400 text-gray-300 bg-gray-800/50'}`}
                                     >
                                         {opt.label}
                                     </button>
@@ -251,13 +251,13 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                     ) : step === 3 ? (
                         <div className="space-y-6">
                             <div>
-                                <h4 className="text-lg font-bold text-gray-900 mb-3">고민 기간은 얼마나 되셨나요?</h4>
+                                <h4 className="text-lg font-bold text-white mb-3">고민 기간은 얼마나 되셨나요?</h4>
                                 <div className="grid grid-cols-2 gap-2">
                                     {DURATION_OPTIONS.map(opt => (
                                         <button
                                             key={opt.id}
                                             onClick={() => setDuration(opt.id)}
-                                            className={`p-3 rounded-xl border-2 transition-all text-sm ${duration === opt.id ? 'border-purple-500 bg-purple-50 text-purple-700 font-medium' : 'border-gray-200 hover:border-purple-200 text-gray-600'}`}
+                                            className={`p-3 rounded-xl border-2 transition-all text-sm ${duration === opt.id ? 'border-purple-500 bg-purple-500/20 text-purple-300 font-medium' : 'border-gray-700 hover:border-purple-400 text-gray-300 bg-gray-800/50'}`}
                                         >
                                             {opt.label}
                                         </button>
@@ -265,13 +265,13 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                                 </div>
                             </div>
                             <div>
-                                <h4 className="text-lg font-bold text-gray-900 mb-3">관련 시술 경험이 있으신가요?</h4>
+                                <h4 className="text-lg font-bold text-white mb-3">관련 시술 경험이 있으신가요?</h4>
                                 <div className="grid grid-cols-2 gap-2">
                                     {EXPERIENCE_OPTIONS.map(opt => (
                                         <button
                                             key={opt.id}
                                             onClick={() => setExperience(opt.id)}
-                                            className={`p-3 rounded-xl border-2 transition-all text-sm ${experience === opt.id ? 'border-purple-500 bg-purple-50 text-purple-700 font-medium' : 'border-gray-200 hover:border-purple-200 text-gray-600'}`}
+                                            className={`p-3 rounded-xl border-2 transition-all text-sm ${experience === opt.id ? 'border-purple-500 bg-purple-500/20 text-purple-300 font-medium' : 'border-gray-700 hover:border-purple-400 text-gray-300 bg-gray-800/50'}`}
                                         >
                                             {opt.label}
                                         </button>
@@ -281,14 +281,14 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                         </div>
                     ) : step === 4 ? (
                         <div className="space-y-4">
-                            <h4 className="text-lg font-bold text-gray-900">어떤 결과를 원하시나요?</h4>
-                            <p className="text-sm text-gray-500">중요하게 생각하는 가치를 선택해주세요 (복수 선택)</p>
+                            <h4 className="text-lg font-bold text-white">어떤 결과를 원하시나요?</h4>
+                            <p className="text-sm text-gray-400">중요하게 생각하는 가치를 선택해주세요 (복수 선택)</p>
                             <div className="flex flex-wrap gap-2">
                                 {GOAL_OPTIONS.map(opt => (
                                     <button
                                         key={opt.id}
                                         onClick={() => handleMultiSelect(opt.id, goals, setGoals)}
-                                        className={`px-4 py-2 rounded-full border-2 transition-all text-sm ${goals.includes(opt.id) ? 'border-purple-500 bg-purple-50 text-purple-700 font-medium' : 'border-gray-200 hover:border-purple-200 text-gray-600'}`}
+                                        className={`px-4 py-2 rounded-full border-2 transition-all text-sm ${goals.includes(opt.id) ? 'border-purple-500 bg-purple-500/20 text-purple-300 font-medium' : 'border-gray-700 hover:border-purple-400 text-gray-300 bg-gray-800/50'}`}
                                     >
                                         {opt.label}
                                     </button>
@@ -298,13 +298,13 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                     ) : step === 5 ? (
                         <div className="space-y-6">
                             <div>
-                                <h4 className="text-lg font-bold text-gray-900 mb-3">본인의 피부 타입은?</h4>
+                                <h4 className="text-lg font-bold text-white mb-3">본인의 피부 타입은?</h4>
                                 <div className="grid grid-cols-2 gap-2">
                                     {SKIN_TYPE_OPTIONS.map(opt => (
                                         <button
                                             key={opt.id}
                                             onClick={() => setSkinType(opt.id)}
-                                            className={`p-3 rounded-xl border-2 transition-all text-sm ${skinType === opt.id ? 'border-purple-500 bg-purple-50 text-purple-700 font-medium' : 'border-gray-200 hover:border-purple-200 text-gray-600'}`}
+                                            className={`p-3 rounded-xl border-2 transition-all text-sm ${skinType === opt.id ? 'border-purple-500 bg-purple-500/20 text-purple-300 font-medium' : 'border-gray-700 hover:border-purple-400 text-gray-300 bg-gray-800/50'}`}
                                         >
                                             {opt.label}
                                         </button>
@@ -312,47 +312,47 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                                 </div>
                             </div>
                             <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-2">추가 메모 (선택)</h4>
+                                <h4 className="text-sm font-medium text-gray-300 mb-2">추가 메모 (선택)</h4>
                                 <textarea
                                     value={memo}
                                     onChange={(e) => setMemo(e.target.value)}
                                     placeholder="예: 특히 눈가 주름이 신경 쓰여요."
-                                    className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none resize-none h-24 text-sm"
+                                    className="w-full p-3 border-2 border-gray-700 bg-gray-800 text-white placeholder-gray-500 rounded-xl focus:border-purple-500 focus:outline-none resize-none h-24 text-sm"
                                 />
                             </div>
                         </div>
                     ) : step === 6 ? (
                         <div className="space-y-4">
-                            <h4 className="text-lg font-bold text-gray-900">시술 전 체크리스트</h4>
-                            <p className="text-sm text-gray-500">해당하는 항목이 있다면 체크해주세요.</p>
+                            <h4 className="text-lg font-bold text-white">시술 전 체크리스트</h4>
+                            <p className="text-sm text-gray-400">해당하는 항목이 있다면 체크해주세요.</p>
                             <div className="space-y-2">
                                 {PRE_CHECK_LIST.map(check => (
                                     <button
                                         key={check.id}
                                         onClick={() => handlePreCheckChange(check.id)}
-                                        className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center gap-3 ${preChecks.includes(check.id) ? 'border-pink-500 bg-pink-50' : 'border-gray-200 hover:border-pink-200'}`}
+                                        className={`w-full p-4 rounded-xl border-2 text-left transition-all flex items-center gap-3 ${preChecks.includes(check.id) ? 'border-pink-500 bg-pink-500/20' : 'border-gray-700 hover:border-pink-400 bg-gray-800/50'}`}
                                     >
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${preChecks.includes(check.id) ? 'border-pink-500 bg-pink-500' : 'border-gray-300'}`}>
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${preChecks.includes(check.id) ? 'border-pink-500 bg-pink-500' : 'border-gray-500'}`}>
                                             {preChecks.includes(check.id) && <CheckCircle className="w-4 h-4 text-white" />}
                                         </div>
-                                        <span className="font-medium text-gray-700">{check.label}</span>
+                                        <span className="font-medium text-gray-200">{check.label}</span>
                                     </button>
                                 ))}
                             </div>
-                            <div className="bg-gray-50 p-4 rounded-xl text-xs text-gray-500 mt-4">
+                            <div className="bg-gray-800/50 p-4 rounded-xl text-xs text-gray-400 mt-4 border border-gray-700">
                                 * 위 항목은 시술 가능 여부 판단에 중요한 정보입니다. 정확하게 체크해주세요.
                             </div>
                         </div>
                     ) : step === 7 ? (
                         <div className="space-y-4">
                             <div className="flex items-center gap-2 mb-4">
-                                <CheckCircle className="w-6 h-6 text-purple-500" />
-                                <h4 className="text-lg font-bold text-gray-900">상담 기초자료 작성 완료</h4>
+                                <CheckCircle className="w-6 h-6 text-purple-400" />
+                                <h4 className="text-lg font-bold text-white">상담 기초자료 작성 완료</h4>
                             </div>
-                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm text-gray-700 whitespace-pre-wrap">
+                            <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 text-sm text-gray-300 whitespace-pre-wrap">
                                 {summary.replace(/##/g, '').replace(/\*\*/g, '').replace(/>/g, '')}
                             </div>
-                            <p className="text-xs text-gray-500 text-center">
+                            <p className="text-xs text-gray-400 text-center">
                                 작성하신 내용은 상담 시 의료진에게 전달됩니다.<br />
                                 대기실에서 잠시만 기다려주세요.
                             </p>
@@ -365,7 +365,7 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
                                 </button>
                                 <button
                                     onClick={resetAndClose}
-                                    className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                                    className="w-full py-3 bg-gray-700 text-gray-300 rounded-xl font-medium hover:bg-gray-600 transition-colors"
                                 >
                                     닫기
                                 </button>
@@ -376,12 +376,12 @@ export default function AestheticCheckModal({ isOpen, onClose, onComplete }: Aes
 
                 {/* Footer */}
                 {step <= 6 && (
-                    <div className="p-4 border-t border-gray-100">
+                    <div className="p-4 border-t border-gray-700">
                         <div className="flex gap-3">
                             {step > 1 && (
                                 <button
                                     onClick={handleBack}
-                                    className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                                    className="flex-1 py-3 border border-gray-600 text-gray-300 rounded-xl font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
                                 >
                                     <ChevronLeft size={18} /> 이전
                                 </button>

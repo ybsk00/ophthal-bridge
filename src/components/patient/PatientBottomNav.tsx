@@ -13,7 +13,7 @@ export default function PatientBottomNav() {
     const navItems = [
         { href: "/patient", icon: Home, label: "홈", exact: true },
         { href: "/patient/appointments", icon: Calendar, label: "예약" },
-        { href: null, icon: Sparkles, label: "시각화", isModal: true },
+        { href: null, icon: Sparkles, label: "시뮬레이션", isModal: true },
         { href: "/patient/chat", icon: MessageSquare, label: "상담", badge: true },
         { href: "/patient/profile", icon: User, label: "마이" },
     ];

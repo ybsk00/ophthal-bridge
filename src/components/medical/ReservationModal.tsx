@@ -372,28 +372,28 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
     if (!isOpen) return null;
 
     const modalContent = (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 border border-gray-700">
                 {/* Header */}
-                <div className="bg-traditional-bg p-4 flex justify-between items-center border-b border-traditional-muted/20">
-                    <h3 className="font-bold text-lg text-traditional-text flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-traditional-accent" />
+                <div className="bg-gray-800 p-4 flex justify-between items-center border-b border-gray-700">
+                    <h3 className="font-bold text-lg text-white flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-pink-500" />
                         예약 관리
                     </h3>
-                    <button onClick={resetAndClose} className="text-gray-400 hover:text-gray-600">
+                    <button onClick={resetAndClose} className="text-gray-400 hover:text-white">
                         <X size={20} />
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="p-6">
+                <div className="p-6 bg-[#1e293b]">
                     {step === 3 ? (
                         <div className="text-center py-8">
-                            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <CheckCircle2 size={32} />
                             </div>
-                            <h4 className="text-xl font-bold text-gray-900 mb-2">처리되었습니다</h4>
-                            <p className="text-gray-600 mb-6">
+                            <h4 className="text-xl font-bold text-white mb-2">처리되었습니다</h4>
+                            <p className="text-gray-400 mb-6">
                                 {activeTab === "book" && "예약 신청이 완료되었습니다."}
                                 {activeTab === "reschedule" && "예약 변경이 완료되었습니다."}
                                 {activeTab === "cancel" && "예약이 취소되었습니다."}
@@ -402,7 +402,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                             </p>
                             <button
                                 onClick={resetAndClose}
-                                className="w-full py-3 bg-traditional-accent text-white rounded-xl font-medium hover:bg-opacity-90 transition-colors"
+                                className="w-full py-3 bg-pink-500 text-white rounded-xl font-medium hover:bg-pink-600 transition-colors"
                             >
                                 확인
                             </button>
@@ -410,22 +410,22 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                     ) : (
                         <>
                             {/* Tabs */}
-                            <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
+                            <div className="flex bg-gray-800 p-1 rounded-xl mb-6">
                                 <button
                                     onClick={() => setActiveTab("book")}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === "book" ? "bg-white text-traditional-accent shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === "book" ? "bg-pink-500 text-white shadow-sm" : "text-gray-400 hover:text-white"}`}
                                 >
                                     예약하기
                                 </button>
                                 <button
                                     onClick={() => setActiveTab("reschedule")}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === "reschedule" ? "bg-white text-traditional-accent shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === "reschedule" ? "bg-pink-500 text-white shadow-sm" : "text-gray-400 hover:text-white"}`}
                                 >
                                     예약변경
                                 </button>
                                 <button
                                     onClick={() => setActiveTab("cancel")}
-                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === "cancel" ? "bg-white text-red-500 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === "cancel" ? "bg-red-500 text-white shadow-sm" : "text-gray-400 hover:text-white"}`}
                                 >
                                     예약취소
                                 </button>
@@ -434,68 +434,68 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                             {/* Content based on Tab */}
                             <div className="space-y-4">
                                 {isLoading ? (
-                                    <div className="text-center py-8 text-gray-500">로딩중...</div>
+                                    <div className="text-center py-8 text-gray-400">로딩중...</div>
                                 ) : (
                                     <>
                                         {activeTab === "book" && (
                                             <div className="space-y-4">
-                                                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-blue-800">
+                                                <div className="bg-blue-500/10 p-4 rounded-xl border border-blue-500/30 text-sm text-blue-300">
                                                     <p className="font-bold mb-1">진료 예약</p>
                                                     <p>원하시는 날짜와 시간을 선택해주세요.</p>
                                                 </div>
 
                                                 <div className="space-y-1">
-                                                    <label className="text-xs font-medium text-gray-500">예약자 성함</label>
+                                                    <label className="text-xs font-medium text-gray-400">예약자 성함</label>
                                                     <div className="relative">
-                                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={16} />
                                                         <input
                                                             type="text"
                                                             value={name}
                                                             onChange={(e) => setName(e.target.value)}
                                                             placeholder="성함을 입력해주세요"
-                                                            className="w-full pl-10 p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all"
+                                                            className="w-full pl-10 p-3 border border-gray-700 rounded-xl bg-gray-800 text-white placeholder-gray-500 focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all"
                                                         />
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-1">
-                                                    <label className="text-xs font-medium text-gray-500">담당 의료진</label>
+                                                    <label className="text-xs font-medium text-gray-400">담당 의료진</label>
                                                     <div className="relative">
                                                         <select
                                                             value={doctor}
                                                             onChange={(e) => setDoctor(e.target.value)}
-                                                            className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all appearance-none"
+                                                            className="w-full p-3 border border-gray-700 rounded-xl bg-gray-800 text-white focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all appearance-none"
                                                         >
                                                             <option value="">-- 선택해주세요 --</option>
                                                             {doctors.filter(d => d !== '').map(d => (
                                                                 <option key={d} value={d}>{d}</option>
                                                             ))}
                                                         </select>
-                                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
                                                     </div>
                                                 </div>
 
                                                 <div className="grid grid-cols-1 gap-3">
                                                     <div className="space-y-1">
-                                                        <label className="text-xs font-medium text-gray-500">날짜</label>
+                                                        <label className="text-xs font-medium text-gray-400">날짜</label>
                                                         <input
                                                             type="date"
                                                             value={date}
                                                             onChange={(e) => setDate(e.target.value)}
-                                                            className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all"
+                                                            className="w-full p-3 border border-gray-700 rounded-xl bg-gray-800 text-white focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all"
                                                         />
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <label className="text-xs font-medium text-gray-500">
-                                                            시간 {isLoadingSlots && <span className="text-blue-500">(조회중...)</span>}
-                                                            {!currentTimeAvailable && date && doctor && <span className="text-red-500 ml-2">⚠️ 예약됨</span>}
+                                                        <label className="text-xs font-medium text-gray-400">
+                                                            시간 {isLoadingSlots && <span className="text-blue-400">(조회중...)</span>}
+                                                            {!currentTimeAvailable && date && doctor && <span className="text-red-400 ml-2">⚠️ 예약됨</span>}
                                                         </label>
                                                         <div className="flex gap-2">
                                                             <div className="relative flex-1">
                                                                 <select
                                                                     value={hour}
                                                                     onChange={(e) => setHour(e.target.value)}
-                                                                    className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all appearance-none"
+                                                                    className="w-full p-3 border border-gray-700 rounded-xl bg-gray-800 text-white focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all appearance-none"
                                                                 >
                                                                     {hours.map(h => {
                                                                         const hasAvailableMinute = minutes.some(m => isTimeAvailable(h, m));
@@ -512,7 +512,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                                                 <select
                                                                     value={minute}
                                                                     onChange={(e) => setMinute(e.target.value)}
-                                                                    className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all appearance-none"
+                                                                    className="w-full p-3 border border-gray-700 rounded-xl bg-gray-800 text-white focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all appearance-none"
                                                                 >
                                                                     {minutes.map(m => {
                                                                         const available = isTimeAvailable(hour, m);
@@ -533,63 +533,63 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
 
                                         {activeTab === "reschedule" && (
                                             <div className="space-y-4">
-                                                <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 text-sm text-amber-800">
+                                                <div className="bg-amber-500/10 p-4 rounded-xl border border-amber-500/30 text-sm text-amber-300">
                                                     <p className="font-bold mb-1">예약 변경</p>
                                                     <p>변경하실 날짜와 시간을 선택해주세요.</p>
                                                 </div>
 
                                                 {!existingReservation ? (
-                                                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                                                    <div className="text-center py-8 text-gray-400 bg-gray-800/50 rounded-xl border border-dashed border-gray-600">
                                                         변경할 예약 내역이 없습니다.
                                                     </div>
                                                 ) : (
                                                     <>
                                                         <div className="space-y-1">
-                                                            <label className="text-xs font-medium text-gray-500">예약자 성함</label>
+                                                            <label className="text-xs font-medium text-gray-400">예약자 성함</label>
                                                             <input
                                                                 type="text"
                                                                 value={name}
                                                                 onChange={(e) => setName(e.target.value)}
                                                                 placeholder="성함을 입력해주세요"
-                                                                className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all"
+                                                                className="w-full p-3 border border-gray-700 rounded-xl bg-gray-800 text-white placeholder-gray-500 focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all"
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-1 gap-3">
                                                             <div className="space-y-1">
-                                                                <label className="text-xs font-medium text-gray-500">날짜</label>
+                                                                <label className="text-xs font-medium text-gray-400">날짜</label>
                                                                 <input
                                                                     type="date"
                                                                     value={date}
                                                                     onChange={(e) => setDate(e.target.value)}
-                                                                    className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all"
+                                                                    className="w-full p-3 border border-gray-700 rounded-xl bg-gray-800 text-white focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all"
                                                                 />
                                                             </div>
                                                             <div className="space-y-1">
-                                                                <label className="text-xs font-medium text-gray-500">시간</label>
+                                                                <label className="text-xs font-medium text-gray-400">시간</label>
                                                                 <div className="flex gap-2">
                                                                     <div className="relative flex-1">
                                                                         <select
                                                                             value={hour}
                                                                             onChange={(e) => setHour(e.target.value)}
-                                                                            className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all appearance-none"
+                                                                            className="w-full p-3 border border-gray-700 rounded-xl bg-gray-800 text-white focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all appearance-none"
                                                                         >
                                                                             {hours.map(h => (
                                                                                 <option key={h} value={h}>{h}시</option>
                                                                             ))}
                                                                         </select>
-                                                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                                                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
                                                                     </div>
                                                                     <div className="relative flex-1">
                                                                         <select
                                                                             value={minute}
                                                                             onChange={(e) => setMinute(e.target.value)}
-                                                                            className="w-full p-3 border rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-traditional-accent focus:border-transparent outline-none transition-all appearance-none"
+                                                                            className="w-full p-3 border border-gray-700 rounded-xl bg-gray-800 text-white focus:bg-gray-700 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all appearance-none"
                                                                         >
                                                                             {minutes.map(m => (
                                                                                 <option key={m} value={m}>{m}분</option>
                                                                             ))}
                                                                         </select>
-                                                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                                                                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -601,7 +601,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
 
                                         {activeTab === "cancel" && (
                                             <div className="space-y-4">
-                                                <div className="bg-red-50 p-4 rounded-xl border border-red-100 text-sm text-red-800 flex items-start gap-3">
+                                                <div className="bg-red-500/10 p-4 rounded-xl border border-red-500/30 text-sm text-red-300 flex items-start gap-3">
                                                     <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                                                     <div>
                                                         <p className="font-bold mb-1">정말 취소하시겠습니까?</p>
@@ -610,20 +610,20 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                                 </div>
 
                                                 {!existingReservation ? (
-                                                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                                                    <div className="text-center py-8 text-gray-400 bg-gray-800/50 rounded-xl border border-dashed border-gray-600">
                                                         취소할 예약 내역이 없습니다.
                                                     </div>
                                                 ) : (
-                                                    <div className="bg-white border rounded-xl p-4 space-y-4">
-                                                        <div className="p-3 bg-gray-50 rounded-lg">
+                                                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 space-y-4">
+                                                        <div className="p-3 bg-gray-900/50 rounded-lg">
                                                             <p className="text-xs text-gray-500 mb-1">현재 예약 정보</p>
-                                                            <p className="font-bold text-gray-900">{existingReservation.time}</p>
-                                                            <p className="text-sm text-gray-600">{existingReservation.name}님</p>
+                                                            <p className="font-bold text-white">{existingReservation.time}</p>
+                                                            <p className="text-sm text-gray-400">{existingReservation.name}님</p>
                                                         </div>
 
                                                         <div>
-                                                            <p className="text-sm text-gray-600 font-medium mb-2">취소 사유</p>
-                                                            <select className="w-full p-2 border rounded-lg text-sm">
+                                                            <p className="text-sm text-gray-400 font-medium mb-2">취소 사유</p>
+                                                            <select className="w-full p-2 border border-gray-700 rounded-lg text-sm bg-gray-800 text-white">
                                                                 <option>단순 변심</option>
                                                                 <option>일정 변경</option>
                                                                 <option>증상 호전</option>
@@ -640,7 +640,7 @@ export default function ReservationModal({ isOpen, onClose, initialTab = "book" 
                                 <button
                                     onClick={handleConfirm}
                                     disabled={isSubmitting || (activeTab !== 'book' && !existingReservation)}
-                                    className={`w-full py-3 rounded-xl font-medium text-white transition-colors mt-4 ${activeTab === "cancel" ? "bg-red-500 hover:bg-red-600" : "bg-traditional-accent hover:bg-opacity-90"} ${isSubmitting || (activeTab !== 'book' && !existingReservation) ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    className={`w-full py-3 rounded-xl font-medium text-white transition-colors mt-4 ${activeTab === "cancel" ? "bg-red-500 hover:bg-red-600" : "bg-pink-500 hover:bg-pink-600"} ${isSubmitting || (activeTab !== 'book' && !existingReservation) ? "opacity-50 cursor-not-allowed" : ""}`}
                                 >
                                     {isSubmitting ? "처리중..." : (
                                         <>

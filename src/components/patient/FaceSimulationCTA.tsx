@@ -21,7 +21,7 @@ export default function FaceSimulationCTA() {
                 </div>
 
                 <span className="inline-block px-3 py-1 text-xs font-medium text-pink-100 bg-white/20 rounded-full mb-4">
-                    가상 시각화(참고용)
+                    가상 시뮬레이션(참고용)
                 </span>
                 <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
                     <Camera className="w-5 h-5" />

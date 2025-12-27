@@ -177,8 +177,8 @@ export default function FaceSimulationModal({ isOpen, onClose, isMobile = false 
             {/* 모달 */}
             <div
                 className={`absolute flex flex-col overflow-hidden transition-all duration-300 ${isMobile
-                        ? "inset-0 rounded-none bg-[#0f172a]"
-                        : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl border border-gray-700 bg-[#1e293b]"
+                    ? "inset-0 rounded-none bg-[#0f172a]"
+                    : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl border border-gray-700 bg-[#1e293b]"
                     } ${isAnimating ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
                 onClick={(e) => e.stopPropagation()}
             >
@@ -186,7 +186,7 @@ export default function FaceSimulationModal({ isOpen, onClose, isMobile = false 
                 <div className="flex items-center justify-between p-4 border-b border-gray-700 flex-shrink-0">
                     <div>
                         <h2 className="text-lg font-bold text-white">
-                            가상 시각화<span className="text-gray-400 font-normal ml-1">(참고용)</span>
+                            가상 시뮬레이션<span className="text-gray-400 font-normal ml-1">(참고용)</span>
                         </h2>
                         <p className="text-xs text-gray-400">
                             {step === "select" && "어떤 시술이 궁금하세요?"}

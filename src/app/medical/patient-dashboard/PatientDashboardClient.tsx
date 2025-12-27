@@ -300,7 +300,7 @@ export default function PatientDashboardClient() {
                                     <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-pink-500/80 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
                                         <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
                                     </div>
-                                    <span className="text-[10px] md:text-xs font-medium text-white/90 whitespace-nowrap">시각화</span>
+                                    <span className="text-[10px] md:text-xs font-medium text-white/90 whitespace-nowrap">시뮬레이션</span>
                                 </button>
                                 <button
                                     onClick={() => setShowReviewModal(true)}
