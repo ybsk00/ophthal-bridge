@@ -57,8 +57,8 @@ export default function LandingPage() {
             >
               <source src="/2.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-r from-skin-bg/95 via-skin-bg/80 to-skin-bg/50" />
-            <div className="absolute inset-0 bg-gradient-to-b from-skin-bg/30 via-transparent to-skin-bg/80" />
+            <div className="absolute inset-0 bg-gradient-to-r from-skin-bg/70 via-skin-bg/50 to-skin-bg/20" />
+            <div className="absolute inset-0 bg-gradient-to-b from-skin-bg/10 via-transparent to-skin-bg/50" />
           </div>
 
           {/* Hero Content - 1컬럼 중앙 정렬 */}
