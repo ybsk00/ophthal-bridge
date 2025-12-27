@@ -266,6 +266,29 @@ export default function HeroExperience({ className = "" }: HeroExperienceProps) 
         };
     }, []);
 
+    // 모바일 스크롤 방지를 위한 non-passive 리스너 등록
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const preventDefault = (e: TouchEvent) => {
+            // 두 손가락 터치(줌) 또는 페인팅 중일 때 스크롤 방지
+            if (e.touches.length >= 2 || isPainting) {
+                e.preventDefault();
+            }
+        };
+
+        // React의 onTouchStart 등은 passive: true가 기본일 수 있으므로
+        // 직접 addEventListener로 { passive: false } 옵션을 주어 등록
+        container.addEventListener('touchstart', preventDefault, { passive: false });
+        container.addEventListener('touchmove', preventDefault, { passive: false });
+
+        return () => {
+            container.removeEventListener('touchstart', preventDefault);
+            container.removeEventListener('touchmove', preventDefault);
+        };
+    }, [isPainting]);
+
     const selectedStyle = STYLE_VARIANTS.find((v) => v.key === selectedVariant)!;
     const baseStyle = STYLE_VARIANTS.find((v) => v.key === "natural")!;
 

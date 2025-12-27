@@ -86,7 +86,7 @@ export default function PhotoSlideOver({ isOpen, onClose }: PhotoSlideOverProps)
                 </div>
 
                 {/* 콘텐츠 */}
-                <div className="h-[calc(100%-65px)] overflow-y-auto p-4">
+                <div className="h-[calc(100%-65px)] overflow-y-auto p-4 overscroll-y-contain">
                     <HeroExperience />
 
                     {/* 내 사진 업로드 버튼 */}

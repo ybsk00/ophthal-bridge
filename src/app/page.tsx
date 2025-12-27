@@ -53,7 +53,6 @@ export default function LandingPage() {
               playsInline
               preload="metadata"
               className="absolute inset-0 w-full h-full object-cover"
-              poster="/NEON RIM.png"
             >
               <source src="/2.mp4" type="video/mp4" />
             </video>
