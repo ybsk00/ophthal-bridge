@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { processWithSharp, VariantKey } from '@/lib/face-style/sharp-provider';
 
 // Service role client for all operations
 function getAdminClient() {
@@ -10,11 +11,7 @@ function getAdminClient() {
     );
 }
 
-// 4종 시술 variant 키
-type VariantKey = 'laser' | 'botox' | 'filler' | 'booster' | 'natural' | 'makeup' | 'bright';
-
-// 간단한 이미지 처리 (Sharp 없이 원본 복사)
-// 실제 프로덕션에서는 Sharp 또는 외부 API 사용 권장
+// Sharp 기반 이미지 처리
 async function processVariant(
     adminClient: ReturnType<typeof getAdminClient>,
     userId: string,
@@ -22,7 +19,7 @@ async function processVariant(
     variantKey: VariantKey
 ): Promise<{ success: boolean; imagePath?: string; error?: string }> {
     try {
-        // 원본 이미지 다운로드
+        // 1. 원본 이미지 다운로드
         const originalPath = `${userId}/${sessionId}/original.jpg`;
         const { data: originalData, error: downloadError } = await adminClient.storage
             .from('face-style')
@@ -32,13 +29,15 @@ async function processVariant(
             return { success: false, error: 'Failed to download original' };
         }
 
-        // TODO: 실제 이미지 처리 로직 (Sharp, Cloud Vision API 등)
-        // 현재는 원본을 그대로 복사 (placeholder)
-        const variantPath = `${userId}/${sessionId}/${variantKey}.jpg`;
+        // 2. Sharp로 이미지 처리
+        const inputBuffer = Buffer.from(await originalData.arrayBuffer());
+        const processedBuffer = await processWithSharp(inputBuffer, variantKey);
 
+        // 3. 처리된 이미지 업로드
+        const variantPath = `${userId}/${sessionId}/${variantKey}.jpg`;
         const { error: uploadError } = await adminClient.storage
             .from('face-style')
-            .upload(variantPath, originalData, {
+            .upload(variantPath, processedBuffer, {
                 contentType: 'image/jpeg',
                 upsert: true,
             });
@@ -106,15 +105,14 @@ export async function POST(request: NextRequest) {
 
         const adminClient = getAdminClient();
 
-        // 4. 선택된 단일 variant 또는 기본값
+        // 4. 선택된 단일 variant 처리
         const targetVariant: VariantKey = variant || 'laser';
         const results: Record<string, { success: boolean; error?: string }> = {};
 
-        // 단일 variant만 처리
         const result = await processVariant(adminClient, user.id, sessionId, targetVariant);
         results[targetVariant] = { success: result.success, error: result.error };
 
-        // variant 레코드 생성/업데이트 (upsert)
+        // 5. variant 레코드 생성/업데이트
         await adminClient
             .from('face_style_variants')
             .upsert({
@@ -126,7 +124,7 @@ export async function POST(request: NextRequest) {
                 onConflict: 'session_id,variant_key'
             });
 
-        // 5. 최종 세션 상태 결정
+        // 6. 최종 세션 상태 결정
         const finalStatus = result.success ? 'ready' : 'failed';
         const errorMessage = result.success ? null : result.error;
 
