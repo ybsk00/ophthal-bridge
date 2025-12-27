@@ -59,7 +59,9 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
     const fetchReviews = async (source: string) => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/reviews/search?source=${source}`);
+            // "의정부 세인트 의원"으로 명시적 검색
+            const query = encodeURIComponent("의정부 세인트 의원");
+            const response = await fetch(`/api/reviews/search?source=${source}&q=${query}`);
             const data: ReviewResponse = await response.json();
             setReviews(data.items || []);
             setIsDummy(data.isDummy || false);
@@ -140,8 +142,8 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
                                     className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === tab.key
-                                            ? 'bg-orange-500 text-white'
-                                            : 'text-gray-400 hover:text-white'
+                                        ? 'bg-orange-500 text-white'
+                                        : 'text-gray-400 hover:text-white'
                                         }`}
                                 >
                                     <Icon className="w-3.5 h-3.5" />
