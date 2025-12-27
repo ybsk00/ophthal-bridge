@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { RefreshCw, AlertCircle } from "lucide-react";
-import Link from "next/link";
 
 interface Variant {
     key: string;
@@ -13,18 +12,22 @@ interface Variant {
 
 interface FaceSwapViewerProps {
     sessionId: string;
+    selectedVariant?: string; // 선택된 단일 variant
 }
 
-const VARIANT_CONFIG = [
-    { key: "natural", label: "내추럴", description: "피부결/톤 정리" },
-    { key: "makeup", label: "메이크업 느낌", description: "색감/채도 조정" },
-    { key: "bright", label: "밝은 톤", description: "밝기/화이트밸런스" },
-] as const;
+// 4종 시술 설정
+const VARIANT_CONFIG: Record<string, { label: string; description: string }> = {
+    laser: { label: "결·톤 정돈", description: "레이저 느낌" },
+    botox: { label: "표정주름 완화", description: "보톡스 느낌" },
+    filler: { label: "볼륨감 변화", description: "필러 느낌" },
+    booster: { label: "광채/물광", description: "스킨부스터 느낌" },
+    // 기존 variant (호환성)
+    natural: { label: "내추럴", description: "피부결/톤 정리" },
+    makeup: { label: "메이크업 느낌", description: "색감/채도 조정" },
+    bright: { label: "밝은 톤", description: "밝기/화이트밸런스" },
+};
 
-type VariantKey = (typeof VARIANT_CONFIG)[number]["key"];
-
-export default function FaceSwapViewer({ sessionId }: FaceSwapViewerProps) {
-    const [activeVariant, setActiveVariant] = useState<VariantKey>("natural");
+export default function FaceSwapViewer({ sessionId, selectedVariant }: FaceSwapViewerProps) {
     const [variants, setVariants] = useState<Variant[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -55,7 +58,9 @@ export default function FaceSwapViewer({ sessionId }: FaceSwapViewerProps) {
         return () => clearInterval(interval);
     }, [sessionId]);
 
-    const activeConfig = VARIANT_CONFIG.find(c => c.key === activeVariant);
+    // 선택된 variant의 정보
+    const activeVariant = selectedVariant || variants[0]?.key || "laser";
+    const activeConfig = VARIANT_CONFIG[activeVariant] || { label: activeVariant, description: "" };
     const activeUrl = variants.find(v => v.key === activeVariant)?.url;
 
     if (isLoading) {
@@ -90,26 +95,13 @@ export default function FaceSwapViewer({ sessionId }: FaceSwapViewerProps) {
             <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl shadow-skin-primary/20 border border-white/10 mb-6">
                 {activeUrl ? (
                     <>
-                        {VARIANT_CONFIG.map(config => {
-                            const url = variants.find(v => v.key === config.key)?.url;
-                            return (
-                                <div
-                                    key={config.key}
-                                    className={`absolute inset-0 transition-opacity duration-300 ${config.key === activeVariant ? "opacity-100" : "opacity-0"
-                                        }`}
-                                >
-                                    {url && (
-                                        <Image
-                                            src={url}
-                                            alt={config.label}
-                                            fill
-                                            className="object-cover object-top"
-                                            unoptimized // Signed URL이므로 최적화 비활성화
-                                        />
-                                    )}
-                                </div>
-                            );
-                        })}
+                        <Image
+                            src={activeUrl}
+                            alt={activeConfig.label}
+                            fill
+                            className="object-cover object-top"
+                            unoptimized // Signed URL이므로 최적화 비활성화
+                        />
 
                         {/* 오버레이 */}
                         <div className="absolute inset-0 bg-gradient-to-t from-skin-bg/80 via-transparent to-transparent" />
@@ -117,10 +109,10 @@ export default function FaceSwapViewer({ sessionId }: FaceSwapViewerProps) {
                         {/* 하단 라벨 */}
                         <div className="absolute bottom-0 left-0 right-0 p-4 text-center">
                             <p className="text-lg font-bold text-white drop-shadow-lg">
-                                {activeConfig?.label}
+                                {activeConfig.label}
                             </p>
                             <p className="text-sm text-white/80 drop-shadow">
-                                {activeConfig?.description}
+                                {activeConfig.description}
                             </p>
                         </div>
                     </>
@@ -131,42 +123,10 @@ export default function FaceSwapViewer({ sessionId }: FaceSwapViewerProps) {
                 )}
             </div>
 
-            {/* 탭 버튼 */}
-            <div className="flex justify-center gap-2 mb-6">
-                {VARIANT_CONFIG.map(config => {
-                    const variantData = variants.find(v => v.key === config.key);
-                    const isAvailable = variantData?.status === "done" && variantData?.url;
-
-                    return (
-                        <button
-                            key={config.key}
-                            onClick={() => isAvailable && setActiveVariant(config.key)}
-                            disabled={!isAvailable}
-                            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${config.key === activeVariant
-                                    ? "bg-skin-primary text-white shadow-lg shadow-skin-primary/30"
-                                    : isAvailable
-                                        ? "bg-white/10 text-skin-subtext hover:bg-white/20 hover:text-white"
-                                        : "bg-white/5 text-skin-muted cursor-not-allowed"
-                                }`}
-                        >
-                            {config.label}
-                        </button>
-                    );
-                })}
-            </div>
-
-            {/* CTA */}
-            <div className="space-y-3">
-                <Link
-                    href="#clinic-search"
-                    className="block w-full py-3 bg-skin-primary text-white text-center font-semibold rounded-xl hover:bg-skin-accent transition-colors shadow-lg shadow-skin-primary/30"
-                >
-                    가까운 피부과 찾기
-                </Link>
-                <p className="text-xs text-skin-muted text-center">
-                    ℹ️ 참고용 안내이며, 진단·처방이 아닙니다.
-                </p>
-            </div>
+            {/* 안내 */}
+            <p className="text-xs text-skin-muted text-center">
+                ⚠️ 참고용 시각화이며, 실제 시술 결과와 다를 수 있습니다.
+            </p>
         </div>
     );
 }

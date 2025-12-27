@@ -39,10 +39,11 @@ export default function FaceSimulationCTA() {
                 </div>
             </button>
 
-            {/* 모달 */}
+            {/* 모달 - 모바일 전체 화면 */}
             <FaceSimulationModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                isMobile={true}
             />
         </>
     );

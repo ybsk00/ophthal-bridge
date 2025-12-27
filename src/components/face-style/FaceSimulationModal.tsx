@@ -1,22 +1,33 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { X, AlertCircle } from "lucide-react";
+import { X, AlertCircle, Sparkles, Zap, Droplet, Sun } from "lucide-react";
 import ConsentGate from "./ConsentGate";
 import PhotoUploader from "./PhotoUploader";
 import ProgressPanel from "./ProgressPanel";
 import FaceSwapViewer from "./FaceSwapViewer";
 import DeleteMyPhotosButton from "./DeleteMyPhotosButton";
 
-type Step = "consent" | "upload" | "generating" | "result";
+type Step = "consent" | "select" | "upload" | "generating" | "result";
+type VariantKey = "laser" | "botox" | "filler" | "booster";
+
+// 4종 시술 메뉴 설정
+const VARIANT_OPTIONS: { key: VariantKey; label: string; description: string; icon: React.ElementType; color: string }[] = [
+    { key: "laser", label: "결·톤 정돈", description: "레이저 느낌", icon: Zap, color: "bg-blue-500" },
+    { key: "botox", label: "표정주름 완화", description: "보톡스 느낌", icon: Sparkles, color: "bg-purple-500" },
+    { key: "filler", label: "볼륨감 변화", description: "필러 느낌", icon: Droplet, color: "bg-pink-500" },
+    { key: "booster", label: "광채/물광", description: "스킨부스터 느낌", icon: Sun, color: "bg-amber-500" },
+];
 
 interface FaceSimulationModalProps {
     isOpen: boolean;
     onClose: () => void;
+    isMobile?: boolean; // 모바일 여부 (기본: false)
 }
 
-export default function FaceSimulationModal({ isOpen, onClose }: FaceSimulationModalProps) {
+export default function FaceSimulationModal({ isOpen, onClose, isMobile = false }: FaceSimulationModalProps) {
     const [step, setStep] = useState<Step>("consent");
+    const [selectedVariant, setSelectedVariant] = useState<VariantKey | null>(null);
     const [sessionId, setSessionId] = useState<string | null>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
@@ -62,8 +73,14 @@ export default function FaceSimulationModal({ isOpen, onClose }: FaceSimulationM
         };
     }, [isOpen]);
 
-    // 동의 완료 핸들러 (ConsentGate의 onConsent prop과 연결)
+    // 동의 완료 핸들러
     const handleConsent = useCallback(() => {
+        setStep("select");
+    }, []);
+
+    // 메뉴 선택 핸들러
+    const handleSelectVariant = useCallback((variant: VariantKey) => {
+        setSelectedVariant(variant);
         setStep("upload");
     }, []);
 
@@ -81,17 +98,25 @@ export default function FaceSimulationModal({ isOpen, onClose }: FaceSimulationM
     // 생성 에러 핸들러
     const handleGenerateError = useCallback((error: string) => {
         console.error("Generate error:", error);
-        // 에러시에도 result로 전환 (부분 성공 표시)
         setStep("result");
+    }, []);
+
+    // 다른 스타일 선택 핸들러
+    const handleSelectOtherStyle = useCallback(() => {
+        setStep("select");
     }, []);
 
     // 삭제 완료 핸들러
     const handleDeleteComplete = useCallback(() => {
         setSessionId(null);
-        setStep("upload");
+        setSelectedVariant(null);
+        setStep("select");
     }, []);
 
     if (!isVisible) return null;
+
+    // 선택된 variant 라벨
+    const selectedVariantLabel = VARIANT_OPTIONS.find(v => v.key === selectedVariant)?.label || "";
 
     return (
         <div className="fixed inset-0 z-50">
@@ -102,10 +127,12 @@ export default function FaceSimulationModal({ isOpen, onClose }: FaceSimulationM
                 onClick={onClose}
             />
 
-            {/* 모달 */}
+            {/* 모달 - 모바일: 전체화면, 데스크톱: 중앙 모달 */}
             <div
-                className={`absolute inset-4 md:inset-8 lg:inset-16 bg-skin-bg rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden transition-all duration-300 ${isAnimating ? "opacity-100 scale-100" : "opacity-0 scale-95"
-                    }`}
+                className={`absolute bg-skin-bg flex flex-col overflow-hidden transition-all duration-300 ${isMobile
+                        ? "inset-0 rounded-none" // 모바일: 전체 화면
+                        : "inset-4 md:inset-8 lg:inset-16 rounded-2xl shadow-2xl border border-white/10" // 데스크톱
+                    } ${isAnimating ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* 헤더 */}
@@ -115,7 +142,11 @@ export default function FaceSimulationModal({ isOpen, onClose }: FaceSimulationM
                             가상 시각화<span className="text-skin-muted font-normal">(참고용)</span>
                         </h2>
                         <p className="text-xs text-skin-subtext">
-                            내 사진을 기반으로 피부 표현을 시각화합니다
+                            {step === "select" ? "어떤 시술이 궁금하세요?" :
+                                step === "upload" ? `${selectedVariantLabel} - 사진을 업로드하세요` :
+                                    step === "generating" ? `${selectedVariantLabel} 변환 중...` :
+                                        step === "result" ? `${selectedVariantLabel} 결과` :
+                                            "내 사진을 기반으로 피부 표현을 시각화합니다"}
                         </p>
                     </div>
                     <button
@@ -132,8 +163,42 @@ export default function FaceSimulationModal({ isOpen, onClose }: FaceSimulationM
                         <ConsentGate onConsent={handleConsent} />
                     )}
 
+                    {step === "select" && (
+                        <div className="max-w-md mx-auto">
+                            <h3 className="text-center text-lg font-semibold text-skin-text mb-6">
+                                어떤 시술이 궁금하세요?
+                            </h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                {VARIANT_OPTIONS.map((option) => {
+                                    const Icon = option.icon;
+                                    return (
+                                        <button
+                                            key={option.key}
+                                            onClick={() => handleSelectVariant(option.key)}
+                                            className="flex flex-col items-center gap-3 p-6 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-skin-primary/50 rounded-2xl transition-all duration-300 group"
+                                        >
+                                            <div className={`w-14 h-14 ${option.color} rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                                                <Icon className="w-7 h-7 text-white" />
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="font-semibold text-skin-text">{option.label}</p>
+                                                <p className="text-xs text-skin-muted">{option.description}</p>
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            <p className="text-xs text-skin-muted text-center mt-6">
+                                ⚠️ 참고용 시각화이며 실제 시술 결과와 다를 수 있습니다
+                            </p>
+                        </div>
+                    )}
+
                     {step === "upload" && (
-                        <PhotoUploader onUploadComplete={handleUploadComplete} />
+                        <PhotoUploader
+                            onUploadComplete={handleUploadComplete}
+                            selectedVariant={selectedVariant || undefined}
+                        />
                     )}
 
                     {step === "generating" && sessionId && (
@@ -141,13 +206,23 @@ export default function FaceSimulationModal({ isOpen, onClose }: FaceSimulationM
                             sessionId={sessionId}
                             onComplete={handleGenerateComplete}
                             onError={handleGenerateError}
+                            selectedVariant={selectedVariant || undefined}
                         />
                     )}
 
                     {step === "result" && sessionId && (
                         <div className="space-y-6">
-                            <FaceSwapViewer sessionId={sessionId} />
-                            <div className="flex justify-center">
+                            <FaceSwapViewer
+                                sessionId={sessionId}
+                                selectedVariant={selectedVariant || undefined}
+                            />
+                            <div className="flex flex-col sm:flex-row justify-center gap-3">
+                                <button
+                                    onClick={handleSelectOtherStyle}
+                                    className="px-6 py-3 bg-white/10 text-skin-text font-medium rounded-xl hover:bg-white/20 transition-colors"
+                                >
+                                    다른 스타일 보기
+                                </button>
                                 <DeleteMyPhotosButton
                                     sessionId={sessionId}
                                     onDeleteComplete={handleDeleteComplete}

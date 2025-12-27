@@ -69,10 +69,11 @@ export default function PatientBottomNav() {
                 </div>
             </nav>
 
-            {/* 가상 시각화 모달 */}
+            {/* 가상 시각화 모달 - 모바일 전체 화면 */}
             <FaceSimulationModal
                 isOpen={isFaceModalOpen}
                 onClose={() => setIsFaceModalOpen(false)}
+                isMobile={true}
             />
         </>
     );

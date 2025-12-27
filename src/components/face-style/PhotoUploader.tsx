@@ -7,12 +7,13 @@ import Image from "next/image";
 interface PhotoUploaderProps {
     onUploadComplete: (sessionId: string) => void;
     isLoading?: boolean;
+    selectedVariant?: string; // 선택된 시술 타입
 }
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-export default function PhotoUploader({ onUploadComplete, isLoading = false }: PhotoUploaderProps) {
+export default function PhotoUploader({ onUploadComplete, isLoading = false, selectedVariant }: PhotoUploaderProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -97,11 +98,11 @@ export default function PhotoUploader({ onUploadComplete, isLoading = false }: P
                 throw new Error("파일 업로드 실패");
             }
 
-            // 3. 업로드 완료 마킹
+            // 3. 업로드 완료 마킹 (variant 전달)
             const markRes = await fetch("/api/face-style/session/mark-uploaded", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sessionId }),
+                body: JSON.stringify({ sessionId, variant: selectedVariant }),
             });
 
             if (!markRes.ok) {
@@ -188,8 +189,8 @@ export default function PhotoUploader({ onUploadComplete, isLoading = false }: P
                     onClick={handleUpload}
                     disabled={isUploading}
                     className={`w-full mt-4 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${isUploading
-                            ? "bg-white/10 text-skin-muted cursor-not-allowed"
-                            : "bg-skin-primary text-white hover:bg-skin-accent shadow-lg shadow-skin-primary/30"
+                        ? "bg-white/10 text-skin-muted cursor-not-allowed"
+                        : "bg-skin-primary text-white hover:bg-skin-accent shadow-lg shadow-skin-primary/30"
                         }`}
                 >
                     {isUploading ? (

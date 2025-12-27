@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, Suspense, useEffect } from "react";
-import { Calendar, Clock, MoreHorizontal, Send, ClipboardList, Pill, Upload, MessageSquare, MapPin, Users, FileText } from "lucide-react";
+import { Calendar, Clock, MoreHorizontal, Send, ClipboardList, Pill, Upload, MessageSquare, MapPin, Users, FileText, Sparkles } from "lucide-react";
 import Image from "next/image";
 import ChatInterface from "@/components/chat/ChatInterface";
 import PatientHeader from "@/components/medical/PatientHeader";
@@ -14,6 +14,7 @@ import ReviewModal from "@/components/medical/ReviewModal";
 import DoctorIntroModal from "@/components/medical/DoctorIntroModal";
 import EvidenceModal from "@/components/medical/EvidenceModal";
 import { createClient } from "@/lib/supabase/client";
+import FaceSimulationModal from "@/components/face-style/FaceSimulationModal";
 import { useSession } from "next-auth/react";
 import { DOCTORS, SCI_EVIDENCE } from "@/lib/ai/prompts";
 
@@ -27,6 +28,7 @@ export default function PatientDashboardClient() {
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [showDoctorIntroModal, setShowDoctorIntroModal] = useState(false);
     const [showEvidenceModal, setShowEvidenceModal] = useState(false);
+    const [showFaceSimulationModal, setShowFaceSimulationModal] = useState(false);
     const [highlightedTabs, setHighlightedTabs] = useState<('review' | 'map')[]>([]);
     const [symptomSummary, setSymptomSummary] = useState<string | undefined>(undefined);  // 증상정리 요약
     const [appointment, setAppointment] = useState({
@@ -254,7 +256,7 @@ export default function PatientDashboardClient() {
                     {/* Quick Actions Card - 6 buttons */}
                     <div className="absolute bottom-4 left-4 right-4">
                         <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-3 shadow-lg">
-                            <div className="grid grid-cols-6 gap-2">
+                            <div className="grid grid-cols-7 gap-2">
                                 <button
                                     onClick={() => setIsReservationModalOpen(true)}
                                     className="flex flex-col items-center gap-1.5 p-2 bg-white/5 hover:bg-white/20 rounded-xl transition-all duration-300 group"
@@ -290,6 +292,15 @@ export default function PatientDashboardClient() {
                                         <Upload className="w-4 h-4 md:w-5 md:h-5 text-white" />
                                     </div>
                                     <span className="text-[10px] md:text-xs font-medium text-white/90 whitespace-nowrap">검사결과지</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowFaceSimulationModal(true)}
+                                    className="flex flex-col items-center gap-1.5 p-2 bg-white/5 hover:bg-white/20 rounded-xl transition-all duration-300 group"
+                                >
+                                    <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-pink-500/80 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+                                        <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                                    </div>
+                                    <span className="text-[10px] md:text-xs font-medium text-white/90 whitespace-nowrap">시각화</span>
                                 </button>
                                 <button
                                     onClick={() => setShowReviewModal(true)}
@@ -384,6 +395,12 @@ export default function PatientDashboardClient() {
                 isOpen={showEvidenceModal}
                 onClose={() => setShowEvidenceModal(false)}
                 evidence={SCI_EVIDENCE}
+            />
+
+            {/* Face Simulation Modal */}
+            <FaceSimulationModal
+                isOpen={showFaceSimulationModal}
+                onClose={() => setShowFaceSimulationModal(false)}
             />
         </div>
     );
