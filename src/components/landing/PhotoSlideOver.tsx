@@ -92,7 +92,7 @@ export default function PhotoSlideOver({ isOpen, onClose }: PhotoSlideOverProps)
                     {/* 내 사진 업로드 버튼 */}
                     <div className="mt-6 pt-4 border-t border-white/10">
                         <a
-                            href="/patient/login"
+                            href="/login"
                             className="flex items-center justify-center gap-2 w-full py-3 bg-skin-primary text-white font-semibold rounded-xl hover:bg-skin-accent transition-colors shadow-lg shadow-skin-primary/30"
                         >
                             <Camera className="w-5 h-5" />
