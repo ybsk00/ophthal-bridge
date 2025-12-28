@@ -83,23 +83,23 @@ export default function LandingPage() {
 
               {/* CTA 3종 */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                {/* Primary CTA */}
-                <Link
-                  href="/healthcare/chat?topic=glow-booster"
-                  className="px-8 py-4 bg-skin-primary text-white text-base font-bold rounded-2xl shadow-lg shadow-skin-primary/40 hover:bg-skin-accent hover:shadow-xl hover:shadow-skin-primary/50 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
-                >
-                  <Sparkles className="w-5 h-5" />
-                  30초 체크 시작
-                </Link>
-
-                {/* Secondary CTA */}
+                {/* Primary CTA - 사진으로 스타일 보기 */}
                 <button
                   onClick={() => setIsPhotoSlideOverOpen(true)}
-                  className="px-6 py-3 border-2 border-skin-primary/50 text-skin-primary bg-skin-bg/50 backdrop-blur-sm text-sm font-semibold rounded-xl hover:bg-skin-primary/10 hover:border-skin-primary transition-all duration-300 flex items-center gap-2"
+                  className="px-8 py-4 bg-skin-primary text-white text-base font-bold rounded-2xl shadow-lg shadow-skin-primary/40 hover:bg-skin-accent hover:shadow-xl hover:shadow-skin-primary/50 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
                 >
-                  <Camera className="w-4 h-4" />
+                  <Camera className="w-5 h-5" />
                   사진으로 스타일 보기
                 </button>
+
+                {/* Secondary CTA - 30초 체크 */}
+                <Link
+                  href="/healthcare/chat?topic=glow-booster"
+                  className="px-6 py-3 border-2 border-skin-primary/50 text-skin-primary bg-skin-bg/50 backdrop-blur-sm text-sm font-semibold rounded-xl hover:bg-skin-primary/10 hover:border-skin-primary transition-all duration-300 flex items-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  30초 체크 시작
+                </Link>
               </div>
 
               {/* Tertiary Link */}
