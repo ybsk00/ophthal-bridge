@@ -180,6 +180,7 @@ export default function FaceSimulationModal({ isOpen, onClose, isMobile = false 
                     ? "inset-0 rounded-none bg-[#0f172a]"
                     : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md max-h-[90vh] rounded-2xl shadow-2xl border border-gray-700 bg-[#1e293b]"
                     } ${isAnimating ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
+                style={isMobile ? { maxWidth: '480px', margin: '0 auto', left: 0, right: 0 } : undefined}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* 헤더 */}
@@ -217,21 +218,21 @@ export default function FaceSimulationModal({ isOpen, onClose, isMobile = false 
                                 <h3 className="text-center text-base font-semibold text-white mb-4">
                                     어떤 시술이 궁금하세요?
                                 </h3>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 gap-4">
                                     {VARIANT_OPTIONS.map((option) => {
                                         const Icon = option.icon;
                                         return (
                                             <button
                                                 key={option.key}
                                                 onClick={() => handleSelectVariant(option.key)}
-                                                className="flex flex-col items-center gap-2 p-4 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-pink-500/50 rounded-xl transition-all group"
+                                                className="flex flex-col items-center gap-3 p-5 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 hover:border-pink-500/50 rounded-2xl transition-all group"
                                             >
-                                                <div className={`w-12 h-12 ${option.color} rounded-full flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform`}>
-                                                    <Icon className="w-6 h-6 text-white" />
+                                                <div className={`w-14 h-14 ${option.color} rounded-full flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform`}>
+                                                    <Icon className="w-7 h-7 text-white" />
                                                 </div>
                                                 <div className="text-center">
-                                                    <p className="text-sm font-medium text-white">{option.label}</p>
-                                                    <p className="text-xs text-gray-500">{option.description}</p>
+                                                    <p className="text-base font-medium text-white">{option.label}</p>
+                                                    <p className="text-xs text-gray-500 mt-0.5">{option.description}</p>
                                                 </div>
                                             </button>
                                         );
