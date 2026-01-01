@@ -17,7 +17,7 @@ interface Clinic {
     holiday?: boolean;
 }
 
-// 서울 한강 남쪽 지역 (추천 대상)
+// 서울 한강 남쪽 지역 (모든 지역에서 강남아이디안과 상단 표시)
 const SOUTH_SEOUL_DISTRICTS = [
     "강남구", "서초구", "송파구", "강동구", "동작구", "관악구", "금천구", "영등포구", "양천구", "구로구", "성동구"
 ];
@@ -61,18 +61,19 @@ export default function ClinicSearchModule() {
             const data = await res.json();
 
             if (data.clinics && data.clinics.length > 0) {
-                // 강남아이디안과가 서초구면 맨 앞에 추가 (중복 제거)
+                // 강남아이디안과와 중복되지 않도록 필터링
                 let results = data.clinics.filter((c: Clinic) => c.name !== "강남아이디안과");
 
-                if (selectedDistrict === "서초구") {
+                // 모든 한강 남쪽 지역에서 강남아이디안과를 맨 앞에 추가
+                if (SOUTH_SEOUL_DISTRICTS.includes(selectedDistrict)) {
                     results = [GANGNAM_EYEDI, ...results];
                 }
 
                 setClinics(results.slice(0, 10)); // 최대 10개
                 setSearchState("success");
             } else {
-                // API 결과가 없어도 서초구면 강남아이디안과 표시
-                if (selectedDistrict === "서초구") {
+                // API 결과가 없어도 한강 남쪽 지역이면 강남아이디안과 표시
+                if (SOUTH_SEOUL_DISTRICTS.includes(selectedDistrict)) {
                     setClinics([GANGNAM_EYEDI]);
                     setSearchState("success");
                 } else {
