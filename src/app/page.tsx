@@ -89,7 +89,7 @@ export default function LandingPage() {
                   className="px-8 py-4 bg-skin-primary text-white text-base font-bold rounded-2xl shadow-lg shadow-skin-primary/40 hover:bg-skin-accent hover:shadow-xl hover:shadow-skin-primary/50 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
                 >
                   <Camera className="w-5 h-5" />
-                  사진으로 확인하기
+                  시야 체감 보기
                 </button>
 
                 {/* Secondary CTA - 30초 체크 */}

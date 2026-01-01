@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Camera } from "lucide-react";
-import HeroExperience from "./HeroExperience";
+import { X, Eye } from "lucide-react";
+import VisionSimulator from "@/components/eye-care/VisionSimulator";
+import Link from "next/link";
 
 interface PhotoSlideOverProps {
     isOpen: boolean;
@@ -74,12 +75,13 @@ export default function PhotoSlideOver({ isOpen, onClose }: PhotoSlideOverProps)
                 {/* 헤더 */}
                 <div className="flex items-center justify-between p-4 border-b border-white/10">
                     <div className="flex items-center gap-2">
-                        <Camera className="w-5 h-5 text-skin-primary" />
-                        <span className="font-semibold text-skin-text">사진으로 스타일 보기</span>
+                        <Eye className="w-5 h-5 text-skin-primary" />
+                        <span className="font-semibold text-skin-text">시야 체감 시뮬레이터(참고용)</span>
                     </div>
                     <button
                         onClick={onClose}
                         className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+                        aria-label="닫기"
                     >
                         <X className="w-5 h-5 text-skin-subtext" />
                     </button>
@@ -87,19 +89,18 @@ export default function PhotoSlideOver({ isOpen, onClose }: PhotoSlideOverProps)
 
                 {/* 콘텐츠 */}
                 <div className="h-[calc(100%-65px)] overflow-y-auto p-4 overscroll-y-contain">
-                    <HeroExperience />
+                    <VisionSimulator />
 
-                    {/* 내 사진 업로드 버튼 */}
+                    {/* CTA: 저장하기 */}
                     <div className="mt-6 pt-4 border-t border-white/10">
-                        <a
+                        <Link
                             href="/login"
                             className="flex items-center justify-center gap-2 w-full py-3 bg-skin-primary text-white font-semibold rounded-xl hover:bg-skin-accent transition-colors shadow-lg shadow-skin-primary/30"
                         >
-                            <Camera className="w-5 h-5" />
-                            내 사진으로 업로드하기
-                        </a>
+                            이 설정을 저장하기 (로그인)
+                        </Link>
                         <p className="text-xs text-skin-muted text-center mt-2">
-                            로그인 후 내 사진을 직접 업로드하여 결과를 확인할 수 있습니다
+                            로그인 후 기록을 저장하고 비교할 수 있습니다
                         </p>
                     </div>
                 </div>
