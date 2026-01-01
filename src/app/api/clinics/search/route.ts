@@ -37,7 +37,7 @@ export async function GET(req: Request) {
     const q0 = searchParams.get("q0") ?? "서울";
     const q1 = searchParams.get("q1") ?? "강남구";
     const qt = searchParams.get("qt"); // 1~7 (월~일), 8 (공휴일) - 옵션
-    const qn = searchParams.get("qn") ?? "피부과"; // 기관명 키워드
+    const qn = searchParams.get("qn") ?? "안과"; // 기관명 키워드
     const debug = searchParams.get("debug") === "true";
 
     const serviceKey = process.env.DATA_GO_KR_SERVICE_KEY;
@@ -142,15 +142,15 @@ export async function GET(req: Request) {
         // 단일 항목일 경우 배열로 변환
         const itemArray = Array.isArray(items) ? items : [items];
 
-        // 피부과 검색 키워드
-        const SKIN_KEYWORDS = ["피부과", "피부의원", "피부클리닉", "더마", "derma"];
+        // 안과 검색 키워드
+        const EYE_KEYWORDS = ["안과", "안과의원", "안과클리닉", "eye", "안의원"];
 
         // 정규화된 클리닉 데이터 생성
         const clinics: Clinic[] = itemArray
             .filter((item: Record<string, unknown>) => {
-                // 피부과 관련 키워드 필터링
+                // 안과 관련 키워드 필터링
                 const name = String(item.dutyName || "").toLowerCase();
-                return SKIN_KEYWORDS.some(kw => name.includes(kw.toLowerCase()));
+                return EYE_KEYWORDS.some(kw => name.includes(kw.toLowerCase()));
             })
             .map((item: Record<string, unknown>) => {
                 // 현재 요일에 맞는 종료 시간 추출

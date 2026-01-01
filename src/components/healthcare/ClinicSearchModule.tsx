@@ -1,40 +1,94 @@
 ﻿"use client";
 
-import { useState } from "react";
-import { MapPin, Phone, Clock, ChevronDown, ArrowRight, Eye } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Search, Loader2, MapPin, Phone, Clock, ChevronDown, ArrowRight, Eye, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
-// 서울 한강 남쪽 지역 (강남아이디안과 추천 대상)
+// 클리닉 타입
+interface Clinic {
+    name: string;
+    addr: string;
+    tel: string;
+    lat?: number;
+    lng?: number;
+    closeTime?: string;
+    openToday?: boolean;
+    night?: boolean;
+    holiday?: boolean;
+}
+
+// 서울 한강 남쪽 지역 (추천 대상)
 const SOUTH_SEOUL_DISTRICTS = [
     "강남구", "서초구", "송파구", "강동구", "동작구", "관악구", "금천구", "영등포구", "양천구", "구로구", "성동구"
 ];
 
 // 강남아이디안과 정보
-const GANGNAM_EYEDI = {
+const GANGNAM_EYEDI: Clinic = {
     name: "강남아이디안과",
     addr: "서울특별시 서초구 서초대로77길 3",
     tel: "02-XXX-XXXX",
-    district: "서초구",
-    hours: {
-        weekday: "09:00 - 18:00",
-        saturday: "09:00 - 13:00",
-        sunday: "휴진"
-    },
-    features: ["시력교정", "드라이아이", "녹내장", "백내장", "눈건강검진"]
+    openToday: true,
 };
+
+// 검색 상태
+type SearchState = "idle" | "loading" | "success" | "error" | "empty";
 
 export default function ClinicSearchModule() {
     const [selectedDistrict, setSelectedDistrict] = useState("서초구");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [showResult, setShowResult] = useState(false);
+    const [searchState, setSearchState] = useState<SearchState>("idle");
+    const [clinics, setClinics] = useState<Clinic[]>([]);
+    const [errorMessage, setErrorMessage] = useState("");
 
     // 검색 실행
-    const handleSearch = () => {
-        setShowResult(true);
-    };
+    const handleSearch = useCallback(async () => {
+        setSearchState("loading");
+        setErrorMessage("");
 
-    // 추천 대상 지역인지 확인
-    const isRecommendedDistrict = SOUTH_SEOUL_DISTRICTS.includes(selectedDistrict);
+        try {
+            const params = new URLSearchParams({
+                q0: "서울",
+                q1: selectedDistrict,
+                qn: "안과",
+            });
+
+            const res = await fetch(`/api/clinics/search?${params.toString()}`);
+
+            if (!res.ok) {
+                throw new Error("API 호출 실패");
+            }
+
+            const data = await res.json();
+
+            if (data.clinics && data.clinics.length > 0) {
+                // 강남아이디안과가 서초구면 맨 앞에 추가 (중복 제거)
+                let results = data.clinics.filter((c: Clinic) => c.name !== "강남아이디안과");
+
+                if (selectedDistrict === "서초구") {
+                    results = [GANGNAM_EYEDI, ...results];
+                }
+
+                setClinics(results.slice(0, 10)); // 최대 10개
+                setSearchState("success");
+            } else {
+                // API 결과가 없어도 서초구면 강남아이디안과 표시
+                if (selectedDistrict === "서초구") {
+                    setClinics([GANGNAM_EYEDI]);
+                    setSearchState("success");
+                } else {
+                    setClinics([]);
+                    setSearchState("empty");
+                }
+            }
+        } catch (error) {
+            console.error("검색 오류:", error);
+            setErrorMessage("검색 중 오류가 발생했습니다.");
+            setSearchState("error");
+        }
+    }, [selectedDistrict]);
+
+    // 강남아이디안과인지 확인
+    const isGangnamEyedi = (name: string) => name === "강남아이디안과";
 
     return (
         <div className="space-y-6">
@@ -58,7 +112,7 @@ export default function ClinicSearchModule() {
                                     onClick={() => {
                                         setSelectedDistrict(district);
                                         setIsDropdownOpen(false);
-                                        setShowResult(false);
+                                        setSearchState("idle");
                                     }}
                                     className={`w-full text-left px-4 py-3 hover:bg-white/10 transition-colors ${selectedDistrict === district ? 'bg-skin-primary/20 text-skin-primary' : 'text-skin-text'
                                         }`}
@@ -74,69 +128,115 @@ export default function ClinicSearchModule() {
             {/* 검색 버튼 */}
             <button
                 onClick={handleSearch}
-                className="w-full py-3 bg-skin-primary text-white font-semibold rounded-xl hover:bg-skin-accent transition-colors shadow-lg shadow-skin-primary/30"
+                disabled={searchState === "loading"}
+                className="w-full py-3 bg-skin-primary text-white font-semibold rounded-xl hover:bg-skin-accent transition-colors shadow-lg shadow-skin-primary/30 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-                가까운 안과 찾기
+                {searchState === "loading" ? (
+                    <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        검색 중...
+                    </>
+                ) : (
+                    <>
+                        <Search className="w-5 h-5" />
+                        가까운 안과 찾기
+                    </>
+                )}
             </button>
 
             {/* 검색 결과 */}
-            {showResult && isRecommendedDistrict && (
+            {searchState === "success" && clinics.length > 0 && (
                 <div className="space-y-4 animate-in fade-in duration-300">
-                    <div className="flex items-center gap-2 text-skin-primary">
-                        <Eye className="w-5 h-5" />
-                        <span className="font-medium">추천 안과</span>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-skin-primary">
+                            <Eye className="w-5 h-5" />
+                            <span className="font-medium">{selectedDistrict} 안과 목록</span>
+                        </div>
+                        <span className="text-xs text-skin-subtext">{clinics.length}개 결과</span>
                     </div>
 
-                    {/* 강남아이디안과 카드 */}
-                    <div className="bg-gradient-to-br from-skin-primary/10 to-skin-accent/10 rounded-2xl p-5 border border-skin-primary/30">
-                        <div className="flex items-start justify-between mb-4">
-                            <div>
-                                <h3 className="text-lg font-bold text-skin-text">{GANGNAM_EYEDI.name}</h3>
-                                <span className="inline-block mt-1 px-2 py-0.5 bg-skin-primary/20 text-skin-primary text-xs rounded-full">
-                                    {selectedDistrict} 추천
-                                </span>
-                            </div>
-                            <div className="w-12 h-12 bg-skin-primary rounded-full flex items-center justify-center">
-                                <span className="text-2xl">👁️</span>
-                            </div>
-                        </div>
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                        {clinics.map((clinic, idx) => (
+                            <div
+                                key={`${clinic.name}-${idx}`}
+                                className={`rounded-xl p-4 border transition-all ${isGangnamEyedi(clinic.name)
+                                        ? 'bg-gradient-to-br from-skin-primary/10 to-skin-accent/10 border-skin-primary/30'
+                                        : 'bg-white/5 border-white/10 hover:bg-white/10'
+                                    }`}
+                            >
+                                <div className="flex items-start justify-between mb-2">
+                                    <div>
+                                        <h3 className="font-bold text-skin-text">{clinic.name}</h3>
+                                        {isGangnamEyedi(clinic.name) && (
+                                            <span className="inline-block mt-1 px-2 py-0.5 bg-skin-primary/20 text-skin-primary text-xs rounded-full">
+                                                적합 안과
+                                            </span>
+                                        )}
+                                    </div>
+                                    {isGangnamEyedi(clinic.name) && (
+                                        <div className="w-10 h-10 bg-skin-primary rounded-full flex items-center justify-center flex-shrink-0">
+                                            <span className="text-xl">👁️</span>
+                                        </div>
+                                    )}
+                                </div>
 
-                        <div className="space-y-2 text-sm text-skin-subtext">
-                            <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 flex-shrink-0" />
-                                <span>{GANGNAM_EYEDI.addr}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 flex-shrink-0" />
-                                <span>{GANGNAM_EYEDI.tel}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Clock className="w-4 h-4 flex-shrink-0" />
-                                <span>평일 {GANGNAM_EYEDI.hours.weekday} | 토 {GANGNAM_EYEDI.hours.saturday}</span>
-                            </div>
-                        </div>
+                                <div className="space-y-1 text-sm text-skin-subtext">
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="w-4 h-4 flex-shrink-0" />
+                                        <span className="truncate">{clinic.addr}</span>
+                                    </div>
+                                    {clinic.tel && (
+                                        <div className="flex items-center gap-2">
+                                            <Phone className="w-4 h-4 flex-shrink-0" />
+                                            <a href={`tel:${clinic.tel}`} className="hover:text-skin-primary">
+                                                {clinic.tel}
+                                            </a>
+                                        </div>
+                                    )}
+                                    {clinic.closeTime && (
+                                        <div className="flex items-center gap-2">
+                                            <Clock className="w-4 h-4 flex-shrink-0" />
+                                            <span>
+                                                종료 {clinic.closeTime.substring(0, 2)}:{clinic.closeTime.substring(2, 4)}
+                                                {clinic.night && <span className="ml-2 text-xs text-skin-primary">야간진료</span>}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
 
-                        {/* 특징 태그 */}
-                        <div className="flex flex-wrap gap-2 mt-4">
-                            {GANGNAM_EYEDI.features.map((feature) => (
-                                <span
-                                    key={feature}
-                                    className="px-2 py-1 bg-white/10 rounded-lg text-xs text-skin-subtext"
-                                >
-                                    {feature}
-                                </span>
-                            ))}
-                        </div>
-
-                        {/* 예약 버튼 */}
-                        <Link
-                            href="/login"
-                            className="flex items-center justify-center gap-2 w-full mt-4 py-3 bg-skin-primary text-white font-semibold rounded-xl hover:bg-skin-accent transition-colors"
-                        >
-                            상담 예약하기
-                            <ArrowRight className="w-4 h-4" />
-                        </Link>
+                                {isGangnamEyedi(clinic.name) && (
+                                    <Link
+                                        href="/login"
+                                        className="flex items-center justify-center gap-2 w-full mt-3 py-2 bg-skin-primary text-white font-medium rounded-lg hover:bg-skin-accent transition-colors text-sm"
+                                    >
+                                        상담 예약하기
+                                        <ArrowRight className="w-4 h-4" />
+                                    </Link>
+                                )}
+                            </div>
+                        ))}
                     </div>
+                </div>
+            )}
+
+            {/* 결과 없음 */}
+            {searchState === "empty" && (
+                <div className="text-center py-8 text-skin-subtext">
+                    <p>해당 지역에 등록된 안과가 없습니다.</p>
+                </div>
+            )}
+
+            {/* 에러 */}
+            {searchState === "error" && (
+                <div className="text-center py-8 text-orange-400">
+                    <p>{errorMessage}</p>
+                    <button
+                        onClick={handleSearch}
+                        className="mt-3 flex items-center gap-2 mx-auto text-sm text-skin-subtext hover:text-skin-primary"
+                    >
+                        <RefreshCw className="w-4 h-4" />
+                        다시 시도
+                    </button>
                 </div>
             )}
 
