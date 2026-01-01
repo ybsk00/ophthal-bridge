@@ -54,10 +54,10 @@ export default function LandingPage() {
               preload="metadata"
               className="absolute inset-0 w-full h-full object-cover"
             >
-              <source src="/2.mp4" type="video/mp4" />
+              <source src="/3.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-r from-skin-bg/70 via-skin-bg/50 to-skin-bg/20" />
-            <div className="absolute inset-0 bg-gradient-to-b from-skin-bg/10 via-transparent to-skin-bg/50" />
+            <div className="absolute inset-0 bg-gradient-to-r from-skin-bg/40 via-skin-bg/30 to-skin-bg/10" />
+            <div className="absolute inset-0 bg-gradient-to-b from-skin-bg/10 via-transparent to-skin-bg/30" />
           </div>
 
           {/* Hero Content - 1컬럼 중앙 정렬 */}
@@ -222,10 +222,10 @@ export default function LandingPage() {
               playsInline
               className="w-full h-full object-cover object-[75%_35%] md:object-center scale-[0.8] md:scale-100 origin-center"
             >
-              <source src="/1.mp4" type="video/mp4" />
+              <source src="/grok-video-d2ce9230-c0a9-4bed-9097-3443b0c49cfd.mp4" type="video/mp4" />
             </video>
             {/* Slight overlay to reduce brightness */}
-            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 bg-black/25" />
           </div>
 
           <div className="relative z-10 max-w-7xl mx-auto px-6">
