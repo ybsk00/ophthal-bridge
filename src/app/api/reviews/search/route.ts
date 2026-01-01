@@ -6,7 +6,7 @@
 
 const NAVER_CLIENT_ID = process.env.NAVER_SEARCH_CLIENT_ID;
 const NAVER_CLIENT_SECRET = process.env.NAVER_SEARCH_CLIENT_SECRET;
-const HOSPITAL_NAME = process.env.HOSPITAL_REVIEW_QUERY_BASE || '세인트의원';
+const HOSPITAL_NAME = process.env.HOSPITAL_REVIEW_QUERY_BASE || '강남아이디안과';
 
 // 제외 키워드 (잡상인 필터링)
 const EXCLUDE_KEYWORDS = [
@@ -97,12 +97,10 @@ export async function GET(req: NextRequest) {
         const filteredItems = cleanedItems.filter(item => {
             const text = `${item.title} ${item.description}`.toLowerCase();
 
-            // 1. 병원명 포함 여부 (필수)
-            // "의정부"가 반드시 포함되어야 하며, "세인트의원" 또는 "세인트 의원"이 포함되어야 함
-            const hasLocation = text.includes('의정부');
-            const hasName = text.includes('세인트의원') || text.includes('세인트 의원');
+            // "강남아이디안과" 포함 여부 확인
+            const hasName = text.includes('강남아이디안과') || text.includes('아이디안과');
 
-            if (!hasLocation || !hasName) {
+            if (!hasName) {
                 return false;
             }
 
@@ -182,7 +180,7 @@ function formatDate(dateStr?: string): string {
 function getDummyItems(source: string) {
     const items = [
         {
-            title: '강남 세인트의원 방문 후기 - 친절한 진료',
+            title: '강남아이디안과 라섹 후기 - 친절한 진료',
             link: 'https://blog.naver.com/example1',
             description: '지인 추천으로 방문했는데 정말 만족스러웠습니다...',
             author: '건강맘',
@@ -190,23 +188,23 @@ function getDummyItems(source: string) {
             origin: 'naver'
         },
         {
-            title: '삼성역 피부과 추천 - 세인트의원',
+            title: '서초역 안과 추천 - 아이디안과',
             link: 'https://blog.naver.com/example2',
-            description: '소화가 안되서 방문했는데 꼼꼼하게 봐주셨어요...',
+            description: '드라이아이 진료받으러 방문했는데 꼼꼼하게 봐주셨어요...',
             author: '강남직장인',
             postdate: '2024.12.10',
             origin: 'naver'
         },
         {
-            title: '세인트의원 진료 경험 공유',
+            title: '강남아이디안과 노안 상담 후기',
             link: 'https://blog.naver.com/example3',
-            description: '다이어트 한약 처방받고 효과 좋았습니다...',
-            author: '다이어터',
+            description: '노안 교정술 상담받고 후기 남깁니다...',
+            author: '노안고민',
             postdate: '2024.12.05',
             origin: 'naver'
         },
         {
-            title: '강남구 피부과 비교 후기',
+            title: '강남구 안과 비교 후기',
             link: 'https://blog.naver.com/example4',
             description: '여러 곳 다녀보고 여기로 정착했어요...',
             author: '비교왕',
@@ -214,10 +212,10 @@ function getDummyItems(source: string) {
             origin: 'naver'
         },
         {
-            title: '세인트의원 첫 방문기',
+            title: '아이디안과 첫 방문기',
             link: 'https://blog.naver.com/example5',
-            description: '처음 피부과 가봤는데 생각보다 좋았어요...',
-            author: '피부과초보',
+            description: '처음 안과 가봤는데 생각보다 좋았어요...',
+            author: '안과초보',
             postdate: '2024.11.20',
             origin: 'naver'
         },
