@@ -15,51 +15,41 @@ export default function Footer() {
 
     return (
         <>
-            <footer className="py-16 bg-skin-bg border-t border-white/10 relative z-10">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-12">
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3">
-                            <span className="text-2xl">👁️</span>
-                            <span className="text-xl font-bold text-skin-text font-serif">강남아이디안과</span>
+            <footer className="py-6 bg-skin-bg border-t border-white/10 relative z-10">
+                <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-start gap-4">
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-base">👁️</span>
+                            <span className="text-sm font-bold text-skin-text">강남아이디안과</span>
                         </div>
-                        <div className="text-sm text-skin-subtext space-y-2 font-light">
-                            <p>강남아이디안과 ㅣ 서울특별시 서초구 서초대로77길 3</p>
-                            <p>Tel: 02-XXX-XXXX</p>
-                            <p className="mt-2 text-xs text-skin-subtext/60">사업자등록번호: XXX-XX-XXXXX</p>
+                        <div className="text-xs text-skin-subtext/70 space-y-0.5">
+                            <p>서울특별시 서초구 서초대로77길 3 ㅣ Tel: 02-XXX-XXXX</p>
+                            <p>사업자등록번호: XXX-XX-XXXXX</p>
                         </div>
                     </div>
 
-                    <div className="flex gap-16 text-sm text-skin-subtext">
-                        <div className="space-y-4">
-                            <h4 className="font-bold text-skin-text text-base">지원</h4>
-                            <ul className="space-y-3">
-                                <li>
-                                    <button
-                                        onClick={() => openModal('terms')}
-                                        className="hover:text-skin-primary transition-colors"
-                                    >
-                                        이용약관
-                                    </button>
-                                </li>
-                                <li>
-                                    <button
-                                        onClick={() => openModal('privacy')}
-                                        className="hover:text-skin-primary transition-colors"
-                                    >
-                                        개인정보처리방침
-                                    </button>
-                                </li>
-                                <li>
-                                    <Link href="/eye-care?topic=condition" className="hover:text-skin-primary transition-colors">
-                                        문의하기
-                                    </Link>
-                                </li>
-                            </ul>
-                        </div>
+                    <div className="text-xs text-skin-subtext/70 flex gap-3">
+                        <button
+                            onClick={() => openModal('terms')}
+                            className="hover:text-skin-primary transition-colors"
+                        >
+                            이용약관
+                        </button>
+                        <span>|</span>
+                        <button
+                            onClick={() => openModal('privacy')}
+                            className="hover:text-skin-primary transition-colors"
+                        >
+                            개인정보처리방침
+                        </button>
+                        <span>|</span>
+                        <Link href="/eye-care?topic=condition" className="hover:text-skin-primary transition-colors">
+                            문의하기
+                        </Link>
                     </div>
                 </div>
-                <div className="max-w-7xl mx-auto px-6 mt-12 pt-8 border-t border-white/10 text-center text-xs text-skin-subtext/60 font-light">
-                    <p>© 2025 강남아이디안과. All rights reserved. 본 사이트의 콘텐츠는 저작권법의 보호를 받습니다.</p>
+                <div className="max-w-7xl mx-auto px-4 mt-3 pt-3 border-t border-white/5 text-center text-[10px] text-skin-subtext/50">
+                    <p>© 2025 강남아이디안과. All rights reserved.</p>
                 </div>
             </footer>
 
