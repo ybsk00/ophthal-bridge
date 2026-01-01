@@ -280,7 +280,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                 <header className="bg-skin-bg/80 backdrop-blur-md border-b border-white/10 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-all duration-300">
                     <Link href="/" className="flex items-center gap-3 group cursor-pointer">
                         <span className="text-2xl">👁️</span>
-                        <span className="text-xl font-bold text-white tracking-wide">아이디안과</span>
+                        <span className="text-xl font-bold text-white tracking-wide">Eye Insight</span>
                     </Link>
                     <div className="hidden md:flex items-center gap-6 text-sm font-medium text-skin-subtext">
                         <Link href="/login" className="px-6 py-2 bg-skin-primary text-white text-sm font-medium rounded-full hover:bg-skin-accent hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
