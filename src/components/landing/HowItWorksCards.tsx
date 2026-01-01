@@ -7,22 +7,22 @@ const STEPS = [
     {
         icon: Timer,
         title: "30초 체크",
-        description: "현재 루틴/고민을 빠르게 정리",
+        description: "눈 건강 습관을 빠르게 정리",
         label: "비로그인 가능",
         labelColor: "bg-skin-primary",
-        href: "/healthcare/chat?topic=glow-booster",
+        href: "/eye-care?topic=condition",
     },
     {
         icon: Camera,
-        title: "사진으로 스타일 보기",
+        title: "사진으로 확인하기",
         description: "로그인/동의 후 내 사진으로 예시 확인",
         label: "로그인 필요",
         labelColor: "bg-skin-secondary",
-        href: "/login?redirect=/healthcare/face-style",
+        href: "/login?redirect=/eye-care/face-style",
     },
     {
         icon: MapPin,
-        title: "가까운 피부과 찾기",
+        title: "가까운 안과 찾기",
         description: "지역·시간 기준으로 바로 탐색",
         label: "바로 검색",
         labelColor: "bg-skin-muted",
@@ -47,7 +47,7 @@ export default function HowItWorksCards({ className = "" }: HowItWorksCardsProps
                         간단한 3단계
                     </h2>
                     <p className="text-skin-subtext mt-3 max-w-lg mx-auto text-sm">
-                        루틴 체크부터 피부과 찾기까지, 빠르게 시작하세요.
+                        눈 건강 체크부터 안과 찾기까지, 빠르게 시작하세요.
                     </p>
                 </div>
 

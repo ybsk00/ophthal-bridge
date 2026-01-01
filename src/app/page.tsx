@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Sparkles, Droplet, Shield, ArrowUpRight, Heart, CheckCircle, BarChart2, Calendar, ChevronRight, Camera } from "lucide-react";
+import { Eye, Droplet, Grid3X3, Monitor, Heart, CheckCircle, BarChart2, Calendar, ChevronRight, Camera } from "lucide-react";
 import { TrackF1View } from "@/components/marketing/MarketingTracker";
 import Footer from "@/components/common/Footer";
 import ClinicSearchModule from "@/components/healthcare/ClinicSearchModule";
@@ -10,13 +10,13 @@ import PhotoSlideOver from "@/components/landing/PhotoSlideOver";
 import HowItWorksCards from "@/components/landing/HowItWorksCards";
 import { VALID_TOPICS, TOPIC_LABELS, TOPIC_DESCRIPTIONS, Topic } from "@/lib/constants/topics";
 
-// 모듈 아이콘/컬러 매핑
-const MODULE_CONFIG: Record<Topic, { icon: typeof Sparkles; color: string; gradient: string }> = {
-  'glow-booster': { icon: Sparkles, color: 'pink', gradient: 'from-pink-500/20 to-pink-600/20' },
-  'makeup-killer': { icon: Droplet, color: 'rose', gradient: 'from-rose-500/20 to-rose-600/20' },
-  'barrier-reset': { icon: Shield, color: 'teal', gradient: 'from-teal-500/20 to-teal-600/20' },
-  'lifting-check': { icon: ArrowUpRight, color: 'purple', gradient: 'from-purple-500/20 to-purple-600/20' },
-  'skin-concierge': { icon: Heart, color: 'fuchsia', gradient: 'from-fuchsia-500/20 to-fuchsia-600/20' },
+// 모듈 아이콘/컬러 매핑 (안과 5종)
+const MODULE_CONFIG: Record<Topic, { icon: typeof Eye; color: string; gradient: string }> = {
+  'condition': { icon: Eye, color: 'blue', gradient: 'from-blue-500/20 to-blue-600/20' },
+  'dryness': { icon: Droplet, color: 'cyan', gradient: 'from-cyan-500/20 to-cyan-600/20' },
+  'pattern': { icon: Grid3X3, color: 'purple', gradient: 'from-purple-500/20 to-purple-600/20' },
+  'strain': { icon: Monitor, color: 'orange', gradient: 'from-orange-500/20 to-orange-600/20' },
+  'lifestyle': { icon: Heart, color: 'green', gradient: 'from-green-500/20 to-green-600/20' },
 };
 
 export default function LandingPage() {
@@ -30,8 +30,8 @@ export default function LandingPage() {
         <nav className="fixed top-0 left-0 right-0 z-50 bg-skin-bg/80 backdrop-blur-md border-b border-white/10">
           <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
             <Link href="/" className="flex items-center gap-3 group cursor-pointer">
-              <span className="text-2xl">✨</span>
-              <span className="text-xl font-bold text-skin-text tracking-wide">세인트 아틀리에</span>
+              <span className="text-2xl">👁️</span>
+              <span className="text-xl font-bold text-skin-text tracking-wide">아이디안과</span>
             </Link>
             <Link
               href="/login"
@@ -65,20 +65,20 @@ export default function LandingPage() {
             <div className="space-y-6 animate-fade-in">
               {/* Eyebrow */}
               <p className="text-skin-secondary font-semibold tracking-[0.15em] uppercase text-xs">
-                ROUTINE · BASE · GLOW · RESET
+                CONDITION · DRYNESS · PATTERN · STRAIN · LIFESTYLE
               </p>
 
               {/* H1 */}
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] font-serif">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-skin-primary via-pink-400 to-skin-accent">
-                  베이스가 달라지는
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600">
+                  눈 건강이 달라지는
                 </span><br />
-                광채 루틴 리셋
+                아이디 눈 건강 체크
               </h1>
 
               {/* Body */}
               <p className="text-base md:text-lg text-skin-subtext leading-relaxed max-w-lg mx-auto">
-                지금 내 상태를 빠르게 체크하고, 오늘부터 적용할 루틴 포인트를 정리해보세요.
+                지금 내 눈 상태를 빠르게 체크하고, 오늘부터 적용할 관리 포인트를 정리해보세요.
               </p>
 
               {/* CTA 3종 */}
@@ -89,15 +89,15 @@ export default function LandingPage() {
                   className="px-8 py-4 bg-skin-primary text-white text-base font-bold rounded-2xl shadow-lg shadow-skin-primary/40 hover:bg-skin-accent hover:shadow-xl hover:shadow-skin-primary/50 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2"
                 >
                   <Camera className="w-5 h-5" />
-                  사진으로 스타일 보기
+                  사진으로 확인하기
                 </button>
 
                 {/* Secondary CTA - 30초 체크 */}
                 <Link
-                  href="/healthcare/chat?topic=glow-booster"
+                  href="/eye-care?topic=condition"
                   className="px-6 py-3 border-2 border-skin-primary/50 text-skin-primary bg-skin-bg/50 backdrop-blur-sm text-sm font-semibold rounded-xl hover:bg-skin-primary/10 hover:border-skin-primary transition-all duration-300 flex items-center gap-2"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Eye className="w-4 h-4" />
                   30초 체크 시작
                 </Link>
               </div>
@@ -108,7 +108,7 @@ export default function LandingPage() {
                   href="#clinic-search"
                   className="text-skin-subtext hover:text-skin-primary text-sm font-medium inline-flex items-center gap-1 transition-colors"
                 >
-                  운영 중인 피부과 찾기
+                  운영 중인 안과 찾기
                   <ChevronRight className="w-4 h-4" />
                 </a>
               </div>
@@ -137,10 +137,10 @@ export default function LandingPage() {
           <div className="w-full max-w-4xl px-6 md:px-0 md:pl-[clamp(48px,10vw,160px)] md:pr-[clamp(16px,8vw,180px)] mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-skin-text mb-2">
-                지금 운영 중인 피부과 찾기
+                지금 운영 중인 안과 찾기
               </h2>
               <p className="text-skin-subtext text-sm">
-                지역과 운영 시간을 선택해 가까운 피부과를 검색하세요.
+                지역과 운영 시간을 선택해 가까운 안과를 검색하세요.
               </p>
             </div>
             <div className="bg-skin-surface rounded-3xl p-6 md:p-8 border border-white/10 shadow-xl">
@@ -154,10 +154,10 @@ export default function LandingPage() {
           <div className="relative z-10 max-w-5xl mx-auto">
             <div className="text-center mb-12 space-y-3">
               <h2 className="text-3xl md:text-4xl font-bold text-skin-text font-sans tracking-tight">
-                2분 스킨 패턴 체크
+                2분 눈 건강 체크
               </h2>
               <p className="text-skin-subtext max-w-lg mx-auto text-sm font-medium">
-                간단한 질문으로 피부 관리 습관을 점검하고, 요약을 받아보세요.
+                간단한 질문으로 눈 사용 습관을 점검하고, 요약을 받아보세요.
               </p>
             </div>
 
@@ -166,10 +166,10 @@ export default function LandingPage() {
                 {
                   icon: <BarChart2 className="w-6 h-6" />,
                   title: "패턴 1장 요약",
-                  desc: "스킨케어·수면·수분 습관을 5문답으로 정리합니다.",
+                  desc: "스크린타임·수면·눈 휴식 습관을 5문답으로 정리합니다.",
                   label: "약 2분",
                   labelColor: "bg-skin-muted",
-                  href: "/healthcare/chat?topic=glow-booster"
+                  href: "/eye-care?topic=condition"
                 },
                 {
                   icon: <CheckCircle className="w-6 h-6" />,
@@ -177,7 +177,7 @@ export default function LandingPage() {
                   desc: "현실적으로 가능한 '한 가지 조정'만 제안합니다.",
                   label: "실천 중심",
                   labelColor: "bg-skin-primary",
-                  href: "/healthcare/chat?topic=barrier-reset"
+                  href: "/eye-care?topic=strain"
                 },
                 {
                   icon: <Calendar className="w-6 h-6" />,
@@ -230,9 +230,9 @@ export default function LandingPage() {
 
           <div className="relative z-10 max-w-7xl mx-auto px-6">
             <div className="text-center mb-16">
-              <span className="text-skin-primary font-bold tracking-widest uppercase text-sm mb-2 block">Skin Health Check</span>
+              <span className="text-skin-primary font-bold tracking-widest uppercase text-sm mb-2 block">Eye Health Check</span>
               <h2 className="text-4xl md:text-5xl font-bold text-skin-text font-serif">
-                내 피부 건강 체크
+                내 눈 건강 체크
               </h2>
               <p className="text-skin-subtext mt-4 max-w-2xl mx-auto">
                 모듈을 선택해 2~3분 문답으로 패턴을 정리해보세요.
@@ -247,16 +247,16 @@ export default function LandingPage() {
                 const config = MODULE_CONFIG[topic];
                 const IconComponent = config.icon;
                 const colorMap: Record<string, { border: string; shadow: string; text: string }> = {
-                  pink: { border: 'border-pink-500/30', shadow: 'group-hover:shadow-pink-500/30', text: 'text-pink-400' },
-                  rose: { border: 'border-rose-500/30', shadow: 'group-hover:shadow-rose-500/30', text: 'text-rose-400' },
-                  teal: { border: 'border-teal-500/30', shadow: 'group-hover:shadow-teal-500/30', text: 'text-teal-400' },
+                  blue: { border: 'border-blue-500/30', shadow: 'group-hover:shadow-blue-500/30', text: 'text-blue-400' },
+                  cyan: { border: 'border-cyan-500/30', shadow: 'group-hover:shadow-cyan-500/30', text: 'text-cyan-400' },
                   purple: { border: 'border-purple-500/30', shadow: 'group-hover:shadow-purple-500/30', text: 'text-purple-400' },
-                  fuchsia: { border: 'border-fuchsia-500/30', shadow: 'group-hover:shadow-fuchsia-500/30', text: 'text-fuchsia-400' },
+                  orange: { border: 'border-orange-500/30', shadow: 'group-hover:shadow-orange-500/30', text: 'text-orange-400' },
+                  green: { border: 'border-green-500/30', shadow: 'group-hover:shadow-green-500/30', text: 'text-green-400' },
                 };
                 const colors = colorMap[config.color];
 
                 return (
-                  <Link key={topic} href={`/healthcare/chat?topic=${topic}`} className="group">
+                  <Link key={topic} href={`/eye-care?topic=${topic}`} className="group">
                     <div className="h-full bg-white/5 rounded-2xl p-6 border border-white/10 hover:bg-white/10 hover:border-skin-primary/30 transition-all duration-300 hover:scale-105 flex flex-col items-center text-center">
                       <div className={`w-14 h-14 bg-gradient-to-br ${config.gradient} rounded-full flex items-center justify-center mb-6 ${colors.border}`}>
                         <IconComponent className={`w-7 h-7 ${colors.text} group-hover:scale-110 transition-transform`} />
@@ -278,12 +278,11 @@ export default function LandingPage() {
 
         {/* Floating Chat Button */}
         <div className="fixed bottom-8 right-8 z-50">
-          <Link href="/healthcare/chat?topic=glow-booster" className="w-16 h-16 bg-skin-primary rounded-full flex items-center justify-center text-white shadow-xl shadow-skin-primary/40 hover:bg-skin-accent transition-all duration-300 hover:scale-110 border-2 border-white/20">
-            <span className="text-3xl">✨</span>
+          <Link href="/eye-care?topic=condition" className="w-16 h-16 bg-skin-primary rounded-full flex items-center justify-center text-white shadow-xl shadow-skin-primary/40 hover:bg-skin-accent transition-all duration-300 hover:scale-110 border-2 border-white/20">
+            <span className="text-3xl">👁️</span>
           </Link>
         </div>
       </div>
     </TrackF1View >
   );
 }
-

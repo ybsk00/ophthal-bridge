@@ -434,17 +434,17 @@ export default function ClinicSearchModule() {
                     )}
                 </div>
 
-                {/* 스킨 체크 CTA */}
+                {/* 눈 건강 체크 CTA */}
                 <div className="mt-6 pt-6 border-t border-white/10">
                     <p className="text-skin-subtext text-sm mb-3 font-medium text-center">
-                        ✨ 피부 습관이 궁금하다면?
+                        👁️ 눈 건강 습관이 궁금하다면?
                     </p>
                     <Link
-                        href="/healthcare/chat?topic=glow-booster"
+                        href="/eye-care?topic=condition"
                         className="group relative w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-white/10 backdrop-blur-sm text-skin-text border border-white/20 text-base font-medium rounded-full hover:bg-skin-primary hover:text-white hover:border-skin-primary transition-all duration-300 mx-auto block"
                     >
                         <span className="relative flex items-center gap-2">
-                            D-7 광채 부스터 시작 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            눈 컨디션 체크 시작 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </span>
                     </Link>
                 </div>

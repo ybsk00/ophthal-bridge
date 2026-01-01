@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
-import { User, ArrowUp, Paperclip, Sparkles, Droplet, Shield, ArrowUpRight, Heart, ChevronDown, Info } from "lucide-react";
+import { User, ArrowUp, Paperclip, Eye, Droplet, Grid3X3, Monitor, Heart, ChevronDown, Info } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams, redirect } from "next/navigation";
@@ -31,13 +31,13 @@ type ChatInterfaceProps = {
     onTabHighlight?: (tabs: ('review' | 'map')[]) => void;
 };
 
-// 모듈 아이콘/컬러 매핑
-const MODULE_CONFIG: Record<Topic, { icon: typeof Sparkles; color: string }> = {
-    'glow-booster': { icon: Sparkles, color: 'pink' },
-    'makeup-killer': { icon: Droplet, color: 'rose' },
-    'barrier-reset': { icon: Shield, color: 'teal' },
-    'lifting-check': { icon: ArrowUpRight, color: 'purple' },
-    'skin-concierge': { icon: Heart, color: 'fuchsia' },
+// 모듈 아이콘/컬러 매핑 (안과 5종)
+const MODULE_CONFIG: Record<Topic, { icon: typeof Eye; color: string }> = {
+    'condition': { icon: Eye, color: 'blue' },
+    'dryness': { icon: Droplet, color: 'cyan' },
+    'pattern': { icon: Grid3X3, color: 'purple' },
+    'strain': { icon: Monitor, color: 'orange' },
+    'lifestyle': { icon: Heart, color: 'green' },
 };
 
 export default function ChatInterface(props: ChatInterfaceProps) {
@@ -49,7 +49,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
     // 잘못된 topic이면 리다이렉트
     useEffect(() => {
         if (rawTopic && !VALID_TOPICS.includes(rawTopic as Topic)) {
-            window.location.href = `/healthcare/chat?topic=${DEFAULT_TOPIC}`;
+            window.location.href = `/eye-care?topic=${DEFAULT_TOPIC}`;
         }
     }, [rawTopic]);
 
@@ -67,7 +67,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [loginModalContent, setLoginModalContent] = useState({
         title: "상세한 상담이 필요하신가요?",
-        desc: "더 정확한 피부 분석과 맞춤형 조언을 위해<br />로그인이 필요합니다."
+        desc: "더 정확한 눈 건강 분석과 맞춤형 조언을 위해<br />로그인이 필요합니다."
     });
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [showReservationModal, setShowReservationModal] = useState(false);
@@ -78,13 +78,13 @@ export default function ChatInterface(props: ChatInterfaceProps) {
     const [showMedicationModal, setShowMedicationModal] = useState(false);
     const [showFileUploadModal, setShowFileUploadModal] = useState(false);
 
-    // 초기 질문 맵
+    // 초기 질문 맵 (안과 5종)
     const initialQuestionMap: Record<Topic, string> = {
-        'glow-booster': '하루 수분 섭취량은 어느 정도인가요?',
-        'makeup-killer': '메이크업이 보통 몇 시간 정도 지속되나요?',
-        'barrier-reset': '하루 세안 횟수는 몇 번인가요?',
-        'lifting-check': '탄력이 가장 신경 쓰이는 부위는 어디인가요?',
-        'skin-concierge': '본인의 피부 타입은 어떻다고 생각하시나요?',
+        'condition': '하루 스크린(PC/스마트폰) 사용 시간은 어느 정도인가요?',
+        'dryness': '눈이 뻑뻑하거나 이물감을 느끼시나요?',
+        'pattern': '직선이 휘어져 보이거나 시야가 흐릿하게 느껴진 적이 있나요?',
+        'strain': '하루 평균 스크린타임은 얼마나 되나요?',
+        'lifestyle': '하루 평균 수면 시간은 어떻게 되시나요?',
     };
 
     // 초기 메시지 설정
@@ -92,7 +92,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
         if (props.mode === 'medical') {
             setMessages([{
                 role: "ai",
-                content: "안녕하세요, 세인트의원 AI 상담입니다.\n\n**✨ 세인트의원**은 프리미엄 피부 관리와 미용 시술을 전문으로 하는 피부과입니다.\n\n어떤 피부 고민이 있으신가요? 궁금하신 점을 편하게 질문해주세요."
+                content: "안녕하세요, 아이디안과 AI 상담입니다.\n\n**👁️ 아이디안과**는 눈 건강 관리와 시력 교정을 전문으로 하는 안과입니다.\n\n어떤 눈 건강 고민이 있으신가요? 궁금하신 점을 편하게 질문해주세요."
             }]);
         } else {
             const topicLabel = TOPIC_LABELS[topic];
@@ -100,7 +100,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
 
             setMessages([{
                 role: "ai",
-                content: `안녕하세요! **${topicLabel}** 상담을 도와드릴 리원 스킨케어 가이드입니다. ✨\n\n이 대화는 **진단이 아닌 참고용 안내**입니다.\n\n${initialQuestion}`
+                content: `안녕하세요! **${topicLabel}** 점검을 도와드릴 아이디 눈 건강 가이드입니다. 👁️\n\n이 대화는 **진단이 아닌 참고용 안내**입니다.\n\n${initialQuestion}`
             }]);
         }
         setTurnCount(0);
@@ -161,7 +161,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
         if (props.isLoggedIn) return;
         setLoginModalContent({
             title: "이미지 분석 기능",
-            desc: "이미지 분석을 통한 피부 상담은<br />로그인 후 이용 가능합니다."
+            desc: "이미지 분석을 통한 눈 건강 상담은<br />로그인 후 이용 가능합니다."
         });
         setShowLoginModal(true);
     };
@@ -266,11 +266,11 @@ export default function ChatInterface(props: ChatInterfaceProps) {
     };
 
     const colorClasses: Record<string, { bg: string; text: string; ring: string }> = {
-        pink: { bg: 'bg-pink-500/20', text: 'text-pink-400', ring: 'ring-pink-400' },
-        rose: { bg: 'bg-rose-500/20', text: 'text-rose-400', ring: 'ring-rose-400' },
-        teal: { bg: 'bg-teal-500/20', text: 'text-teal-400', ring: 'ring-teal-400' },
+        blue: { bg: 'bg-blue-500/20', text: 'text-blue-400', ring: 'ring-blue-400' },
+        cyan: { bg: 'bg-cyan-500/20', text: 'text-cyan-400', ring: 'ring-cyan-400' },
         purple: { bg: 'bg-purple-500/20', text: 'text-purple-400', ring: 'ring-purple-400' },
-        fuchsia: { bg: 'bg-fuchsia-500/20', text: 'text-fuchsia-400', ring: 'ring-fuchsia-400' },
+        orange: { bg: 'bg-orange-500/20', text: 'text-orange-400', ring: 'ring-orange-400' },
+        green: { bg: 'bg-green-500/20', text: 'text-green-400', ring: 'ring-green-400' },
     };
 
     return (
@@ -279,8 +279,8 @@ export default function ChatInterface(props: ChatInterfaceProps) {
             {!props.isEmbedded && (
                 <header className="bg-skin-bg/80 backdrop-blur-md border-b border-white/10 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-all duration-300">
                     <Link href="/" className="flex items-center gap-3 group cursor-pointer">
-                        <span className="text-2xl">✨</span>
-                        <span className="text-xl font-bold text-white tracking-wide">세인트 아틀리에</span>
+                        <span className="text-2xl">👁️</span>
+                        <span className="text-xl font-bold text-white tracking-wide">아이디안과</span>
                     </Link>
                     <div className="hidden md:flex items-center gap-6 text-sm font-medium text-skin-subtext">
                         <Link href="/login" className="px-6 py-2 bg-skin-primary text-white text-sm font-medium rounded-full hover:bg-skin-accent hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
@@ -304,10 +304,10 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                         </button>
                         {showBadgeExpanded && (
                             <div className="mt-2 px-4 py-3 bg-skin-surface rounded-xl text-sm text-skin-subtext">
-                                본 기능은 참고용 루틴/선택 기준 안내이며, 진단·처방을 대신하지 않습니다.
-                                {topic === 'lifting-check' && (
+                                본 결과는 참고용 자가 체크이며, 의학적 진단이 아닙니다. 불편이 지속되면 전문가 상담을 권장합니다.
+                                {topic === 'pattern' && (
                                     <p className="mt-2 text-skin-primary">
-                                        ⚠️ 개인 상태에 따라 달라질 수 있어, 상담 시 확인이 필요합니다.
+                                        ⚠️ 시야 변화가 느껴지시면 가급적 빠른 안과 방문을 권장합니다.
                                     </p>
                                 )}
                             </div>
@@ -329,7 +329,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                             <div className="relative w-full h-40 md:h-48 rounded-2xl overflow-hidden mb-4">
                                 <Image
                                     src="/GALLERY MINIMAL.png"
-                                    alt="세인트의원 프리미엄 스킨케어"
+                                    alt="아이디안과 눈 건강 케어"
                                     fill
                                     className="object-cover object-[center_25%]"
                                     priority
@@ -337,9 +337,9 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                                 <div className="absolute inset-0 bg-gradient-to-t from-skin-bg/80 via-transparent to-transparent" />
                                 <div className="absolute bottom-4 left-4 right-4">
                                     <h2 className="text-lg md:text-xl font-bold text-white drop-shadow-lg">
-                                        리원 뷰티 스킨케어
+                                        아이디 눈 건강 케어
                                     </h2>
-                                    <p className="text-sm text-white/80 drop-shadow">프리미엄 피부 관리의 시작</p>
+                                    <p className="text-sm text-white/80 drop-shadow">당신의 눈 건강을 위한 첫걸음</p>
                                 </div>
                             </div>
                             {/* Module Tabs */}
@@ -353,7 +353,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                                     return (
                                         <Link
                                             key={t}
-                                            href={`/healthcare/chat?topic=${t}`}
+                                            href={`/eye-care?topic=${t}`}
                                             className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full transition-all ${isActive
                                                 ? `bg-skin-primary text-white shadow-lg`
                                                 : 'bg-white/10 text-skin-subtext hover:bg-white/20'
@@ -395,7 +395,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                                     }`}
                             >
                                 {msg.role === "ai" ? (
-                                    <span className="text-2xl">✨</span>
+                                    <span className="text-2xl">👁️</span>
                                 ) : (
                                     <div className="w-full h-full bg-skin-accent flex items-center justify-center text-white">
                                         <User size={20} />
@@ -405,7 +405,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
 
                             <div className="flex flex-col gap-1 max-w-[80%]">
                                 <span className={`text-xs font-medium ${msg.role === "user" ? "text-right text-skin-subtext" : "text-left text-skin-primary"}`}>
-                                    {msg.role === "ai" ? (props.isLoggedIn ? "세인트의원 AI" : "세인트 스킨케어 가이드") : "나"}
+                                    {msg.role === "ai" ? (props.isLoggedIn ? "아이디안과 AI" : "아이디 눈 건강 가이드") : "나"}
                                 </span>
                                 <div
                                     className={`px-6 py-4 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-line ${msg.role === "ai"
@@ -421,7 +421,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                     {isLoading && (
                         <div className="flex items-start gap-4">
                             <div className="w-12 h-12 rounded-full border-2 border-skin-primary bg-skin-bg flex items-center justify-center shadow-md">
-                                <span className="text-2xl">✨</span>
+                                <span className="text-2xl">👁️</span>
                             </div>
                             <div className="bg-skin-surface px-6 py-4 rounded-2xl rounded-tl-none border border-white/10 shadow-sm">
                                 <div className="flex gap-1.5">
@@ -444,7 +444,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="피부 고민이나 궁금한 점을 입력해주세요..."
+                            placeholder="눈 건강 관련 궁금한 점을 입력해주세요..."
                             className="flex-1 bg-transparent border-none focus:ring-0 text-white placeholder:text-skin-subtext/50 text-base"
                             disabled={!props.isLoggedIn && turnCount >= 5}
                         />
@@ -481,7 +481,7 @@ export default function ChatInterface(props: ChatInterfaceProps) {
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
                     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center transform transition-all scale-100 border border-white/20">
                         <div className="w-16 h-16 bg-skin-bg rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-                            <span className="text-3xl">✨</span>
+                            <span className="text-3xl">👁️</span>
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-3 font-serif">
                             {loginModalContent.title}
@@ -536,4 +536,3 @@ export default function ChatInterface(props: ChatInterfaceProps) {
         </div>
     );
 }
-

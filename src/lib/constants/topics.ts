@@ -1,34 +1,34 @@
-﻿// 세인트의원 헬스케어 토픽 상수 (단일 소스)
+﻿// 아이디안과 헬스케어 토픽 상수 (단일 소스)
 // 모든 topic 관련 검증은 이 파일을 참조
 
 export const VALID_TOPICS = [
-    'glow-booster',    // D-7 광채 부스터 플랜
-    'makeup-killer',   // 메이크업 망치는 원인 TOP3
-    'barrier-reset',   // 피부 장벽 리셋 72시간
-    'lifting-check',   // 리프팅 후회 포인트 체크
-    'skin-concierge',  // 부티크 스킨 컨시어지
+    'condition',    // 눈 컨디션 지수
+    'dryness',      // 건조 체감 지수
+    'pattern',      // 시야 패턴 체크
+    'strain',       // 디지털 피로 지수
+    'lifestyle',    // 눈 라이프스타일 타입
 ] as const;
 
 export type Topic = typeof VALID_TOPICS[number];
 
-export const DEFAULT_TOPIC: Topic = 'glow-booster';
+export const DEFAULT_TOPIC: Topic = 'condition';
 
 // topic별 라벨
 export const TOPIC_LABELS: Record<Topic, string> = {
-    'glow-booster': 'D-7 광채 부스터',
-    'makeup-killer': '메이크업 원인 TOP3',
-    'barrier-reset': '피부장벽 72시간',
-    'lifting-check': '리프팅 후회포인트',
-    'skin-concierge': '부티크 컨시어지',
+    'condition': '눈 컨디션 지수',
+    'dryness': '건조 체감 지수',
+    'pattern': '시야 패턴 체크',
+    'strain': '디지털 피로 지수',
+    'lifestyle': '눈 라이프스타일',
 };
 
 // topic별 설명
 export const TOPIC_DESCRIPTIONS: Record<Topic, string> = {
-    'glow-booster': '7일 광채 플랜 점검',
-    'makeup-killer': '메이크업 무너짐 원인 분석',
-    'barrier-reset': '장벽 회복 72시간 루틴',
-    'lifting-check': '리프팅 전 체크리스트',
-    'skin-concierge': '1:1 맞춤 루틴 설계',
+    'condition': '생활 습관 기반 눈 컨디션 점검',
+    'dryness': '건조함 체감 정도 자가 체크',
+    'pattern': '시야 패턴 체험 (참고용)',
+    'strain': '디지털 기기 사용 피로도 점검',
+    'lifestyle': '눈 건강 라이프스타일 타입 분석',
 };
 
 // topic 유효성 검사
@@ -43,4 +43,3 @@ export function sanitizeTopic(topic: string | null | undefined): Topic {
     }
     return DEFAULT_TOPIC;
 }
-
