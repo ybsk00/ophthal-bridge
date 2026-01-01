@@ -16,7 +16,7 @@ export default function PatientHomePage() {
                         >
                             <Building2 size={20} className="text-white" />
                         </div>
-                        <span className="text-lg font-bold text-white">세인트의원</span>
+                        <span className="text-lg font-bold text-white">강남아이디안과</span>
                     </div>
                     <Link
                         href="/patient/login"
@@ -38,7 +38,7 @@ export default function PatientHomePage() {
                 </div>
 
                 <h1 className="text-3xl font-bold text-white mb-3">
-                    세인트의원 환자 포털
+                    강남아이디안과 환자 포털
                 </h1>
                 <p className="text-gray-400 mb-8 max-w-sm leading-relaxed">
                     예약과 상담 준비, 복약 기록을<br />
@@ -107,7 +107,7 @@ export default function PatientHomePage() {
                     <ShieldCheck size={14} />
                     <span>개인정보 보호 · 안전한 의료 정보 관리</span>
                 </div>
-                <p className="text-gray-600 text-xs">© 2025 세인트의원. All rights reserved.</p>
+                <p className="text-gray-600 text-xs">© 2025 강남아이디안과. All rights reserved.</p>
             </footer>
         </div>
     )
