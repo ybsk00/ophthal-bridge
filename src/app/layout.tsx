@@ -20,17 +20,17 @@ const notoSerifKr = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: "세인트의원",
-  description: "세인트의원에 오신 것을 환영합니다. 프리미엄 피부 관리와 미용 시술을 경험해보세요.",
+  title: "강남아이디안과",
+  description: "강남아이디안과에 오신 것을 환영합니다. 눈 건강과 시력교정을 경험해보세요.",
   openGraph: {
-    title: "세인트의원",
-    description: "세인트의원에 오신 것을 환영합니다.",
+    title: "강남아이디안과",
+    description: "강남아이디안과에 오신 것을 환영합니다.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "세인트의원",
-    description: "세인트의원에 오신 것을 환영합니다.",
+    title: "강남아이디안과",
+    description: "강남아이디안과에 오신 것을 환영합니다.",
   },
 };
 

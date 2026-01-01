@@ -59,8 +59,8 @@ export default function ReviewModal({ isOpen, onClose }: ReviewModalProps) {
     const fetchReviews = async (source: string) => {
         setLoading(true);
         try {
-            // "의정부 세인트 의원"으로 명시적 검색
-            const query = encodeURIComponent("의정부 세인트 의원");
+            // "강남아이디안과"로 명시적 검색
+            const query = encodeURIComponent("강남아이디안과");
             const response = await fetch(`/api/reviews/search?source=${source}&q=${query}`);
             const data: ReviewResponse = await response.json();
             setReviews(data.items || []);

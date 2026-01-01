@@ -8,8 +8,8 @@ interface MapModalProps {
     onClose: () => void;
 }
 
-const HOSPITAL_NAME = '의정부 세인트의원';
-const HOSPITAL_ADDRESS = '경기 의정부시 평화로 540';
+const HOSPITAL_NAME = '강남아이디안과';
+const HOSPITAL_ADDRESS = '서울특별시 서초구 서초대로77길 3';
 const MAP_QUERY = encodeURIComponent(HOSPITAL_ADDRESS);
 
 export default function MapModal({ isOpen, onClose }: MapModalProps) {

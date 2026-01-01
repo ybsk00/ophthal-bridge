@@ -73,7 +73,7 @@ export default function DoctorIntroModal({
                         <div className="w-8 h-8 bg-pink-500/20 rounded-full flex items-center justify-center">
                             <User className="w-4 h-4 text-pink-400" />
                         </div>
-                        <h3 className="font-bold text-white">세인트의원 의료진</h3>
+                        <h3 className="font-bold text-white">강남아이디안과 의료진</h3>
                     </div>
                     <button
                         onClick={onClose}
@@ -121,8 +121,8 @@ export default function DoctorIntroModal({
                                     <div className="flex items-center gap-2 mb-1">
                                         <p className="font-bold text-lg text-white">{doctor.name}</p>
                                         <span className={`px-2 py-0.5 text-xs rounded-full ${doctor.title === '이사장'
-                                                ? 'bg-yellow-500/20 text-yellow-400'
-                                                : 'bg-gray-600 text-gray-300'
+                                            ? 'bg-yellow-500/20 text-yellow-400'
+                                            : 'bg-gray-600 text-gray-300'
                                             }`}>
                                             {doctor.title}
                                         </span>
