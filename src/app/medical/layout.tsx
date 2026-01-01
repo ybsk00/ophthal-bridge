@@ -1,4 +1,5 @@
 ﻿import type { Metadata } from "next";
+import Footer from "@/components/common/Footer";
 
 export const metadata: Metadata = {
     title: "강남아이디안과 진료 시스템",
@@ -13,7 +14,7 @@ export default function MedicalLayout({
     return (
         <div className="min-h-screen bg-traditional-bg text-traditional-text font-sans selection:bg-traditional-accent selection:text-white">
             {children}
+            <Footer />
         </div>
     );
 }
-
