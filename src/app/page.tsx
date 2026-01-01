@@ -222,7 +222,7 @@ export default function LandingPage() {
               playsInline
               className="w-full h-full object-cover object-[75%_35%] md:object-center scale-[0.8] md:scale-100 origin-center"
             >
-              <source src="/grok-video-d2ce9230-c0a9-4bed-9097-3443b0c49cfd.mp4" type="video/mp4" />
+              <source src="/4.mp4" type="video/mp4" />
             </video>
             {/* Slight overlay to reduce brightness */}
             <div className="absolute inset-0 bg-black/25" />
