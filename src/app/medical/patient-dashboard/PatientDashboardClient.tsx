@@ -14,7 +14,7 @@ import ReviewModal from "@/components/medical/ReviewModal";
 import DoctorIntroModal from "@/components/medical/DoctorIntroModal";
 import EvidenceModal from "@/components/medical/EvidenceModal";
 import { createClient } from "@/lib/supabase/client";
-import FaceSimulationModal from "@/components/face-style/FaceSimulationModal";
+import OphthalSimulationModal from "@/components/medical/ophthal/OphthalSimulationModal";
 import { useSession } from "next-auth/react";
 import { DOCTORS, SCI_EVIDENCE } from "@/lib/ai/prompts";
 
@@ -397,8 +397,8 @@ export default function PatientDashboardClient() {
                 evidence={SCI_EVIDENCE}
             />
 
-            {/* Face Simulation Modal */}
-            <FaceSimulationModal
+            {/* Ophthal Simulation Modal */}
+            <OphthalSimulationModal
                 isOpen={showFaceSimulationModal}
                 onClose={() => setShowFaceSimulationModal(false)}
             />
