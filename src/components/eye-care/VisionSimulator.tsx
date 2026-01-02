@@ -1,23 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Camera, RefreshCw, Shuffle, Eye, CloudFog, Sun, Sparkles, Info, SplitSquareVertical, Bookmark, LogIn } from 'lucide-react';
+import { Camera, Info, Eye, EyeOff, LogIn, Shuffle } from 'lucide-react';
 import { useMarketingTracker } from '@/hooks/useMarketingTracker';
-import { useHealthcareTrigger } from '@/hooks/useHealthcareTrigger';
 
 // ===== 타입 정의 =====
 type VisionMode = 'sample' | 'live';
-type VisionPreset = 'clear' | 'blur' | 'glare' | 'mist';
-type ViewMode = 'before' | 'after';  // 교정 전/후 모드
-
-interface VisionState {
-    mode: VisionMode;
-    preset: VisionPreset;
-    blur: number;      // 0~1
-    glare: number;     // 0~1
-    contrast: number;  // -0.3~0.3
-    sampleSrc: string;
-}
+type ViewMode = 'before' | 'after';
 
 // ===== 상수 =====
 const SAMPLE_IMAGES = [
@@ -27,22 +16,19 @@ const SAMPLE_IMAGES = [
     { src: '/samples/vision/street_day.jpg', label: '밝은 야외' },
 ];
 
-const PRESETS: Record<VisionPreset, { blur: number; glare: number; contrast: number; label: string; icon: typeof Eye }> = {
-    clear: { blur: 0, glare: 0, contrast: 0, label: '또렷', icon: Eye },
-    blur: { blur: 0.5, glare: 0.1, contrast: 0, label: '번짐', icon: CloudFog },
-    glare: { blur: 0.2, glare: 0.6, contrast: -0.1, label: '눈부심', icon: Sun },
-    mist: { blur: 0.4, glare: 0.3, contrast: -0.2, label: '안개', icon: Sparkles },
+// 교정 전 효과 설정 (번짐)
+const BEFORE_EFFECT = {
+    blur: 0.5,      // 흐림
+    glare: 0.2,     // 눈부심
+    contrast: -0.1, // 대비 감소
 };
 
-const CAMERA_ERROR_MESSAGES: Record<string, string> = {
-    NotAllowedError: '권한이 차단되어 샘플 모드로 진행합니다.',
-    NotFoundError: '웹캠이 없어 샘플 모드로 진행합니다.',
-    NotReadableError: '다른 앱이 카메라를 사용 중일 수 있습니다.',
-    HTTPS: '보안 연결(HTTPS)에서만 웹캠 사용이 가능합니다.',
-};
+interface VisionSimulatorProps {
+    isLoggedIn?: boolean;
+}
 
 // ===== 컴포넌트 =====
-export default function VisionSimulator() {
+export default function VisionSimulator({ isLoggedIn = false }: VisionSimulatorProps) {
     const { track } = useMarketingTracker();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -50,71 +36,22 @@ export default function VisionSimulator() {
     const animationRef = useRef<number | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
 
-    const [state, setState] = useState<VisionState>({
-        mode: 'sample',
-        preset: 'clear',
-        blur: 0,
-        glare: 0,
-        contrast: 0,
-        sampleSrc: SAMPLE_IMAGES[0].src,
-    });
-
-    const [cameraError, setCameraError] = useState<string | null>(null);
+    const [mode, setMode] = useState<VisionMode>('sample');
+    const [viewMode, setViewMode] = useState<ViewMode>('before'); // 기본값: 교정 전(번짐)
+    const [sampleSrc, setSampleSrc] = useState(SAMPLE_IMAGES[0].src);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const [cameraError, setCameraError] = useState<string | null>(null);
 
-    // 교정 전/후 비교 state
-    const [viewMode, setViewMode] = useState<ViewMode>('after');  // 기본값: 교정 후(설정)
     const pressStartTimeRef = useRef<number>(0);
-
-    // 헬스케어 트리거 훅
-    const {
-        shouldShowCTA,
-        incrementPresetChange,
-        incrementSliderAdjustment,
-        incrementSampleTabChange,
-    } = useHealthcareTrigger({
-        onTrigger: () => {
-            track('cta_trigger', { metadata: { trigger_type: 'healthcare_to_medical' } });
-        },
-    });
 
     // 이벤트: vision_open
     useEffect(() => {
-        track('vision_open', { metadata: { initial_mode: state.mode } });
+        track('vision_open', { metadata: { initial_mode: mode } });
     }, []);
 
-    // 프리셋 적용
-    const applyPreset = useCallback((preset: VisionPreset) => {
-        const values = PRESETS[preset];
-        setState(prev => ({
-            ...prev,
-            preset,
-            blur: values.blur,
-            glare: values.glare,
-            contrast: values.contrast,
-        }));
-        track('preset_change', { metadata: { preset } });
-        incrementPresetChange();  // 트리거 카운터 증가
-    }, [track, incrementPresetChange]);
-
-    // Reset 버튼
-    const handleReset = useCallback(() => {
-        applyPreset('clear');
-    }, [applyPreset]);
-
-    // Random Sample 버튼
-    const handleRandomSample = useCallback(() => {
-        const currentIndex = SAMPLE_IMAGES.findIndex(s => s.src === state.sampleSrc);
-        const nextIndex = (currentIndex + 1) % SAMPLE_IMAGES.length;
-        setState(prev => ({ ...prev, sampleSrc: SAMPLE_IMAGES[nextIndex].src }));
-        setIsImageLoaded(false);
-    }, [state.sampleSrc]);
-
-    // 카메라 시작
+    // 카메라 시작 (로그인 사용자만)
     const startCamera = useCallback(async () => {
-        // HTTPS 체크
-        if (typeof window !== 'undefined' && window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
-            setCameraError(CAMERA_ERROR_MESSAGES.HTTPS);
+        if (!isLoggedIn) {
             return;
         }
 
@@ -127,16 +64,13 @@ export default function VisionSimulator() {
                 videoRef.current.srcObject = stream;
                 await videoRef.current.play();
             }
-            setState(prev => ({ ...prev, mode: 'live' }));
+            setMode('live');
             setCameraError(null);
-            track('mode_switch', { metadata: { from: 'sample', to: 'live', reason: 'user_action' } });
+            track('mode_switch', { metadata: { from: 'sample', to: 'live' } });
         } catch (err: any) {
-            const errorName = err.name || 'Unknown';
-            const message = CAMERA_ERROR_MESSAGES[errorName] || '카메라를 사용할 수 없습니다.';
-            setCameraError(message);
-            track('mode_switch', { metadata: { from: 'sample', to: 'sample', reason: errorName } });
+            setCameraError('카메라를 사용할 수 없습니다.');
         }
-    }, [track]);
+    }, [isLoggedIn, track]);
 
     // 카메라 정지
     const stopCamera = useCallback(() => {
@@ -189,45 +123,45 @@ export default function VisionSimulator() {
             sy = (srcHeight - sh) / 2;
         }
 
-        // CSS Filter 적용 (viewMode에 따라 분기)
+        // 교정 전/후에 따른 필터 적용
         if (viewMode === 'before') {
-            // 교정 전(기본): 필터 미적용
-            ctx.filter = 'none';
-        } else {
-            // 교정 후(설정): 필터 적용
-            const blurPx = state.blur * 8;
-            const brightness = 1 + state.glare * 0.5;
-            const contrastVal = 1 + state.contrast;
+            // 교정 전: 번짐 효과 적용
+            const blurPx = BEFORE_EFFECT.blur * 8;
+            const brightness = 1 + BEFORE_EFFECT.glare * 0.3;
+            const contrastVal = 1 + BEFORE_EFFECT.contrast;
             ctx.filter = `blur(${blurPx}px) brightness(${brightness}) contrast(${contrastVal})`;
+        } else {
+            // 교정 후: 또렷하게 (필터 없음)
+            ctx.filter = 'none';
         }
 
         // 그리기
         ctx.drawImage(source, sx, sy, sw, sh, 0, 0, maxWidth, maxHeight);
 
-        // Glare 오버레이 (눈부심 효과) - 교정 후(설정) 모드에서만
-        if (viewMode === 'after' && state.glare > 0.1) {
+        // 교정 전: 눈부심 오버레이
+        if (viewMode === 'before' && BEFORE_EFFECT.glare > 0.1) {
             const gradient = ctx.createRadialGradient(
                 maxWidth / 2, maxHeight / 3, 0,
                 maxWidth / 2, maxHeight / 3, maxWidth * 0.8
             );
-            gradient.addColorStop(0, `rgba(255, 255, 255, ${state.glare * 0.4})`);
+            gradient.addColorStop(0, `rgba(255, 255, 255, ${BEFORE_EFFECT.glare * 0.3})`);
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
             ctx.filter = 'none';
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, maxWidth, maxHeight);
         }
-    }, [state.blur, state.glare, state.contrast, viewMode]);
+    }, [viewMode]);
 
     // Sample 모드: 이미지 변경 시에만 그리기
     useEffect(() => {
-        if (state.mode === 'sample' && imageRef.current && isImageLoaded) {
+        if (mode === 'sample' && imageRef.current && isImageLoaded) {
             drawFrame(imageRef.current);
         }
-    }, [state.mode, state.blur, state.glare, state.contrast, state.sampleSrc, isImageLoaded, drawFrame, viewMode]);
+    }, [mode, sampleSrc, isImageLoaded, drawFrame, viewMode]);
 
     // Live 모드: rAF 루프
     useEffect(() => {
-        if (state.mode !== 'live' || !videoRef.current) return;
+        if (mode !== 'live' || !videoRef.current) return;
 
         const loop = () => {
             if (videoRef.current && videoRef.current.readyState >= 2) {
@@ -243,34 +177,39 @@ export default function VisionSimulator() {
                 cancelAnimationFrame(animationRef.current);
             }
         };
-    }, [state.mode, drawFrame]);
+    }, [mode, drawFrame]);
 
-    // 슬라이더 핸들러
-    const handleSliderChange = (key: 'blur' | 'glare' | 'contrast', value: number) => {
-        setState(prev => ({ ...prev, [key]: value, preset: 'clear' }));
-        incrementSliderAdjustment();  // 트리거 카운터 증가
-    };
-
-    // 교정 전/후 토글 핸들러
+    // 교정 전/후 토글
     const handleViewModeToggle = useCallback(() => {
         const newMode = viewMode === 'before' ? 'after' : 'before';
         setViewMode(newMode);
         track('before_after_toggle', { metadata: { viewMode: newMode } });
     }, [viewMode, track]);
 
-    // Press-to-compare 핸들러 (누르는 동안 교정 전, 떼면 교정 후)
+    // Press-to-compare (누르면 교정 후, 떼면 교정 전)
     const handlePressStart = useCallback(() => {
         pressStartTimeRef.current = Date.now();
-        setViewMode('before');
+        setViewMode('after');
     }, []);
 
     const handlePressEnd = useCallback(() => {
         const duration = Date.now() - pressStartTimeRef.current;
-        setViewMode('after');
-        if (duration > 100) {  // 100ms 이상 홀드한 경우에만 이벤트 전송
+        setViewMode('before');
+        if (duration > 100) {
             track('before_after_hold', { metadata: { duration_ms: duration } });
         }
     }, [track]);
+
+    // 다음 샘플로 변경
+    const handleNextSample = useCallback(() => {
+        const currentIndex = SAMPLE_IMAGES.findIndex(s => s.src === sampleSrc);
+        const nextIndex = (currentIndex + 1) % SAMPLE_IMAGES.length;
+        setSampleSrc(SAMPLE_IMAGES[nextIndex].src);
+        setIsImageLoaded(false);
+    }, [sampleSrc]);
+
+    // 현재 샘플 라벨
+    const currentSampleLabel = SAMPLE_IMAGES.find(s => s.src === sampleSrc)?.label || '';
 
     return (
         <div className="flex flex-col gap-4">
@@ -288,7 +227,7 @@ export default function VisionSimulator() {
             )}
 
             {/* Canvas 영역 */}
-            <div className="relative bg-black rounded-2xl overflow-hidden aspect-[9/16] max-h-[500px] mx-auto">
+            <div className="relative bg-black rounded-2xl overflow-hidden aspect-[9/16] max-h-[500px] mx-auto w-full max-w-[360px]">
                 <canvas
                     ref={canvasRef}
                     className="w-full h-full object-contain"
@@ -296,7 +235,7 @@ export default function VisionSimulator() {
                 {/* 숨겨진 이미지 로더 */}
                 <img
                     ref={imageRef}
-                    src={state.sampleSrc}
+                    src={sampleSrc}
                     alt="Sample"
                     className="hidden"
                     onLoad={() => setIsImageLoaded(true)}
@@ -310,200 +249,105 @@ export default function VisionSimulator() {
                     muted
                 />
 
-                {/* 모드 표시 배지 */}
-                <div className="absolute top-3 left-3 px-2 py-1 bg-black/50 rounded-full text-xs text-white">
-                    {state.mode === 'live' ? '🎥 웹캠' : '🖼️ 샘플'}
+                {/* 상단 상태 표시 */}
+                <div className="absolute top-3 left-3 right-3 flex justify-between items-center">
+                    <div className="px-3 py-1.5 bg-black/60 rounded-full text-xs text-white font-medium">
+                        {mode === 'live' ? '🎥 내 카메라' : `🖼️ ${currentSampleLabel}`}
+                    </div>
+                    <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${viewMode === 'before'
+                            ? 'bg-orange-500/80 text-white'
+                            : 'bg-emerald-500/80 text-white'
+                        }`}>
+                        {viewMode === 'before' ? '교정 전' : '교정 후'}
+                    </div>
                 </div>
             </div>
 
-            {/* Sample 선택 (Sample 모드일 때만) */}
-            {state.mode === 'sample' && (
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                    {SAMPLE_IMAGES.map((sample) => (
-                        <button
-                            key={sample.src}
-                            onClick={() => {
-                                setState(prev => ({ ...prev, sampleSrc: sample.src }));
-                                setIsImageLoaded(false);
-                                incrementSampleTabChange();  // 트리거 카운터 증가
-                            }}
-                            className={`flex-shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition-all ${state.sampleSrc === sample.src
-                                ? 'bg-skin-primary text-white'
-                                : 'bg-white/10 text-skin-subtext hover:bg-white/20'
-                                }`}
-                        >
-                            {sample.label}
-                        </button>
-                    ))}
-                </div>
-            )}
-
-            {/* 교정 전후 비교 토글 */}
-            <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                    <span className="text-xs text-skin-subtext">
-                        현재: {viewMode === 'before' ? '교정 전(기본)' : '교정 후(설정)'}
-                    </span>
+            {/* 교정 전/후 비교 버튼 */}
+            <div className="flex flex-col gap-3">
+                {/* 토글 버튼 */}
+                <div className="grid grid-cols-2 gap-2">
                     <button
-                        onClick={handleViewModeToggle}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${viewMode === 'before'
-                            ? 'bg-orange-500/20 text-orange-300'
-                            : 'bg-skin-primary/20 text-skin-primary'
+                        onClick={() => setViewMode('before')}
+                        className={`flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition-all ${viewMode === 'before'
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-white/10 text-skin-subtext hover:bg-white/20'
                             }`}
                     >
-                        <SplitSquareVertical size={14} />
-                        교정 전후 보기
+                        <EyeOff size={18} />
+                        교정 전 (번짐)
+                    </button>
+                    <button
+                        onClick={() => setViewMode('after')}
+                        className={`flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition-all ${viewMode === 'after'
+                                ? 'bg-emerald-500 text-white'
+                                : 'bg-white/10 text-skin-subtext hover:bg-white/20'
+                            }`}
+                    >
+                        <Eye size={18} />
+                        교정 후 (또렷)
                     </button>
                 </div>
+
                 {/* Press-to-compare 버튼 */}
                 <button
                     onPointerDown={handlePressStart}
                     onPointerUp={handlePressEnd}
                     onPointerCancel={handlePressEnd}
                     onPointerLeave={handlePressEnd}
-                    className="w-full py-2.5 bg-white/5 border border-white/10 text-skin-subtext rounded-xl text-sm hover:bg-white/10 transition-colors touch-none select-none"
+                    className="w-full py-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-300 rounded-xl text-sm font-medium hover:from-emerald-500/30 hover:to-teal-500/30 transition-all touch-none select-none"
                 >
-                    👆 누르고 있으면 교정 전 보기
+                    👆 누르고 있으면 또렷하게 보기
                 </button>
             </div>
 
-            {/* 프리셋 버튼 */}
-            <div className="grid grid-cols-4 gap-2">
-                {(Object.entries(PRESETS) as [VisionPreset, typeof PRESETS['clear']][]).map(([key, preset]) => {
-                    const IconComponent = preset.icon;
-                    return (
-                        <button
-                            key={key}
-                            onClick={() => applyPreset(key)}
-                            className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${state.preset === key
-                                ? 'bg-skin-primary text-white'
-                                : 'bg-white/10 text-skin-subtext hover:bg-white/20'
-                                }`}
-                        >
-                            <IconComponent size={20} />
-                            <span className="text-xs font-medium">{preset.label}</span>
-                        </button>
-                    );
-                })}
-            </div>
-
-            {/* 슬라이더 */}
-            <div className="space-y-4 bg-white/5 rounded-xl p-4">
-                <div>
-                    <div className="flex justify-between text-xs text-skin-subtext mb-1">
-                        <span>흐림</span>
-                        <span>{Math.round(state.blur * 100)}%</span>
-                    </div>
-                    <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={state.blur}
-                        onChange={(e) => handleSliderChange('blur', parseFloat(e.target.value))}
-                        className="w-full accent-skin-primary"
-                    />
-                </div>
-                <div>
-                    <div className="flex justify-between text-xs text-skin-subtext mb-1">
-                        <span>눈부심</span>
-                        <span>{Math.round(state.glare * 100)}%</span>
-                    </div>
-                    <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={state.glare}
-                        onChange={(e) => handleSliderChange('glare', parseFloat(e.target.value))}
-                        className="w-full accent-skin-primary"
-                    />
-                </div>
-                <div>
-                    <div className="flex justify-between text-xs text-skin-subtext mb-1">
-                        <span>대비</span>
-                        <span>{Math.round(state.contrast * 100)}%</span>
-                    </div>
-                    <input
-                        type="range"
-                        min={-0.3}
-                        max={0.3}
-                        step={0.01}
-                        value={state.contrast}
-                        onChange={(e) => handleSliderChange('contrast', parseFloat(e.target.value))}
-                        className="w-full accent-skin-primary"
-                    />
-                </div>
-            </div>
-
-            {/* 버튼 그룹 */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* 샘플 변경 버튼 (샘플 모드일 때만) */}
+            {mode === 'sample' && (
                 <button
-                    onClick={handleReset}
-                    className="flex items-center justify-center gap-2 py-2.5 bg-white/10 text-skin-subtext rounded-xl hover:bg-white/20 transition-colors"
-                >
-                    <RefreshCw size={16} />
-                    <span className="text-sm">초기화</span>
-                </button>
-                <button
-                    onClick={handleRandomSample}
+                    onClick={handleNextSample}
                     className="flex items-center justify-center gap-2 py-2.5 bg-white/10 text-skin-subtext rounded-xl hover:bg-white/20 transition-colors"
                 >
                     <Shuffle size={16} />
-                    <span className="text-sm">다른 샘플</span>
-                </button>
-            </div>
-
-            {/* 웹캠 전환 버튼 (Sample 모드일 때만) */}
-            {state.mode === 'sample' && (
-                <button
-                    onClick={startCamera}
-                    className="flex items-center justify-center gap-2 py-3 bg-white/5 border border-white/10 text-skin-subtext rounded-xl hover:bg-white/10 transition-colors"
-                >
-                    <Camera size={18} />
-                    <span className="text-sm">웹캠으로 체험하기 (선택)</span>
+                    <span className="text-sm">다른 샘플 보기</span>
                 </button>
             )}
-            {/* CTA: 트리거 조건 충족 시 노출 */}
-            {shouldShowCTA && (
-                <div className="bg-gradient-to-r from-skin-primary/20 to-emerald-500/20 border border-skin-primary/30 rounded-xl p-4 space-y-3">
-                    <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 bg-skin-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Bookmark size={20} className="text-skin-primary" />
-                        </div>
-                        <div className="space-y-1">
-                            <p className="text-sm font-medium text-skin-text">
-                                관리 포인트가 몇 가지 정리되었습니다.
-                            </p>
-                            <p className="text-xs text-skin-subtext">
-                                지금까지 진행한 내용을 '상담용 요약'으로 저장할 수 있어요.
-                            </p>
-                        </div>
-                    </div>
+
+            {/* 카메라 버튼 / 로그인 유도 */}
+            {mode === 'sample' && (
+                isLoggedIn ? (
                     <button
-                        onClick={() => {
-                            track('cta_click', { metadata: { cta_type: 'save_and_continue' } });
-                            // 로그인 페이지로 이동 (sessionId 포함)
-                            window.location.href = '/login?redirect=/medical&source=healthcare';
-                        }}
-                        className="w-full flex items-center justify-center gap-2 py-3 bg-skin-primary text-white rounded-xl font-medium hover:bg-skin-primary/90 transition-colors"
+                        onClick={startCamera}
+                        className="flex items-center justify-center gap-2 py-3 bg-skin-primary text-white rounded-xl font-medium hover:bg-skin-primary/90 transition-colors"
                     >
-                        <LogIn size={18} />
-                        요약 저장하고 이어서 보기
+                        <Camera size={18} />
+                        내 시야로 체험하기
                     </button>
-                    <p className="text-xs text-skin-subtext/60 text-center">
-                        저장하면 메디컬 창에서 바로 이어서 상담이 시작됩니다.
-                    </p>
-                </div>
+                ) : (
+                    <div className="bg-gradient-to-r from-skin-primary/20 to-emerald-500/20 border border-skin-primary/30 rounded-xl p-4 space-y-3">
+                        <p className="text-sm text-white font-medium text-center">
+                            내 카메라로 직접 체험해보세요!
+                        </p>
+                        <p className="text-xs text-skin-subtext text-center">
+                            로그인하면 카메라로 실시간 교정 비교가 가능합니다.
+                        </p>
+                        <button
+                            onClick={() => {
+                                track('cta_click', { metadata: { cta_type: 'login_for_camera' } });
+                                window.location.href = '/login?redirect=/medical&source=healthcare';
+                            }}
+                            className="w-full flex items-center justify-center gap-2 py-3 bg-skin-primary text-white rounded-xl font-medium hover:bg-skin-primary/90 transition-colors"
+                        >
+                            <LogIn size={18} />
+                            로그인하고 체험하기
+                        </button>
+                    </div>
+                )
             )}
 
             {/* 하단 안내 문구 */}
             <div className="text-center space-y-1">
                 <p className="text-xs text-skin-subtext/70">
                     본 기능은 참고용 체감 비교이며, 실제 상태·결과를 예측하거나 보장하지 않습니다.
-                </p>
-                <p className="text-xs text-skin-subtext/50">
-                    이미지는 저장하지 않으며, 저장되는 값은 설정값입니다.
                 </p>
             </div>
         </div>
