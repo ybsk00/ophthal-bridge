@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Camera, RefreshCw, Shuffle, Eye, CloudFog, Sun, Sparkles, Info } from 'lucide-react';
+import { Camera, RefreshCw, Shuffle, Eye, CloudFog, Sun, Sparkles, Info, SplitSquareVertical, Bookmark, LogIn } from 'lucide-react';
 import { useMarketingTracker } from '@/hooks/useMarketingTracker';
+import { useHealthcareTrigger } from '@/hooks/useHealthcareTrigger';
 
 // ===== 타입 정의 =====
 type VisionMode = 'sample' | 'live';
 type VisionPreset = 'clear' | 'blur' | 'glare' | 'mist';
+type ViewMode = 'before' | 'after';  // 교정 전/후 모드
 
 interface VisionState {
     mode: VisionMode;
@@ -60,6 +62,22 @@ export default function VisionSimulator() {
     const [cameraError, setCameraError] = useState<string | null>(null);
     const [isImageLoaded, setIsImageLoaded] = useState(false);
 
+    // 교정 전/후 비교 state
+    const [viewMode, setViewMode] = useState<ViewMode>('after');  // 기본값: 교정 후(설정)
+    const pressStartTimeRef = useRef<number>(0);
+
+    // 헬스케어 트리거 훅
+    const {
+        shouldShowCTA,
+        incrementPresetChange,
+        incrementSliderAdjustment,
+        incrementSampleTabChange,
+    } = useHealthcareTrigger({
+        onTrigger: () => {
+            track('cta_trigger', { metadata: { trigger_type: 'healthcare_to_medical' } });
+        },
+    });
+
     // 이벤트: vision_open
     useEffect(() => {
         track('vision_open', { metadata: { initial_mode: state.mode } });
@@ -76,7 +94,8 @@ export default function VisionSimulator() {
             contrast: values.contrast,
         }));
         track('preset_change', { metadata: { preset } });
-    }, [track]);
+        incrementPresetChange();  // 트리거 카운터 증가
+    }, [track, incrementPresetChange]);
 
     // Reset 버튼
     const handleReset = useCallback(() => {
@@ -170,17 +189,23 @@ export default function VisionSimulator() {
             sy = (srcHeight - sh) / 2;
         }
 
-        // CSS Filter 적용
-        const blurPx = state.blur * 8;
-        const brightness = 1 + state.glare * 0.5;
-        const contrastVal = 1 + state.contrast;
-        ctx.filter = `blur(${blurPx}px) brightness(${brightness}) contrast(${contrastVal})`;
+        // CSS Filter 적용 (viewMode에 따라 분기)
+        if (viewMode === 'before') {
+            // 교정 전(기본): 필터 미적용
+            ctx.filter = 'none';
+        } else {
+            // 교정 후(설정): 필터 적용
+            const blurPx = state.blur * 8;
+            const brightness = 1 + state.glare * 0.5;
+            const contrastVal = 1 + state.contrast;
+            ctx.filter = `blur(${blurPx}px) brightness(${brightness}) contrast(${contrastVal})`;
+        }
 
         // 그리기
         ctx.drawImage(source, sx, sy, sw, sh, 0, 0, maxWidth, maxHeight);
 
-        // Glare 오버레이 (눈부심 효과)
-        if (state.glare > 0.1) {
+        // Glare 오버레이 (눈부심 효과) - 교정 후(설정) 모드에서만
+        if (viewMode === 'after' && state.glare > 0.1) {
             const gradient = ctx.createRadialGradient(
                 maxWidth / 2, maxHeight / 3, 0,
                 maxWidth / 2, maxHeight / 3, maxWidth * 0.8
@@ -191,14 +216,14 @@ export default function VisionSimulator() {
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, maxWidth, maxHeight);
         }
-    }, [state.blur, state.glare, state.contrast]);
+    }, [state.blur, state.glare, state.contrast, viewMode]);
 
     // Sample 모드: 이미지 변경 시에만 그리기
     useEffect(() => {
         if (state.mode === 'sample' && imageRef.current && isImageLoaded) {
             drawFrame(imageRef.current);
         }
-    }, [state.mode, state.blur, state.glare, state.contrast, state.sampleSrc, isImageLoaded, drawFrame]);
+    }, [state.mode, state.blur, state.glare, state.contrast, state.sampleSrc, isImageLoaded, drawFrame, viewMode]);
 
     // Live 모드: rAF 루프
     useEffect(() => {
@@ -223,7 +248,29 @@ export default function VisionSimulator() {
     // 슬라이더 핸들러
     const handleSliderChange = (key: 'blur' | 'glare' | 'contrast', value: number) => {
         setState(prev => ({ ...prev, [key]: value, preset: 'clear' }));
+        incrementSliderAdjustment();  // 트리거 카운터 증가
     };
+
+    // 교정 전/후 토글 핸들러
+    const handleViewModeToggle = useCallback(() => {
+        const newMode = viewMode === 'before' ? 'after' : 'before';
+        setViewMode(newMode);
+        track('before_after_toggle', { metadata: { viewMode: newMode } });
+    }, [viewMode, track]);
+
+    // Press-to-compare 핸들러 (누르는 동안 교정 전, 떼면 교정 후)
+    const handlePressStart = useCallback(() => {
+        pressStartTimeRef.current = Date.now();
+        setViewMode('before');
+    }, []);
+
+    const handlePressEnd = useCallback(() => {
+        const duration = Date.now() - pressStartTimeRef.current;
+        setViewMode('after');
+        if (duration > 100) {  // 100ms 이상 홀드한 경우에만 이벤트 전송
+            track('before_after_hold', { metadata: { duration_ms: duration } });
+        }
+    }, [track]);
 
     return (
         <div className="flex flex-col gap-4">
@@ -278,10 +325,11 @@ export default function VisionSimulator() {
                             onClick={() => {
                                 setState(prev => ({ ...prev, sampleSrc: sample.src }));
                                 setIsImageLoaded(false);
+                                incrementSampleTabChange();  // 트리거 카운터 증가
                             }}
                             className={`flex-shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition-all ${state.sampleSrc === sample.src
-                                    ? 'bg-skin-primary text-white'
-                                    : 'bg-white/10 text-skin-subtext hover:bg-white/20'
+                                ? 'bg-skin-primary text-white'
+                                : 'bg-white/10 text-skin-subtext hover:bg-white/20'
                                 }`}
                         >
                             {sample.label}
@@ -289,6 +337,35 @@ export default function VisionSimulator() {
                     ))}
                 </div>
             )}
+
+            {/* 교정 전후 비교 토글 */}
+            <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                    <span className="text-xs text-skin-subtext">
+                        현재: {viewMode === 'before' ? '교정 전(기본)' : '교정 후(설정)'}
+                    </span>
+                    <button
+                        onClick={handleViewModeToggle}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${viewMode === 'before'
+                            ? 'bg-orange-500/20 text-orange-300'
+                            : 'bg-skin-primary/20 text-skin-primary'
+                            }`}
+                    >
+                        <SplitSquareVertical size={14} />
+                        교정 전후 보기
+                    </button>
+                </div>
+                {/* Press-to-compare 버튼 */}
+                <button
+                    onPointerDown={handlePressStart}
+                    onPointerUp={handlePressEnd}
+                    onPointerCancel={handlePressEnd}
+                    onPointerLeave={handlePressEnd}
+                    className="w-full py-2.5 bg-white/5 border border-white/10 text-skin-subtext rounded-xl text-sm hover:bg-white/10 transition-colors touch-none select-none"
+                >
+                    👆 누르고 있으면 교정 전 보기
+                </button>
+            </div>
 
             {/* 프리셋 버튼 */}
             <div className="grid grid-cols-4 gap-2">
@@ -299,8 +376,8 @@ export default function VisionSimulator() {
                             key={key}
                             onClick={() => applyPreset(key)}
                             className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${state.preset === key
-                                    ? 'bg-skin-primary text-white'
-                                    : 'bg-white/10 text-skin-subtext hover:bg-white/20'
+                                ? 'bg-skin-primary text-white'
+                                : 'bg-white/10 text-skin-subtext hover:bg-white/20'
                                 }`}
                         >
                             <IconComponent size={20} />
@@ -387,6 +464,48 @@ export default function VisionSimulator() {
                     <span className="text-sm">웹캠으로 체험하기 (선택)</span>
                 </button>
             )}
+            {/* CTA: 트리거 조건 충족 시 노출 */}
+            {shouldShowCTA && (
+                <div className="bg-gradient-to-r from-skin-primary/20 to-emerald-500/20 border border-skin-primary/30 rounded-xl p-4 space-y-3">
+                    <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-skin-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Bookmark size={20} className="text-skin-primary" />
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-sm font-medium text-skin-text">
+                                관리 포인트가 몇 가지 정리되었습니다.
+                            </p>
+                            <p className="text-xs text-skin-subtext">
+                                지금까지 진행한 내용을 '상담용 요약'으로 저장할 수 있어요.
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => {
+                            track('cta_click', { metadata: { cta_type: 'save_and_continue' } });
+                            // 로그인 페이지로 이동 (sessionId 포함)
+                            window.location.href = '/login?redirect=/medical&source=healthcare';
+                        }}
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-skin-primary text-white rounded-xl font-medium hover:bg-skin-primary/90 transition-colors"
+                    >
+                        <LogIn size={18} />
+                        요약 저장하고 이어서 보기
+                    </button>
+                    <p className="text-xs text-skin-subtext/60 text-center">
+                        저장하면 메디컬 창에서 바로 이어서 상담이 시작됩니다.
+                    </p>
+                </div>
+            )}
+
+            {/* 하단 안내 문구 */}
+            <div className="text-center space-y-1">
+                <p className="text-xs text-skin-subtext/70">
+                    본 기능은 참고용 체감 비교이며, 실제 상태·결과를 예측하거나 보장하지 않습니다.
+                </p>
+                <p className="text-xs text-skin-subtext/50">
+                    이미지는 저장하지 않으며, 저장되는 값은 설정값입니다.
+                </p>
+            </div>
         </div>
     );
 }
